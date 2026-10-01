@@ -1,0 +1,61 @@
+{
+  "product": "sales-generator",
+  "harness": "MVP evals are structural and API-level. Run npm run test:evals. Invalid cases must return 4xx with plain error strings.",
+  "valid_cases": [
+    {
+      "id": "V-01",
+      "scenario": "Generate three corporate law leads",
+      "request": "POST /api/leads { action: generate, count: 3, practiceArea: Corporate / M&A, minScore: 80 }",
+      "expectations": [
+        "Response 200 with added.length === 3",
+        "Each lead has practiceArea containing Corporate",
+        "Each icpScore >= 80"
+      ]
+    },
+    {
+      "id": "V-02",
+      "scenario": "Draft email for qualified lead",
+      "request": "POST /api/outreach { leadId: lead_2, channel: email }",
+      "expectations": [
+        "Response 200 with draft.body containing firm name",
+        "draft.rationale non-empty",
+        "Lead stage becomes outreach_drafted"
+      ]
+    },
+    {
+      "id": "V-03",
+      "scenario": "Book demo with valid AE",
+      "request": "POST /api/bookings { leadId: lead_8, aeName: Sarah Chen, scheduledAt: future ISO, durationMinutes: 30 }",
+      "expectations": [
+        "Response 200 with booking.meetingLink",
+        "Lead stage demo_booked"
+      ]
+    }
+  ],
+  "invalid_cases": [
+    {
+      "id": "I-01",
+      "scenario": "Outreach missing channel",
+      "request": "POST /api/outreach { leadId: lead_1 }",
+      "expectations": ["Response 400", "error mentions channel"]
+    },
+    {
+      "id": "I-02",
+      "scenario": "Outreach to disqualified lead",
+      "request": "POST /api/outreach { leadId: lead_7, channel: email }",
+      "expectations": ["Response 422", "error mentions disqualified"]
+    },
+    {
+      "id": "I-03",
+      "scenario": "Booking unknown AE",
+      "request": "POST /api/bookings { leadId: lead_1, aeName: Fake Person, scheduledAt: future ISO }",
+      "expectations": ["Response 400", "error lists allowed AEs"]
+    },
+    {
+      "id": "I-04",
+      "scenario": "Booking duration out of range",
+      "request": "POST /api/bookings { leadId: lead_1, aeName: Sarah Chen, scheduledAt: future ISO, durationMinutes: 5 }",
+      "expectations": ["Response 400", "error mentions duration"]
+    }
+  ]
+}

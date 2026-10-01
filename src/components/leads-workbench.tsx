@@ -1,0 +1,518 @@
+"use client";
+
+import { useCallback, useMemo, useState } from "react";
+import type { DemoBooking, Lead, OutreachDraft } from "@/types/sales";
+import { PRACTICE_AREAS, WILLOW_PITCH } from "@/lib/willow-context";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Sparkles, PhoneOff, CalendarPlus, Mail } from "lucide-react";
+
+const STAGE_LABEL: Record<Lead["stage"], string> = {
+  new: "New",
+  qualified: "Qualified",
+  outreach_drafted: "Draft ready",
+  contacted: "Contacted",
+  replied: "Replied",
+  demo_booked: "Demo booked",
+  disqualified: "Disqualified",
+};
+
+function stageVariant(stage: Lead["stage"]) {
+  if (stage === "demo_booked") return "default" as const;
+  if (stage === "disqualified") return "outline" as const;
+  if (stage === "replied") return "secondary" as const;
+  return "outline" as const;
+}
+
+type WorkbenchProps = {
+  initialLeads: Lead[];
+  initialOutreach: OutreachDraft[];
+  initialBookings: DemoBooking[];
+  aes: string[];
+};
+
+export function LeadsWorkbench({
+  initialLeads,
+  initialOutreach,
+  initialBookings,
+  aes,
+}: WorkbenchProps) {
+  const [leads, setLeads] = useState<Lead[]>(initialLeads);
+  const [outreach, setOutreach] = useState<OutreachDraft[]>(initialOutreach);
+  const [bookings, setBookings] = useState<DemoBooking[]>(initialBookings);
+  const [loading, setLoading] = useState(false);
+  const [selected, setSelected] = useState<Lead | null>(null);
+  const [draft, setDraft] = useState<OutreachDraft | null>(null);
+  const [bookOpen, setBookOpen] = useState(false);
+  const [practiceFilter, setPracticeFilter] = useState<string>("any");
+  const [genCount, setGenCount] = useState(3);
+  const [bookingForm, setBookingForm] = useState({
+    aeName: "",
+    scheduledAt: "",
+    notes: "",
+  });
+  const [error, setError] = useState<string | null>(null);
+
+  const refresh = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const [l, o, b] = await Promise.all([
+        fetch("/api/leads").then((r) => r.json()),
+        fetch("/api/outreach").then((r) => r.json()),
+        fetch("/api/bookings").then((r) => r.json()),
+      ]);
+      setLeads(l.leads ?? []);
+      setOutreach(o.outreach ?? []);
+      setBookings(b.bookings ?? []);
+    } catch {
+      setError("Could not load workspace. Retry in a moment.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const stats = useMemo(() => {
+    const active = leads.filter((l) => l.stage !== "disqualified");
+    return {
+      total: active.length,
+      demos: leads.filter((l) => l.stage === "demo_booked").length,
+      drafts: outreach.length,
+      coldCallsAvoided: active.filter((l) => l.stage !== "new").length,
+    };
+  }, [leads, outreach]);
+
+  async function generateLeads() {
+    setError(null);
+    const res = await fetch("/api/leads", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "generate",
+        count: genCount,
+        practiceArea: practiceFilter,
+        minScore: 78,
+      }),
+    });
+    if (!res.ok) {
+      setError("Lead generation failed.");
+      return;
+    }
+    await refresh();
+  }
+
+  async function draftForLead(lead: Lead, channel: "email" | "linkedin_dm") {
+    setError(null);
+    const res = await fetch("/api/outreach", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ leadId: lead.id, channel }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      setError(data.error ?? "Outreach failed.");
+      return;
+    }
+    setDraft(data.draft);
+    setSelected(lead);
+    await refresh();
+  }
+
+  async function markContacted(lead: Lead) {
+    await fetch("/api/leads", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "update_stage", leadId: lead.id, stage: "contacted" }),
+    });
+    await refresh();
+  }
+
+  async function submitBooking() {
+    if (!selected) return;
+    setError(null);
+    const res = await fetch("/api/bookings", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        leadId: selected.id,
+        aeName: bookingForm.aeName,
+        scheduledAt: new Date(bookingForm.scheduledAt).toISOString(),
+        durationMinutes: 30,
+        notes: bookingForm.notes,
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      setError(data.error ?? "Booking failed.");
+      return;
+    }
+    setBookOpen(false);
+    setDraft(null);
+    await refresh();
+  }
+
+  function openBook(lead: Lead) {
+    setSelected(lead);
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(10, 0, 0, 0);
+    setBookingForm({
+      aeName: aes[0] ?? "Sarah Chen",
+      scheduledAt: tomorrow.toISOString().slice(0, 16),
+      notes: "",
+    });
+    setBookOpen(true);
+  }
+
+  if (loading && leads.length === 0) {
+    return (
+      <div className="flex min-h-[40vh] items-center justify-center text-sm text-muted-foreground">
+        Loading pipeline…
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="grid gap-4 md:grid-cols-4">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardDescription>Active leads</CardDescription>
+            <CardTitle className="text-2xl">{stats.total}</CardTitle>
+          </CardHeader>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardDescription>Outreach drafts</CardDescription>
+            <CardTitle className="text-2xl">{stats.drafts}</CardTitle>
+          </CardHeader>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardDescription>Demos booked</CardDescription>
+            <CardTitle className="text-2xl">{stats.demos}</CardTitle>
+          </CardHeader>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardDescription>Touched without cold call</CardDescription>
+            <CardTitle className="text-2xl flex items-center gap-2">
+              {stats.coldCallsAvoided}
+              <PhoneOff className="h-5 w-5 text-primary" />
+            </CardTitle>
+          </CardHeader>
+        </Card>
+      </div>
+
+      <Card className="border-primary/20 bg-gradient-to-br from-background to-primary/5">
+        <CardHeader>
+          <CardTitle className="text-lg">{WILLOW_PITCH.headline}</CardTitle>
+          <CardDescription>
+            {WILLOW_PITCH.valueProps.join(" · ")}
+          </CardDescription>
+        </CardHeader>
+      </Card>
+
+      {error && (
+        <p className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+          {error}
+        </p>
+      )}
+
+      <Tabs defaultValue="leads">
+        <TabsList>
+          <TabsTrigger value="leads">Leads</TabsTrigger>
+          <TabsTrigger value="outreach">Outreach</TabsTrigger>
+          <TabsTrigger value="bookings">Demo calendar</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="leads" className="space-y-4">
+          <Card>
+            <CardHeader className="flex flex-row flex-wrap items-end justify-between gap-4">
+              <div>
+                <CardTitle>Law firm ICP</CardTitle>
+                <CardDescription>Mock Apollo-style pull — no API key required.</CardDescription>
+              </div>
+              <div className="flex flex-wrap items-end gap-2">
+                <div className="space-y-1">
+                  <Label className="text-xs">Practice</Label>
+                  <Select
+                    value={practiceFilter}
+                    onValueChange={(v) => v && setPracticeFilter(v)}
+                  >
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="any">Any practice</SelectItem>
+                      {PRACTICE_AREAS.map((p) => (
+                        <SelectItem key={p} value={p}>
+                          {p}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs">Count</Label>
+                  <Input
+                    type="number"
+                    min={1}
+                    max={10}
+                    className="w-20"
+                    value={genCount}
+                    onChange={(e) => setGenCount(Number(e.target.value))}
+                  />
+                </div>
+                <Button onClick={() => void generateLeads()}>
+                  <Sparkles className="mr-2 h-4 w-4" />
+                  Generate leads
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <ScrollArea className="h-[420px] w-full rounded-md border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Firm</TableHead>
+                      <TableHead>Contact</TableHead>
+                      <TableHead>Practice</TableHead>
+                      <TableHead>ICP</TableHead>
+                      <TableHead>Stage</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {leads.map((lead) => (
+                      <TableRow key={lead.id}>
+                        <TableCell>
+                          <div className="font-medium">{lead.firmName}</div>
+                          <div className="text-xs text-muted-foreground">{lead.location}</div>
+                        </TableCell>
+                        <TableCell>
+                          <div>{lead.contactName}</div>
+                          <div className="text-xs text-muted-foreground">{lead.title}</div>
+                        </TableCell>
+                        <TableCell>{lead.practiceArea}</TableCell>
+                        <TableCell>
+                          <Badge variant={lead.icpScore >= 85 ? "default" : "secondary"}>
+                            {lead.icpScore}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={stageVariant(lead.stage)}>{STAGE_LABEL[lead.stage]}</Badge>
+                        </TableCell>
+                        <TableCell className="text-right space-x-1">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            disabled={lead.stage === "disqualified"}
+                            onClick={() => void draftForLead(lead, "email")}
+                          >
+                            <Mail className="h-3.5 w-3.5" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            disabled={lead.stage === "disqualified"}
+                            onClick={() => void draftForLead(lead, "linkedin_dm")}
+                          >
+                            InMail
+                          </Button>
+                          <Button
+                            size="sm"
+                            disabled={lead.stage === "disqualified" || lead.stage === "demo_booked"}
+                            onClick={() => openBook(lead)}
+                          >
+                            <CalendarPlus className="h-3.5 w-3.5" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </ScrollArea>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="outreach">
+          <Card>
+            <CardHeader>
+              <CardTitle>AI-assisted drafts</CardTitle>
+              <CardDescription>
+                Template engine mirrors Claude-for-sales playbooks; set OPENAI_API_KEY for live model later.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {outreach.length === 0 && (
+                <p className="text-sm text-muted-foreground">No drafts yet — generate from the Leads tab.</p>
+              )}
+              {outreach.map((o) => {
+                const lead = leads.find((l) => l.id === o.leadId);
+                return (
+                  <div key={o.id} className="rounded-lg border p-4 space-y-2">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="font-medium">{lead?.firmName ?? o.leadId}</div>
+                      <Badge variant="outline">{o.channel}</Badge>
+                    </div>
+                    {o.subject && <p className="text-sm font-medium">Subject: {o.subject}</p>}
+                    <pre className="whitespace-pre-wrap text-sm text-muted-foreground font-sans">{o.body}</pre>
+                    <p className="text-xs text-primary/80">Why: {o.rationale}</p>
+                    {lead && lead.stage === "outreach_drafted" && (
+                      <Button size="sm" onClick={() => void markContacted(lead)}>
+                        Mark sent (skip cold call)
+                      </Button>
+                    )}
+                  </div>
+                );
+              })}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="bookings">
+          <Card>
+            <CardHeader>
+              <CardTitle>AE handoff</CardTitle>
+              <CardDescription>Book 30-minute Willow Create demos for account executives.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {bookings.length === 0 && (
+                <p className="text-sm text-muted-foreground">No demos scheduled yet.</p>
+              )}
+              {bookings.map((b) => {
+                const lead = leads.find((l) => l.id === b.leadId);
+                return (
+                  <div key={b.id} className="flex flex-wrap items-center justify-between gap-2 rounded-lg border p-3">
+                    <div>
+                      <p className="font-medium">{lead?.firmName}</p>
+                      <p className="text-sm text-muted-foreground">
+                        AE: {b.aeName} · {new Date(b.scheduledAt).toLocaleString()}
+                      </p>
+                    </div>
+                    <a href={b.meetingLink} className="text-sm text-primary underline">
+                      Meeting link
+                    </a>
+                  </div>
+                );
+              })}
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+
+      <Dialog open={!!draft && !bookOpen} onOpenChange={() => setDraft(null)}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Review outreach</DialogTitle>
+            <DialogDescription>Edit before sending from LinkedIn or email client.</DialogDescription>
+          </DialogHeader>
+          {draft && (
+            <div className="space-y-3">
+              {draft.subject && (
+                <div>
+                  <Label>Subject</Label>
+                  <Input readOnly value={draft.subject} />
+                </div>
+              )}
+              <div>
+                <Label>Body</Label>
+                <Textarea rows={10} readOnly value={draft.body} />
+              </div>
+              <p className="text-xs text-muted-foreground">{draft.rationale}</p>
+            </div>
+          )}
+          <DialogFooter>
+            {selected && (
+              <>
+                <Button variant="outline" onClick={() => void markContacted(selected)}>
+                  Mark sent
+                </Button>
+                <Button onClick={() => openBook(selected)}>Book demo for AE</Button>
+              </>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={bookOpen} onOpenChange={setBookOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Book Willow demo</DialogTitle>
+            <DialogDescription>{selected?.firmName}</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <Label>Account executive</Label>
+              <Select
+                value={bookingForm.aeName}
+                onValueChange={(v) => v && setBookingForm((f) => ({ ...f, aeName: v }))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select AE" />
+                </SelectTrigger>
+                <SelectContent>
+                  {aes.map((ae) => (
+                    <SelectItem key={ae} value={ae}>
+                      {ae}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Date & time</Label>
+              <Input
+                type="datetime-local"
+                value={bookingForm.scheduledAt}
+                onChange={(e) => setBookingForm((f) => ({ ...f, scheduledAt: e.target.value }))}
+              />
+            </div>
+            <div>
+              <Label>Notes for AE</Label>
+              <Textarea
+                value={bookingForm.notes}
+                onChange={(e) => setBookingForm((f) => ({ ...f, notes: e.target.value }))}
+                placeholder="Practice area, LinkedIn activity, objections…"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button onClick={() => void submitBooking()}>Confirm booking</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
