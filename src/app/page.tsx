@@ -3,6 +3,8 @@ import { LeadsWorkbench } from "@/components/leads-workbench";
 import { readState } from "@/lib/db";
 import { DEFAULT_AES } from "@/lib/willow-context";
 
+export const dynamic = "force-dynamic";
+
 export default async function HomePage() {
   const state = await readState();
   return (
