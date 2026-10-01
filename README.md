@@ -7,6 +7,8 @@ Prototype automation for **Floor Hoefkens** (BDR @ [Willow](https://willow.co/))
 ```bash
 npm install
 npm run dev
+# or for a stable local demo (avoids flaky HMR hydration):
+npm run build && npm start
 ```
 
 Open [http://127.0.0.1:4317](http://127.0.0.1:4317). Workspace state persists in `.data/workspace.json` (created on first run, gitignored).

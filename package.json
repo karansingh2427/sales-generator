@@ -6,7 +6,7 @@
     "dev": "next dev -p 4317",
     "test:evals": "node scripts/check-evals.mjs",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -H 127.0.0.1 -p 4317",
     "lint": "eslint"
   },
   "dependencies": {

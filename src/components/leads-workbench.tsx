@@ -81,6 +81,7 @@ export function LeadsWorkbench({
     notes: "",
   });
   const [error, setError] = useState<string | null>(null);
+  const [status, setStatus] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
     setLoading(true);
@@ -127,11 +128,14 @@ export function LeadsWorkbench({
       setError("Lead generation failed.");
       return;
     }
+    const data = await res.json();
     await refresh();
+    setStatus(`Added ${data.added?.length ?? 0} new leads at the top of the table.`);
   }
 
   async function draftForLead(lead: Lead, channel: "email" | "linkedin_dm") {
     setError(null);
+    setStatus(null);
     const res = await fetch("/api/outreach", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -144,6 +148,7 @@ export function LeadsWorkbench({
     }
     setDraft(data.draft);
     setSelected(lead);
+    setStatus(`Drafted ${channel === "email" ? "email" : "LinkedIn DM"} for ${lead.firmName}.`);
     await refresh();
   }
 
@@ -245,6 +250,11 @@ export function LeadsWorkbench({
       {error && (
         <p className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
           {error}
+        </p>
+      )}
+      {status && !error && (
+        <p className="rounded-md border border-primary/20 bg-primary/5 px-3 py-2 text-sm text-foreground">
+          {status}
         </p>
       )}
 
@@ -432,8 +442,13 @@ export function LeadsWorkbench({
         </TabsContent>
       </Tabs>
 
-      <Dialog open={!!draft && !bookOpen} onOpenChange={() => setDraft(null)}>
-        <DialogContent className="max-w-lg">
+      <Dialog
+        open={!!draft && !bookOpen}
+        onOpenChange={(open) => {
+          if (!open) setDraft(null);
+        }}
+      >
+        <DialogContent className="max-w-lg sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>Review outreach</DialogTitle>
             <DialogDescription>Edit before sending from LinkedIn or email client.</DialogDescription>
@@ -466,8 +481,13 @@ export function LeadsWorkbench({
         </DialogContent>
       </Dialog>
 
-      <Dialog open={bookOpen} onOpenChange={setBookOpen}>
-        <DialogContent>
+      <Dialog
+        open={bookOpen}
+        onOpenChange={(open) => {
+          setBookOpen(!!open);
+        }}
+      >
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Book Willow demo</DialogTitle>
             <DialogDescription>{selected?.firmName}</DialogDescription>
