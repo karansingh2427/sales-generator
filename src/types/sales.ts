@@ -7,7 +7,13 @@ export type LeadStage =
   | "demo_booked"
   | "disqualified";
 
-export type LeadSource = "mock_apollo" | "linkedin_search" | "manual" | "referral";
+export type LeadSource =
+  | "sales_nav_csv"
+  | "demo_sample"
+  | "mock_apollo"
+  | "linkedin_search"
+  | "manual"
+  | "referral";
 
 export interface Lead {
   id: string;
@@ -22,6 +28,8 @@ export interface Lead {
   icpScore: number;
   stage: LeadStage;
   source: LeadSource;
+  /** ISO-ish country code when known (BE/NL preferred). */
+  geoCode?: string;
   notes?: string;
   lastTouchAt?: string;
   createdAt: string;

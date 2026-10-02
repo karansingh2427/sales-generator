@@ -1,4 +1,5 @@
 import type { Lead } from "@/types/sales";
+import { detectGeoCode } from "@/lib/geo";
 
 const BASE: Omit<Lead, "id" | "createdAt">[] = [
   {
@@ -10,48 +11,52 @@ const BASE: Omit<Lead, "id" | "createdAt">[] = [
     location: "Amsterdam, NL",
     practiceArea: "Corporate / M&A",
     firmSize: "25–50",
-    icpScore: 92,
+    icpScore: 94,
     stage: "new",
-    source: "mock_apollo",
-    notes: "Active on LinkedIn; last post 8 weeks ago.",
+    source: "demo_sample",
+    geoCode: "NL",
+    notes: "Active on LinkedIn; last post 8 weeks ago. Demo sample — not live Sales Nav.",
   },
   {
-    firmName: "Lexington Legal Group",
-    contactName: "James Whitfield",
-    title: "Head of Marketing",
-    email: "j.whitfield@lexingtonlegal.com",
-    linkedInUrl: "https://www.linkedin.com/in/example-james-whitfield",
-    location: "London, UK",
-    practiceArea: "Litigation",
-    firmSize: "50–100",
-    icpScore: 88,
-    stage: "qualified",
-    source: "linkedin_search",
-  },
-  {
-    firmName: "Studio Legale Ferraro",
-    contactName: "Giulia Ferraro",
+    firmName: "Advocatenkantoor De Clercq",
+    contactName: "Pieter De Clercq",
     title: "Partner",
-    email: "g.ferraro@ferrarolegal.it",
-    location: "Milan, IT",
+    email: "p.declercq@declercq-advocaten.be",
+    linkedInUrl: "https://www.linkedin.com/in/example-pieter-declercq",
+    location: "Brussels, BE",
+    practiceArea: "Litigation",
+    firmSize: "25–50",
+    icpScore: 93,
+    stage: "qualified",
+    source: "demo_sample",
+    geoCode: "BE",
+  },
+  {
+    firmName: "Bureau Lemaire Avocats",
+    contactName: "Camille Lemaire",
+    title: "Associée",
+    email: "c.lemaire@lemaire-avocats.be",
+    location: "Ghent, BE",
     practiceArea: "Employment",
     firmSize: "10–25",
-    icpScore: 85,
+    icpScore: 88,
     stage: "new",
-    source: "mock_apollo",
+    source: "demo_sample",
+    geoCode: "BE",
   },
   {
-    firmName: "Northbridge Solicitors",
-    contactName: "Aisha Khan",
-    title: "Practice Manager",
-    email: "a.khan@northbridgesolicitors.co.uk",
-    location: "Manchester, UK",
+    firmName: "Rotterdam Legal Collective",
+    contactName: "Anouk Vermeer",
+    title: "Head of Marketing",
+    email: "a.vermeer@rlc.nl",
+    linkedInUrl: "https://www.linkedin.com/in/example-anouk-vermeer",
+    location: "Rotterdam, NL",
     practiceArea: "Real estate",
-    firmSize: "10–25",
-    icpScore: 79,
+    firmSize: "50–100",
+    icpScore: 90,
     stage: "new",
-    source: "referral",
-    notes: "Referred by existing Willow customer (ACS Accountants network).",
+    source: "demo_sample",
+    geoCode: "NL",
   },
   {
     firmName: "Hoffmann Rechtsanwälte",
@@ -61,9 +66,11 @@ const BASE: Omit<Lead, "id" | "createdAt">[] = [
     location: "Berlin, DE",
     practiceArea: "IP / Tech",
     firmSize: "25–50",
-    icpScore: 90,
+    icpScore: 78,
     stage: "outreach_drafted",
-    source: "mock_apollo",
+    source: "demo_sample",
+    geoCode: "DE",
+    notes: "Nearby EU — secondary to BE/NL unless Floor expands geo filter.",
   },
   {
     firmName: "Clarke & Doyle LLP",
@@ -73,35 +80,38 @@ const BASE: Omit<Lead, "id" | "createdAt">[] = [
     location: "Dublin, IE",
     practiceArea: "General practice",
     firmSize: "100+",
-    icpScore: 94,
+    icpScore: 76,
     stage: "contacted",
-    source: "linkedin_search",
+    source: "demo_sample",
+    geoCode: "IE",
     lastTouchAt: new Date(Date.now() - 2 * 86400000).toISOString(),
   },
   {
-    firmName: "Bureau Avocats Lemaire",
-    contactName: "Camille Lemaire",
-    title: "Associée",
-    email: "c.lemaire@lemaire-avocats.fr",
-    location: "Lyon, FR",
+    firmName: "Solo Notaris Jansen",
+    contactName: "Mark Jansen",
+    title: "Notaris",
+    email: "m.jansen@solo-notaris.example",
+    location: "Utrecht, NL",
     practiceArea: "Family",
-    firmSize: "5–10",
-    icpScore: 62,
+    firmSize: "1–5",
+    icpScore: 58,
     stage: "disqualified",
     source: "manual",
+    geoCode: "NL",
     notes: "Solo practitioner — below firm-size ICP.",
   },
   {
-    firmName: "Pinnacle Law Chambers",
-    contactName: "David Okonkwo",
+    firmName: "Antwerp Corporate Counsel",
+    contactName: "Liesbeth Peeters",
     title: "Managing Partner",
-    email: "d.okonkwo@pinnaclelaw.co.uk",
-    location: "Birmingham, UK",
+    email: "l.peeters@acc-advocaten.be",
+    location: "Antwerp, BE",
     practiceArea: "Corporate / M&A",
     firmSize: "25–50",
-    icpScore: 91,
+    icpScore: 95,
     stage: "replied",
-    source: "mock_apollo",
+    source: "demo_sample",
+    geoCode: "BE",
     lastTouchAt: new Date(Date.now() - 86400000).toISOString(),
     notes: "Asked for demo next week — warm.",
   },
@@ -116,9 +126,12 @@ export function seedLeads(): Lead[] {
   }));
 }
 
+/** Labeled Demo / sample data fallback when Floor has no CSV handy. */
 export function generateMockLead(filters: {
   practiceArea?: string;
   minScore?: number;
+  /** Prefer BE/NL cities for demo realism. */
+  geoBias?: boolean;
 }): Lead {
   const areas = [
     "Corporate / M&A",
@@ -130,9 +143,10 @@ export function generateMockLead(filters: {
   const cities = [
     ["Brussels", "BE"],
     ["Ghent", "BE"],
+    ["Antwerp", "BE"],
+    ["Amsterdam", "NL"],
     ["Rotterdam", "NL"],
-    ["Zurich", "CH"],
-    ["Edinburgh", "UK"],
+    ["Utrecht", "NL"],
   ] as const;
   const [city, country] = cities[Math.floor(Math.random() * cities.length)];
   const practice =
@@ -141,7 +155,7 @@ export function generateMockLead(filters: {
       : areas[Math.floor(Math.random() * areas.length)];
   const score = Math.min(
     98,
-    Math.max(filters.minScore ?? 70, 72 + Math.floor(Math.random() * 25)),
+    Math.max(filters.minScore ?? 70, 80 + Math.floor(Math.random() * 18)),
   );
   const id = `lead_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
   const suffix = id.slice(-4);
@@ -157,7 +171,9 @@ export function generateMockLead(filters: {
     firmSize: "25–50",
     icpScore: score,
     stage: "new",
-    source: "mock_apollo",
+    source: "demo_sample",
+    geoCode: detectGeoCode(`${city}, ${country}`),
+    notes: "Demo / sample data — replace with Sales Nav CSV import for live leads.",
     createdAt: new Date().toISOString(),
   };
 }

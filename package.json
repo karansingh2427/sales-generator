@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev -p 4317",
     "test:evals": "node scripts/check-evals.mjs",
+    "test:import": "node scripts/test-import.mjs",
     "build": "next build",
     "start": "next start -H 127.0.0.1 -p 4317",
     "lint": "eslint"
@@ -28,6 +29,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.3.8",
     "tailwindcss": "^4",
+    "tsx": "^4.23.15",
     "typescript": "^5"
   }
 }

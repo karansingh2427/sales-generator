@@ -2,6 +2,8 @@ import { promises as fs } from "fs";
 import path from "path";
 import type { DemoBooking, Lead, OutreachDraft, WorkspaceState } from "@/types/sales";
 import { generateMockLead, seedLeads } from "@/lib/mock-leads";
+import type { ImportCommitRow } from "@/lib/sales-nav-import";
+import { findDuplicate, previewRowsToLeads } from "@/lib/sales-nav-import";
 
 const DATA_DIR = path.join(process.cwd(), ".data");
 const STATE_FILE = path.join(DATA_DIR, "workspace.json");
@@ -50,6 +52,7 @@ export async function updateLead(id: string, patch: Partial<Lead>): Promise<Lead
   return state.leads[idx];
 }
 
+/** Demo / sample data fallback — not live Sales Nav. */
 export async function addGeneratedLeads(
   count: number,
   filters: { practiceArea?: string; minScore?: number },
@@ -62,6 +65,31 @@ export async function addGeneratedLeads(
   state.leads = [...added, ...state.leads];
   await writeState(state);
   return added;
+}
+
+/** Persist human-reviewed Sales Nav rows; skip duplicates by email / LinkedIn URL. */
+export async function addImportedLeads(rows: ImportCommitRow[]): Promise<{
+  added: Lead[];
+  skippedDuplicates: number;
+}> {
+  const state = await readState();
+  const accepted: ImportCommitRow[] = [];
+  let skippedDuplicates = 0;
+  for (const row of rows) {
+    const dup = findDuplicate(
+      { email: row.email, linkedInUrl: row.linkedInUrl ?? "" },
+      [...state.leads, ...previewRowsToLeads(accepted)],
+    );
+    if (dup) {
+      skippedDuplicates += 1;
+      continue;
+    }
+    accepted.push(row);
+  }
+  const added = previewRowsToLeads(accepted, "sales_nav_csv");
+  state.leads = [...added, ...state.leads];
+  await writeState(state);
+  return { added, skippedDuplicates };
 }
 
 export async function addOutreach(draft: Omit<OutreachDraft, "id" | "createdAt">): Promise<OutreachDraft> {

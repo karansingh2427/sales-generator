@@ -25,6 +25,18 @@ if (!rules.includes("disqualified")) {
   console.error("RULES.md must mention disqualified leads");
   ok = false;
 }
+if (!rules.includes("Belgium") && !rules.includes("BE + NL")) {
+  console.error("RULES.md must mention Belgium / BE+NL geography");
+  ok = false;
+}
+
+const ids = [...evals.valid_cases, ...evals.invalid_cases].map((c) => c.id);
+for (const required of ["V-04", "V-05", "I-05", "I-06"]) {
+  if (!ids.includes(required)) {
+    console.error(`Missing Sales Nav eval case ${required}`);
+    ok = false;
+  }
+}
 
 if (ok) {
   console.log(`Eval structure OK: ${evals.valid_cases.length} valid, ${evals.invalid_cases.length} invalid`);
