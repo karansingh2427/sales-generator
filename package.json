@@ -3,10 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 4317",
+    "dev": "next dev -H 127.0.0.1 -p 4317",
     "test:evals": "node scripts/check-evals.mjs",
+    "test:import": "node scripts/test-import.mjs",
+    "test:hubspot": "node scripts/test-hubspot-sequences.mjs",
     "build": "next build",
     "start": "next start -H 127.0.0.1 -p 4317",
+    "start:demo": "next start -H 127.0.0.1 -p 4341",
     "lint": "eslint"
   },
   "dependencies": {
@@ -28,6 +31,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.3.8",
     "tailwindcss": "^4",
+    "tsx": "^4.23.15",
     "typescript": "^5"
   }
 }
