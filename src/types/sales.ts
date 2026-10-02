@@ -63,7 +63,7 @@ export interface Lead {
   icpScore: number;
   stage: LeadStage;
   source: LeadSource;
-  /** ISO-ish country code when known (BE/NL preferred). */
+  /** ISO-ish country code when known (BE primary / NL secondary only). */
   geoCode?: string;
   notes?: string;
   lastTouchAt?: string;

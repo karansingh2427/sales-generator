@@ -26,11 +26,15 @@ if (!rules.includes("disqualified")) {
   ok = false;
 }
 if (!rules.includes("Netherlands") && !rules.includes("NL")) {
-  console.error("RULES.md must mention Netherlands / NL pilot geography");
+  console.error("RULES.md must mention Netherlands / NL geography");
   ok = false;
 }
 if (!rules.includes("Belgium") && !rules.includes("BE")) {
-  console.error("RULES.md must mention Belgium as available market");
+  console.error("RULES.md must mention Belgium as primary market");
+  ok = false;
+}
+if (!rules.includes("BE + NL") && !rules.includes("BE+NL") && !rules.includes("Belgium first")) {
+  console.error("RULES.md must lock geography to Belgium first / BE+NL only");
   ok = false;
 }
 if (!rules.includes("company") && !rules.includes("Company")) {
@@ -49,6 +53,25 @@ if (!rules.includes("HubSpot")) {
   console.error("RULES.md must mention HubSpot");
   ok = false;
 }
+
+const skillDirs = [
+  "skills/sales-hubspot-pull/SKILL.md",
+  "skills/sales-sequence-draft/SKILL.md",
+  "skills/sales-demo-book/SKILL.md",
+  "skills/sales-lead-run/SKILL.md",
+];
+for (const rel of skillDirs) {
+  if (!fs.existsSync(path.join(root, rel))) {
+    console.error(`Missing skill file ${rel}`);
+    ok = false;
+  }
+}
+const agents = fs.readFileSync(path.join(root, "AGENTS.md"), "utf8");
+if (!agents.includes("sales-hubspot-pull") || !agents.includes("Belgium first")) {
+  console.error("AGENTS.md must map skills and Belgium-first geo");
+  ok = false;
+}
+
 
 const ids = [...evals.valid_cases, ...evals.invalid_cases].map((c) => c.id);
 for (const required of ["V-04", "V-05", "V-07", "V-08", "V-09", "I-05", "I-06", "I-07", "I-08"]) {

@@ -85,7 +85,7 @@ function draftEmail(
 
 ${hook}
 
-I work with Dutch & Belgian expertise firms (accountancy, legal, IT, HR/search, coaching) — NL pilot first — that need to show expertise online — without pulling decision makers into content production.
+I work with Belgian & Dutch expertise firms (accountancy, legal, IT, HR/search, coaching) — Belgium first — that need to show expertise online — without pulling decision makers into content production.
 
 Willow: quarterly calendars, drafts in your voice, coach who knows professional services. ${WILLOW_PITCH.valueProps[2]}
 

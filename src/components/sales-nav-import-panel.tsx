@@ -37,7 +37,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Upload, FileSpreadsheet, CheckCircle2 } from "lucide-react";
 
-const GEO_OPTIONS: GeoCode[] = ["BE", "NL", "LU", "DE", "FR", "UK", "IE", "CH", "OTHER"];
+const GEO_OPTIONS: GeoCode[] = ["BE", "NL"];
 
 const MAP_FIELDS: SalesNavField[] = [
   "firstName",
@@ -275,7 +275,7 @@ export function SalesNavImportPanel({ onImported, onError, onStatus }: Props) {
 
         <div className="flex flex-wrap items-end gap-4">
           <div className="space-y-2">
-            <Label className="text-xs">Geo filter (default NL pilot · BE available)</Label>
+            <Label className="text-xs">Geo filter (Belgium first · NL second · BE+NL only)</Label>
             <div className="flex flex-wrap gap-1.5">
               {GEO_OPTIONS.map((code) => {
                 const on = geoFilter.includes(code);
@@ -408,7 +408,7 @@ export function SalesNavImportPanel({ onImported, onError, onStatus }: Props) {
                         <div className="text-xs text-muted-foreground">{r.location}</div>
                       </TableCell>
                       <TableCell>
-                        <Badge variant={r.geoTier === "core" ? "default" : "outline"}>
+                        <Badge variant={r.geoTier === "primary" ? "default" : "outline"}>
                           {r.geoCode} · {GEO_LABELS[r.geoCode]}
                         </Badge>
                       </TableCell>

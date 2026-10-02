@@ -1,29 +1,27 @@
-/** Geography defaults for Willow BDR — Floor’s NL-first pilot (BE still available). */
+/** Geography defaults for Willow BDR — Belgium first, Netherlands second. BE + NL only. */
 
-export type GeoCode = "BE" | "NL" | "LU" | "DE" | "FR" | "UK" | "IE" | "CH" | "OTHER";
+export type GeoCode = "BE" | "NL" | "OTHER";
 
-export type GeoTier = "pilot" | "core" | "benelux" | "nearby_eu" | "other";
+export type GeoTier = "primary" | "secondary" | "out_of_scope";
 
 /**
- * Default import / experiment filter: Netherlands only.
- * Belgium remains in the model and filter UI — Floor can opt BE back in.
+ * Default import / HubSpot filter: Belgium + Netherlands.
+ * Belgium is primary (higher ICP bonus); Netherlands is secondary.
+ * No other countries are in scope.
  */
-export const DEFAULT_GEO_FILTER: GeoCode[] = ["NL"];
+export const DEFAULT_GEO_FILTER: GeoCode[] = ["BE", "NL"];
 
-/** Markets Floor covers (pilot + available). */
-export const PILOT_GEO: GeoCode = "NL";
-export const AVAILABLE_GEO: GeoCode[] = ["NL", "BE"];
+/** Markets Floor covers — hard lock. */
+export const PRIMARY_GEO: GeoCode = "BE";
+export const AVAILABLE_GEO: GeoCode[] = ["BE", "NL"];
+
+/** @deprecated Use PRIMARY_GEO — kept so older call sites compile during rename. */
+export const PILOT_GEO: GeoCode = PRIMARY_GEO;
 
 export const GEO_LABELS: Record<GeoCode, string> = {
   BE: "Belgium",
   NL: "Netherlands",
-  LU: "Luxembourg",
-  DE: "Germany",
-  FR: "France",
-  UK: "United Kingdom",
-  IE: "Ireland",
-  CH: "Switzerland",
-  OTHER: "Other / unknown",
+  OTHER: "Other / out of scope",
 };
 
 const CITY_HINTS: Record<string, GeoCode> = {
@@ -55,37 +53,11 @@ const CITY_HINTS: Record<string, GeoCode> = {
   haarlem: "NL",
   leiden: "NL",
   maastricht: "NL",
-  luxembourg: "LU",
-  berlin: "DE",
-  munich: "DE",
-  münchen: "DE",
-  hamburg: "DE",
-  frankfurt: "DE",
-  cologne: "DE",
-  köln: "DE",
-  düsseldorf: "DE",
-  paris: "FR",
-  lyon: "FR",
-  lille: "FR",
-  london: "UK",
-  manchester: "UK",
-  birmingham: "UK",
-  edinburgh: "UK",
-  dublin: "IE",
-  zurich: "CH",
-  zürich: "CH",
-  geneva: "CH",
 };
 
 const COUNTRY_PATTERNS: { re: RegExp; code: GeoCode }[] = [
-  { re: /\b(belgium|belgi[eë]|belgique|be)\b/i, code: "BE" },
-  { re: /\b(netherlands|nederland|holland|nl)\b/i, code: "NL" },
-  { re: /\b(luxembourg|luxemburg|lu)\b/i, code: "LU" },
-  { re: /\b(germany|deutschland|de)\b/i, code: "DE" },
-  { re: /\b(france|frankrijk|fr)\b/i, code: "FR" },
-  { re: /\b(united kingdom|great britain|england|scotland|wales|uk|gb)\b/i, code: "UK" },
-  { re: /\b(ireland|éire|ie)\b/i, code: "IE" },
-  { re: /\b(switzerland|schweiz|suisse|ch)\b/i, code: "CH" },
+  { re: /\b(belgium|belgi[eë]|belgique)\b/i, code: "BE" },
+  { re: /\b(netherlands|nederland|holland)\b/i, code: "NL" },
 ];
 
 export function detectGeoCode(...parts: (string | undefined | null)[]): GeoCode {
@@ -97,11 +69,12 @@ export function detectGeoCode(...parts: (string | undefined | null)[]): GeoCode 
     if (lower.includes(city)) return code;
   }
 
-  // Prefer trailing ", XX" country tokens
+  // Prefer trailing ", XX" country tokens — only BE/NL count
   const trailing = hay.match(/,\s*([A-Za-z]{2})\s*$/);
   if (trailing) {
     const cc = trailing[1].toUpperCase();
-    if (cc in GEO_LABELS && cc !== "OTHER") return cc as GeoCode;
+    if (cc === "BE" || cc === "NL") return cc;
+    return "OTHER";
   }
 
   for (const { re, code } of COUNTRY_PATTERNS) {
@@ -111,31 +84,23 @@ export function detectGeoCode(...parts: (string | undefined | null)[]): GeoCode 
   // Domain TLDs in company/email when location blank
   if (/\.be\b/i.test(hay)) return "BE";
   if (/\.nl\b/i.test(hay)) return "NL";
-  if (/\.lu\b/i.test(hay)) return "LU";
 
   return "OTHER";
 }
 
 export function geoTier(code: GeoCode): GeoTier {
-  if (code === "NL") return "pilot";
-  if (code === "BE") return "core";
-  if (code === "LU") return "benelux";
-  if (code === "DE" || code === "FR" || code === "UK" || code === "IE" || code === "CH")
-    return "nearby_eu";
-  return "other";
+  if (code === "BE") return "primary";
+  if (code === "NL") return "secondary";
+  return "out_of_scope";
 }
 
-/** ICP score bonus: NL pilot highest, then BE, Benelux, nearby EU. */
+/** ICP score bonus: Belgium primary, Netherlands secondary; all else zero. */
 export function geoScoreBonus(code: GeoCode): number {
   switch (geoTier(code)) {
-    case "pilot":
+    case "primary":
       return 20;
-    case "core":
+    case "secondary":
       return 14;
-    case "benelux":
-      return 10;
-    case "nearby_eu":
-      return 6;
     default:
       return 0;
   }
@@ -144,6 +109,9 @@ export function geoScoreBonus(code: GeoCode): number {
 export function matchesGeoFilter(code: GeoCode, filter: GeoCode[]): boolean {
   if (filter.length === 0) return true;
   if (filter.includes(code)) return true;
-  // "OTHER" only matches if explicitly selected
   return false;
+}
+
+export function isInMarket(code: GeoCode): boolean {
+  return code === "BE" || code === "NL";
 }

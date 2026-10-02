@@ -373,7 +373,7 @@ function contactToLead(
     title,
     email: p.email ?? `${contact.id}@hubspot.example`,
     linkedInUrl: p.hs_linkedin_url || p.linkedin_url || undefined,
-    location: location || "Netherlands",
+    location: location || "Belgium",
     practiceArea,
     firmSize,
     icpScore: scored.score,

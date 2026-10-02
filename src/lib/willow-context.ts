@@ -11,12 +11,12 @@ export const WILLOW_PITCH = {
     "Book a 30-minute live demo on the AE’s calendar link (we draft posts for their firm on the call).",
 } as const;
 
-/** NL-first pilot; Belgium stays available when Floor expands the experiment. */
+/** Belgium first, Netherlands second — BE + NL only (hard product rule). */
 export const ICP_GEOGRAPHY = {
-  primaryMarkets: "Netherlands (pilot) · Belgium available",
-  defaultFilterLabel: "NL",
+  primaryMarkets: "Belgium (primary) · Netherlands (secondary)",
+  defaultFilterLabel: "BE + NL",
   description:
-    "Floor’s experiment: Dutch leads first. HubSpot sync and Sales Nav imports default to NL; Belgium stays in the filter for opt-in. Nearby EU scores lower unless she expands the filter.",
+    "ICP geography is locked to Belgium first and the Netherlands second. HubSpot pulls and Sales Nav imports default to BE + NL; every other country is out of scope.",
 } as const;
 
 /**

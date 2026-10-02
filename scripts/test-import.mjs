@@ -1,5 +1,5 @@
 /**
- * Behavioral checks for Sales Nav import / BE-NL geo scoring.
+ * Behavioral checks for Sales Nav import / BE-first geo scoring.
  * Run: npm run test:import
  */
 import { execSync } from "child_process";
@@ -26,19 +26,21 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { previewSalesNavCsv, autoMapColumns, findDuplicate } from "../src/lib/sales-nav-import.ts";
-import { detectGeoCode, geoScoreBonus, DEFAULT_GEO_FILTER } from "../src/lib/geo.ts";
+import { detectGeoCode, geoScoreBonus, DEFAULT_GEO_FILTER, PRIMARY_GEO } from "../src/lib/geo.ts";
 import type { Lead } from "../src/types/sales.ts";
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const csv = fs.readFileSync(path.join(root, "tests/fixtures/sales-nav-sample.csv"), "utf8");
 
-assert.deepEqual(DEFAULT_GEO_FILTER, ["NL"]);
+assert.deepEqual(DEFAULT_GEO_FILTER, ["BE", "NL"]);
+assert.equal(PRIMARY_GEO, "BE");
 assert.equal(detectGeoCode("Brussels, Belgium"), "BE");
 assert.equal(detectGeoCode("Amsterdam, Netherlands"), "NL");
 assert.equal(detectGeoCode("New York, United States"), "OTHER");
-assert.ok(geoScoreBonus("NL") > geoScoreBonus("BE"));
-assert.ok(geoScoreBonus("BE") > geoScoreBonus("DE"));
+assert.equal(detectGeoCode("Berlin, Germany"), "OTHER");
+assert.ok(geoScoreBonus("BE") > geoScoreBonus("NL"));
 assert.ok(geoScoreBonus("NL") > geoScoreBonus("OTHER"));
+assert.equal(geoScoreBonus("OTHER"), 0);
 
 const headers = ["First Name","Last Name","Title","Company","Email","Person LinkedIn URL","Location"];
 const mapping = autoMapColumns(headers);
@@ -62,10 +64,10 @@ const existing: Lead[] = [{
   createdAt: new Date().toISOString(),
 }];
 
-const preview = previewSalesNavCsv(csv, existing, { geoFilter: ["NL"], minScore: 70 });
+const preview = previewSalesNavCsv(csv, existing, { geoFilter: ["BE", "NL"], minScore: 70 });
 assert.equal(preview.rows.length, 5);
+assert.ok(preview.geoFilter.includes("BE"));
 assert.ok(preview.geoFilter.includes("NL"));
-assert.ok(!preview.geoFilter.includes("BE") || preview.geoFilter.length === 1);
 
 const be = preview.rows.find(r => r.firmName.includes("Janssens"));
 const nl = preview.rows.find(r => r.firmName.includes("Bakker"));
@@ -73,14 +75,15 @@ const us = preview.rows.find(r => r.firmName.includes("Doe"));
 assert.ok(be, "BE lawyer row present");
 assert.ok(nl, "NL lawyer row present");
 assert.ok(us, "US row present");
-assert.equal(be!.passesGeoFilter, false, "BE filtered out of NL-only pilot default");
+assert.equal(be!.passesGeoFilter, true, "BE included in default BE+NL filter");
 assert.equal(nl!.passesGeoFilter, true);
 assert.equal(us!.passesGeoFilter, false);
-assert.ok(nl!.icpScore > us!.icpScore, "NL lawyer scores higher than US row");
+assert.ok(be!.icpScore > us!.icpScore, "BE lawyer scores higher than US row");
+assert.ok(be!.icpScore >= nl!.icpScore, "BE scores at least as high as NL for comparable rows");
 
-const previewBoth = previewSalesNavCsv(csv, existing, { geoFilter: ["BE", "NL"], minScore: 70 });
-const beBoth = previewBoth.rows.find(r => r.firmName.includes("Janssens"));
-assert.equal(beBoth!.passesGeoFilter, true, "BE available when opted into filter");
+const previewNlOnly = previewSalesNavCsv(csv, existing, { geoFilter: ["NL"], minScore: 70 });
+const beNlOnly = previewNlOnly.rows.find(r => r.firmName.includes("Janssens"));
+assert.equal(beNlOnly!.passesGeoFilter, false, "BE filtered when NL-only override");
 
 const dupRow = preview.rows.find(r => r.firmName.includes("Bakker"));
 assert.ok(dupRow?.isDuplicate, "existing email/LinkedIn marked duplicate");
@@ -88,7 +91,7 @@ assert.ok(dupRow?.isDuplicate, "existing email/LinkedIn marked duplicate");
 const dup = findDuplicate({ email: "p.bakker@bakkerlegal.nl", linkedInUrl: "" }, existing);
 assert.ok(dup);
 
-console.log("test:import OK — NL pilot geo defaults, mapping, scoring, dedupe");
+console.log("test:import OK — BE-first geo defaults, mapping, scoring, dedupe");
 `,
 );
 
