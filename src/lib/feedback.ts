@@ -10,9 +10,8 @@ import type {
   FeedbackTarget,
   Lead,
 } from "@/types/sales";
+import { dataFile } from "@/lib/data-dir";
 
-const DATA_DIR = path.join(process.cwd(), ".data");
-const FEEDBACK_FILE = path.join(DATA_DIR, "feedback.json");
 /** Optional skill-memory mirror Floor can promote into the repo for Claude sessions. */
 export const SKILL_MEMORY_FEEDBACK = path.join(
   process.cwd(),
@@ -41,14 +40,10 @@ function emptyStore(): FeedbackStore {
   return { version: 1, entries: [], updatedAt: new Date().toISOString() };
 }
 
-async function ensureDataDir() {
-  await fs.mkdir(DATA_DIR, { recursive: true });
-}
-
 export async function readFeedbackStore(): Promise<FeedbackStore> {
-  await ensureDataDir();
+  const feedbackFile = await dataFile("feedback.json");
   try {
-    const raw = await fs.readFile(FEEDBACK_FILE, "utf8");
+    const raw = await fs.readFile(feedbackFile, "utf8");
     const parsed = JSON.parse(raw) as FeedbackStore;
     return {
       version: 1,
@@ -63,9 +58,9 @@ export async function readFeedbackStore(): Promise<FeedbackStore> {
 }
 
 export async function writeFeedbackStore(store: FeedbackStore): Promise<void> {
-  await ensureDataDir();
+  const feedbackFile = await dataFile("feedback.json");
   store.updatedAt = new Date().toISOString();
-  await fs.writeFile(FEEDBACK_FILE, JSON.stringify(store, null, 2), "utf8");
+  await fs.writeFile(feedbackFile, JSON.stringify(store, null, 2), "utf8");
 }
 
 export function activeFeedback(entries: FeedbackEntry[]): FeedbackEntry[] {

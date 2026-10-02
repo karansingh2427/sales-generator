@@ -1,5 +1,4 @@
 import { promises as fs } from "fs";
-import path from "path";
 import type {
   DemoBooking,
   Lead,
@@ -8,13 +7,11 @@ import type {
   SequenceStep,
   WorkspaceState,
 } from "@/types/sales";
+import { dataFile } from "@/lib/data-dir";
 import { generateMockLead, seedLeads } from "@/lib/mock-leads";
 import type { ImportCommitRow } from "@/lib/sales-nav-import";
 import { findDuplicate, previewRowsToLeads } from "@/lib/sales-nav-import";
 import { defaultHubSpotConfig } from "@/lib/hubspot-config";
-
-const DATA_DIR = path.join(process.cwd(), ".data");
-const STATE_FILE = path.join(DATA_DIR, "workspace.json");
 
 const defaultState = (): WorkspaceState => ({
   leads: seedLeads(),
@@ -39,14 +36,10 @@ function migrateState(raw: WorkspaceState): WorkspaceState {
   };
 }
 
-async function ensureDataDir() {
-  await fs.mkdir(DATA_DIR, { recursive: true });
-}
-
 export async function readState(): Promise<WorkspaceState> {
-  await ensureDataDir();
+  const stateFile = await dataFile("workspace.json");
   try {
-    const raw = await fs.readFile(STATE_FILE, "utf8");
+    const raw = await fs.readFile(stateFile, "utf8");
     return migrateState(JSON.parse(raw) as WorkspaceState);
   } catch {
     const state = defaultState();
@@ -56,9 +49,9 @@ export async function readState(): Promise<WorkspaceState> {
 }
 
 export async function writeState(state: WorkspaceState): Promise<void> {
-  await ensureDataDir();
+  const stateFile = await dataFile("workspace.json");
   state.updatedAt = new Date().toISOString();
-  await fs.writeFile(STATE_FILE, JSON.stringify(state, null, 2), "utf8");
+  await fs.writeFile(stateFile, JSON.stringify(state, null, 2), "utf8");
 }
 
 export async function findLead(id: string): Promise<Lead | undefined> {
