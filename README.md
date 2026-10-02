@@ -4,6 +4,13 @@ Prototype for **Floor Hoefkens** (BDR @ [Willow](https://willow.co/)): **HubSpot
 
 **Geography:** **Belgium first**, Netherlands second — **BE + NL only**. **Governance:** human-in-the-loop — nothing auto-blasts. **CRM language:** English writebacks. **HubSpot path:** prefer Floor’s Claude/Cursor HubSpot MCP/tools; web-app private-app token is optional fallback only.
 
+## For Floor
+
+- **Live pilot (mock HubSpot):** https://sales-generator-delta.vercel.app
+- **5-minute test guide:** [docs/floor-test-guide.md](./docs/floor-test-guide.md)
+- **Demo video:** [media/floor-sales-generator-demo.mp4](./media/floor-sales-generator-demo.mp4)
+- Optional: [docs/vercel-deploy.md](./docs/vercel-deploy.md) · [docs/floor-feedback-learning.md](./docs/floor-feedback-learning.md)
+
 ## Quick start
 
 ```bash
