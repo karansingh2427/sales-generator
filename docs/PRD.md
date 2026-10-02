@@ -17,6 +17,7 @@ Lead gen is already handled by an internal agent that writes **HubSpot company n
 6. Post–Demo Booked stages: **Demo Completed | Rescheduled | Cancelled**.
 7. CRM writebacks stay **English**; outreach drafts remain editable.
 8. Ship a **skill pack** (`skills/*/SKILL.md`) mirroring [agent-data/job-search](https://github.com/agent-data/job-search) + AGENTS.md map.
+9. **Feedback learning** — Floor submits ICP / company / tone / geo / sequence feedback (UI + “remember this feedback”); next HubSpot pull / sequence draft / lead-run loads and applies active memory. Human-visible list with disable/delete. Feedback never bypasses approve-before-send.
 
 ## Geography (product rule — Karandeep, 2026-10-02)
 
@@ -49,6 +50,10 @@ Supersedes earlier NL-first pilot experiment defaults in the codebase.
 | RF-SEQ-02 | As Floor, I edit / approve / mark sent per step | Cannot mark sent until approved; nothing auto-transmits |
 | RF-SEQ-03 | As Floor, strong social presence leads are skipped/DQ | Sync flags; sequence generate rejects DQ |
 | RF-SK-01 | As Floor, I run `sales-hubspot-pull` / `sales-sequence-draft` / `sales-demo-book` from Cursor | Skills present under `skills/`; AGENTS.md maps them |
+| RF-FB-01 | As Floor, I submit feedback via UI form or “remember this feedback” | Entry persisted with category, target, text, timestamp, source |
+| RF-FB-02 | As Floor, next HubSpot pull / sequence draft applies active feedback | Skip company / prefer title / never pitch / tone reflected |
+| RF-FB-03 | As Floor, I see learned feedback and can disable/delete | Feedback tab list; disable keeps history |
+| RF-FB-04 | As Floor, feedback never auto-sends | Approve-before-send still required |
 | RF-01 | As Floor, I still import Sales Nav CSV (fallback) | Preview defaults to **BE + NL**; human select-before-commit |
 | RF-04 | As Floor, I book an AE demo | Valid AE + datetime; **per-AE calendar link**; stage → demo_booked |
 | RF-05 | As Floor, I set post-demo outcome | Completed / Rescheduled / Cancelled from bookings UI / skill |

@@ -48,7 +48,18 @@ These rules govern human and agent operators. Violations are **invalid** scenari
 2. `sales-hubspot-pull` must instruct BE-first pulls and company notes.
 3. `sales-sequence-draft` must require approve before send.
 4. `sales-demo-book` must use per-AE links and the three post-demo outcomes.
-5. Orchestrator `sales-lead-run` may compose the three — it must not bypass HITL or geo lock.
+5. Orchestrator `sales-lead-run` may compose the skills — it must not bypass HITL or geo lock.
+6. `sales-feedback-learn` persists structured feedback; pull/draft/lead-run **must** load active feedback.
+7. Feedback never auto-sends and never bypasses draft → approve → mark sent.
+8. Feedback cannot add countries outside BE+NL.
+
+## Feedback learning rules
+
+1. Storage: `.data/feedback.json` (gitignored) + optional promote to `skills/memory/FEEDBACK.md`.
+2. Each entry: category, optional target entity, free text, instruction, timestamp, source (`ui` \| `skill` \| `teach_lead`), active flag.
+3. Active feedback applies on HubSpot sync, sequence generate, outreach draft, and skill lead-run.
+4. Floor can disable or delete any entry from the Feedback tab.
+5. Per-lead **Teach agent** action creates company-targeted feedback.
 
 ## Agent communication (when driving UI or skills via Cursor)
 
@@ -56,3 +67,4 @@ These rules govern human and agent operators. Violations are **invalid** scenari
 2. Present sequence drafts as readable prose before approve/mark sent.
 3. Name failures in plain language.
 4. Prefer **Belgium-first** language in ICP explanations; mention Netherlands as secondary; never propose other countries.
+5. When Floor steers (“skip X”, “prefer title Y”), save via `sales-feedback-learn` and confirm in one line.

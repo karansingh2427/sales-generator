@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
-import type { DemoBooking, Lead, OutreachDraft, OutreachSequence } from "@/types/sales";
+import type { DemoBooking, FeedbackEntry, Lead, OutreachDraft, OutreachSequence } from "@/types/sales";
 import { PRACTICE_AREAS, WILLOW_PITCH, ICP_GEOGRAPHY } from "@/lib/willow-context";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -34,10 +34,12 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Sparkles, PhoneOff, CalendarPlus, Mail, ListOrdered } from "lucide-react";
+import { Sparkles, PhoneOff, CalendarPlus, Mail, ListOrdered, GraduationCap } from "lucide-react";
 import { SalesNavImportPanel } from "@/components/sales-nav-import-panel";
 import { HubSpotSyncPanel, type HubSpotStatus } from "@/components/hubspot-sync-panel";
 import { SequenceBuilderPanel } from "@/components/sequence-builder-panel";
+import { FeedbackPanel } from "@/components/feedback-panel";
+import type { FeedbackCategory } from "@/types/sales";
 
 const STAGE_LABEL: Record<Lead["stage"], string> = {
   new: "New",
@@ -66,6 +68,7 @@ type WorkbenchProps = {
   initialOutreach: OutreachDraft[];
   initialBookings: DemoBooking[];
   initialSequences: OutreachSequence[];
+  initialFeedback?: FeedbackEntry[];
   hubspotStatus: HubSpotStatus;
   aes: string[];
   aeRoster?: AeRosterEntry[];
@@ -76,6 +79,7 @@ export function LeadsWorkbench({
   initialOutreach,
   initialBookings,
   initialSequences,
+  initialFeedback = [],
   hubspotStatus,
   aes,
   aeRoster = [],
@@ -99,6 +103,9 @@ export function LeadsWorkbench({
   const [status, setStatus] = useState<string | null>(null);
   const [sequenceFocusLeadId, setSequenceFocusLeadId] = useState<string | null>(null);
   const [tab, setTab] = useState("leads");
+  const [teachLead, setTeachLead] = useState<Lead | null>(null);
+  const [teachText, setTeachText] = useState("");
+  const [teachCategory, setTeachCategory] = useState<FeedbackCategory>("company");
 
   const refresh = useCallback(async () => {
     setLoading(true);
@@ -245,6 +252,46 @@ export function LeadsWorkbench({
     setBookOpen(true);
   }
 
+  function openTeach(lead: Lead) {
+    setTeachLead(lead);
+    setTeachCategory("company");
+    setTeachText(`Skip company ${lead.firmName}`);
+  }
+
+  async function submitTeach() {
+    if (!teachLead || !teachText.trim()) return;
+    setError(null);
+    const res = await fetch("/api/feedback", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "remember",
+        category: teachCategory,
+        text: teachText.trim(),
+        source: "teach_lead",
+        target: {
+          type: "company",
+          name: teachLead.firmName,
+          leadId: teachLead.id,
+          hubspotCompanyId: teachLead.hubspotCompanyId,
+        },
+        companyName: teachLead.firmName,
+        leadId: teachLead.id,
+        leadName: teachLead.firmName,
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      setError(data.error ?? "Could not save teach-agent feedback.");
+      return;
+    }
+    setTeachLead(null);
+    setTeachText("");
+    setStatus(
+      `Taught agent about ${teachLead.firmName}. Next HubSpot pull / sequence run will apply it.`,
+    );
+  }
+
   if (loading && leads.length === 0) {
     return (
       <div className="flex min-h-[40vh] items-center justify-center text-sm text-muted-foreground">
@@ -311,6 +358,7 @@ export function LeadsWorkbench({
           <TabsTrigger value="sequences">Sequences</TabsTrigger>
           <TabsTrigger value="outreach">Outreach</TabsTrigger>
           <TabsTrigger value="bookings">Demo calendar</TabsTrigger>
+          <TabsTrigger value="feedback">Feedback</TabsTrigger>
         </TabsList>
 
         <TabsContent value="leads" className="space-y-4">
@@ -480,6 +528,14 @@ export function LeadsWorkbench({
                           >
                             <CalendarPlus className="h-3.5 w-3.5" />
                           </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => openTeach(lead)}
+                            title="Teach agent about this lead"
+                          >
+                            <GraduationCap className="h-3.5 w-3.5" />
+                          </Button>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -538,6 +594,17 @@ export function LeadsWorkbench({
               })}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="feedback" className="space-y-4">
+          <FeedbackPanel
+            initialEntries={initialFeedback}
+            onError={(msg) => setError(msg || null)}
+            onStatus={(msg) => {
+              setError(null);
+              setStatus(msg);
+            }}
+          />
         </TabsContent>
 
         <TabsContent value="bookings">
@@ -650,6 +717,61 @@ export function LeadsWorkbench({
                 <Button onClick={() => openBook(selected)}>Book demo for AE</Button>
               </>
             )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={!!teachLead}
+        onOpenChange={(open) => {
+          if (!open) setTeachLead(null);
+        }}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Teach the agent</DialogTitle>
+            <DialogDescription>
+              {teachLead?.firmName} — saved feedback applies on the next HubSpot pull / sequence
+              draft. Does not auto-send.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <Label>Category</Label>
+              <Select
+                value={teachCategory}
+                onValueChange={(v) => v && setTeachCategory(v as FeedbackCategory)}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="company">Company / skip</SelectItem>
+                  <SelectItem value="contact">Contact</SelectItem>
+                  <SelectItem value="messaging_tone">Messaging tone</SelectItem>
+                  <SelectItem value="disqualifier">Disqualifier</SelectItem>
+                  <SelectItem value="icp">ICP</SelectItem>
+                  <SelectItem value="sequence_quality">Sequence quality</SelectItem>
+                  <SelectItem value="title_preference">Title preference</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>What should the agent remember?</Label>
+              <Textarea
+                rows={4}
+                value={teachText}
+                onChange={(e) => setTeachText(e.target.value)}
+                placeholder={`Skip company ${teachLead?.firmName ?? ""} / Prefer Partner titles / Never pitch pricing…`}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setTeachLead(null)}>
+              Cancel
+            </Button>
+            <Button onClick={() => void submitTeach()}>Remember feedback</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

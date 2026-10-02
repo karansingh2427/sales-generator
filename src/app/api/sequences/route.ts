@@ -7,6 +7,11 @@ import {
   updateSequenceStep,
 } from "@/lib/db";
 import { buildSequenceForLead, validateSequenceAction } from "@/lib/sequence-engine";
+import {
+  applyFeedbackToLeads,
+  listFeedback,
+  sequenceGuidanceFromFeedback,
+} from "@/lib/feedback";
 
 export async function GET() {
   const state = await readState();
@@ -31,6 +36,18 @@ export async function POST(request: Request) {
         { status: 422 },
       );
     }
+    const feedbackEntries = await listFeedback({ activeOnly: true });
+    const applied = applyFeedbackToLeads([lead], feedbackEntries);
+    if (applied.skipped.length) {
+      return NextResponse.json(
+        {
+          error:
+            "Lead skipped by Floor feedback learning (company/disqualifier). Disable that feedback to sequence.",
+          feedbackApplication: applied.application,
+        },
+        { status: 422 },
+      );
+    }
     const existing = state.sequences.find(
       (s) => s.leadId === lead.id && s.status !== "cancelled" && s.status !== "completed",
     );
@@ -41,12 +58,18 @@ export async function POST(request: Request) {
         note: "Active sequence already exists for this lead — edit steps or mark sent.",
       });
     }
-    const built = buildSequenceForLead(lead, state.bdrName);
+    const guidance = sequenceGuidanceFromFeedback(applied.application);
+    const built = buildSequenceForLead(lead, state.bdrName, undefined, {
+      feedbackGuidance: guidance || undefined,
+      neverPitchTopics: applied.application.neverPitchTopics,
+    });
     const saved = await addSequence(built);
     return NextResponse.json({
       sequence: saved,
       mode: "draft",
-      governance: "Draft only — Floor must approve each step, then mark sent. No auto-send.",
+      feedbackApplication: applied.application,
+      governance:
+        "Draft only — Floor must approve each step, then mark sent. No auto-send. Active feedback applied to tone/never-pitch/ICP notes.",
     });
   }
 

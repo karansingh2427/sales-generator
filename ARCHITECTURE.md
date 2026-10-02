@@ -9,9 +9,9 @@ docs and a **skill pack** mirroring [agent-data/job-search](https://github.com/a
 | OS concept | In Sales Generator |
 |---|---|
 | Kernel / shell | Cursor/Claude agent (skills) or human BDR using the web UI |
-| Programs | `skills/*`, Pipeline UI, `/api/hubspot`, `/api/sequences`, `/api/leads`, `/api/outreach`, `/api/bookings` |
-| Shared libraries | `hubspot.ts`, `sequence-engine.ts`, `icp.ts`, `outreach-engine.ts`, `sales-nav-import.ts`, `db.ts` |
-| Filesystem | `.data/workspace.json` (local, never committed) |
+| Programs | `skills/*`, Pipeline UI, `/api/hubspot`, `/api/sequences`, `/api/leads`, `/api/outreach`, `/api/bookings`, `/api/feedback` |
+| Shared libraries | `hubspot.ts`, `sequence-engine.ts`, `feedback.ts`, `icp.ts`, `outreach-engine.ts`, `sales-nav-import.ts`, `db.ts` |
+| Filesystem | `.data/workspace.json`, `.data/feedback.json` (local, never committed) |
 | System calls | HubSpot MCP/session tools (preferred) or CRM API (optional token); Sales Nav CSV; per-AE calendar links |
 | Cron | Future: scheduled sync + digest (not this slice) |
 
@@ -25,6 +25,7 @@ docs and a **skill pack** mirroring [agent-data/job-search](https://github.com/a
 | `outreach-drafting` | Single-touch templates + CRM rationale | adequate |
 | `demo-scheduling` | AE roster + per-AE calendar links | adequate |
 | `pipeline-state` | Stage machine incl. post-demo outcomes | strong |
+| `feedback-learning` | Persist + apply Floor ICP/company/tone memory | strong |
 | `error-surfacing` | API 4xx with plain errors | adequate |
 
 ## Architectural layers
@@ -42,9 +43,11 @@ docs and a **skill pack** mirroring [agent-data/job-search](https://github.com/a
 ```
 [Lead-gen agent] → HubSpot Company notes
         ↓
-sales-hubspot-pull / /api/hubspot (BE first)
+sales-feedback-learn / .data/feedback.json  (load active memory)
         ↓
-sales-sequence-draft / /api/sequences  (approve → mark sent)
+sales-hubspot-pull / /api/hubspot (BE first · apply skips)
+        ↓
+sales-sequence-draft / /api/sequences  (tone/never-pitch · approve → mark sent)
         ↓
 sales-demo-book / /api/bookings  (per-AE link → Completed|Rescheduled|Cancelled)
 ```

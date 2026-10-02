@@ -112,12 +112,38 @@ function channelFor(kind: SequenceStepKind): OutreachChannel | undefined {
   return undefined;
 }
 
+export type BuildSequenceOptions = {
+  /** Soft guidance from Floor feedback learning (tone, never-pitch, ICP notes). */
+  feedbackGuidance?: string;
+  neverPitchTopics?: string[];
+};
+
+function withFeedbackRationale(base: string, guidance?: string): string {
+  if (!guidance?.trim()) return base;
+  return `${base} · Floor feedback: ${guidance.trim()}`;
+}
+
+function scrubBody(body: string, topics?: string[]): string {
+  if (!topics?.length) return body;
+  let out = body;
+  for (const topic of topics) {
+    const trimmed = topic.trim();
+    if (trimmed.length < 3) continue;
+    const re = new RegExp(trimmed.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi");
+    out = out.replace(re, "[omitted per Floor feedback]");
+  }
+  return out;
+}
+
 export function buildSequenceForLead(
   lead: Lead,
   bdrName: string,
   playbook = DEFAULT_PLAYBOOK,
+  options: BuildSequenceOptions = {},
 ): Omit<OutreachSequence, "id" | "createdAt" | "updatedAt"> {
   const angles = inferOpportunityAngles(lead);
+  const guidance = options.feedbackGuidance;
+  const neverPitch = options.neverPitchTopics;
   const steps: SequenceStep[] = playbook.map((p, i) => {
     const id = `step_${i + 1}`;
     if (p.kind === "wait") {
@@ -127,7 +153,10 @@ export function buildSequenceForLead(
         label: `${p.label} (${p.waitDays} days)`,
         waitDays: p.waitDays,
         status: "pending" as const,
-        rationale: `Pause ${p.waitDays} days — Floor’s playbook: connect/message → follow-up days later → email.`,
+        rationale: withFeedbackRationale(
+          `Pause ${p.waitDays} days — Floor’s playbook: connect/message → follow-up days later → email.`,
+          guidance,
+        ),
       };
     }
     if (p.kind === "linkedin_connect") {
@@ -138,8 +167,8 @@ export function buildSequenceForLead(
         label: p.label,
         waitDays: p.waitDays,
         channel: channelFor(p.kind),
-        body: d.body,
-        rationale: d.rationale,
+        body: scrubBody(d.body, neverPitch),
+        rationale: withFeedbackRationale(d.rationale, guidance),
         status: "draft" as const,
       };
     }
@@ -151,8 +180,8 @@ export function buildSequenceForLead(
         label: p.label,
         waitDays: p.waitDays,
         channel: channelFor(p.kind),
-        body: d.body,
-        rationale: d.rationale,
+        body: scrubBody(d.body, neverPitch),
+        rationale: withFeedbackRationale(d.rationale, guidance),
         status: "draft" as const,
       };
     }
@@ -164,8 +193,8 @@ export function buildSequenceForLead(
         label: p.label,
         waitDays: p.waitDays,
         channel: channelFor(p.kind),
-        body: d.body,
-        rationale: d.rationale,
+        body: scrubBody(d.body, neverPitch),
+        rationale: withFeedbackRationale(d.rationale, guidance),
         status: "draft" as const,
       };
     }
@@ -177,8 +206,8 @@ export function buildSequenceForLead(
       waitDays: p.waitDays,
       channel: channelFor(p.kind),
       subject: d.subject,
-      body: d.body,
-      rationale: d.rationale,
+      body: scrubBody(d.body, neverPitch),
+      rationale: withFeedbackRationale(d.rationale, guidance),
       status: "draft" as const,
     };
   });

@@ -45,11 +45,13 @@ export function HubSpotSyncPanel({ initialStatus, onSynced, onError, onStatus }:
       const updated = data.updatedCount ?? 0;
       onSynced(added, updated);
       const skip = data.skippedStrongPresence ?? 0;
+      const fbSkip = data.feedbackSkipped?.length ?? 0;
       const coNotes = data.companyNotesFetched ?? 0;
       onStatus(
         `HubSpot ${data.mode} sync: ${added} new, ${updated} updated` +
           (coNotes ? ` · ${coNotes} company note(s)` : "") +
           (skip ? ` · ${skip} strong-presence flagged/skipped for outreach` : "") +
+          (fbSkip ? ` · ${fbSkip} skipped by Floor feedback` : "") +
           (data.errors?.length ? ` · ${data.errors.length} warning(s)` : "") +
           ". Build a sequence from company CRM notes next — drafts only.",
       );

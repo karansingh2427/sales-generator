@@ -33,13 +33,15 @@ Web-app fallback (optional): `POST /api/hubspot { action: "sync" }` with mock mo
 
 ## Steps
 
+0. **Load Floor feedback** from `.data/feedback.json` (or `skills/memory/FEEDBACK.md` / `GET /api/feedback`). Apply skip-company, prefer-title, ICP/geo notes, disqualifier patterns. Confirm in one line what memory is active.
 1. Confirm geo = BE primary, NL secondary; refuse lists that include other countries.
 2. Via HubSpot tools, list companies filtered to Belgium and the Netherlands.
 3. For each company, pull the latest **company note** (agent handoff). Prefer company-level over contact-only notes.
-4. Skip / flag **strong social presence** (Floor disqualifier).
-5. Present a short table: company · country · right contact · opener one-liner · why-good · presence.
-6. Sort Belgium first, then Netherlands; highest ICP / freshest notes first.
+4. Skip / flag **strong social presence** (Floor disqualifier) **and** any company named in active skip feedback.
+5. Present a short table: company · country · right contact · opener one-liner · why-good · presence · feedback flags.
+6. Sort Belgium first, then Netherlands; preferred titles (from feedback) and highest ICP / freshest notes first.
 7. Ask Floor which rows to sequence next → hand off to `sales-sequence-draft`.
+8. If she steers (“skip that one forever”, “prefer Ops managers”) → invoke `sales-feedback-learn` before the next pull.
 
 ## Company note contract
 

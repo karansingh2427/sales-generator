@@ -24,6 +24,7 @@ Never auto-send. Never claim a message was delivered by this skill. Floor asked 
 - Company + contact from `sales-hubspot-pull` (or a pasted HubSpot company note).
 - Required note fields when available: `whyGood`, `opener`, `rightContact`.
 - Opportunity angles when present: consistency, content quality, content mix, visibility, open vacancies.
+- **Active Floor feedback** (`.data/feedback.json` or `skills/memory/FEEDBACK.md`) — tone, never-pitch topics, sequence notes, ICP memory. Load before drafting.
 
 ## Playbook (default)
 
@@ -43,8 +44,10 @@ CTA: 30-minute Willow demo booked on the **AE’s personal calendar link** (not 
 2. Name the opportunity angle in plain language (consistency, quality, mix, visibility, vacancies).
 3. Keep messages short; LinkedIn connect note ≤ ~280 characters when possible.
 4. CRM writebacks stay **English**; outreach drafts may be NL/FR/EN — ask Floor if language unclear.
-5. Skip if social presence is **strong**.
-6. Show every draft as readable prose and wait for **Approve** before she sends.
+5. Skip if social presence is **strong** or company is in active skip feedback.
+6. Apply **tone** and **never_pitch** feedback (omit forbidden topics).
+7. Show every draft as readable prose and wait for **Approve** before she sends.
+8. Feedback never auto-sends and never skips the approve step.
 
 ## Output shape (per lead)
 

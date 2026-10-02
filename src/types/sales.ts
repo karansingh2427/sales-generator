@@ -188,3 +188,85 @@ export interface WorkspaceState {
   bdrName: string;
   updatedAt: string;
 }
+
+/** Floor feedback categories — ICP, client, tone, geo, sequence quality, etc. */
+export type FeedbackCategory =
+  | "icp"
+  | "company"
+  | "contact"
+  | "messaging_tone"
+  | "disqualifier"
+  | "geo"
+  | "sequence_quality"
+  | "title_preference"
+  | "other";
+
+export type FeedbackSource = "ui" | "skill" | "teach_lead";
+
+export type FeedbackTargetType =
+  | "company"
+  | "contact"
+  | "lead"
+  | "title"
+  | "geo"
+  | "vertical"
+  | "general";
+
+export interface FeedbackTarget {
+  type: FeedbackTargetType;
+  /** Display name (firm, contact, title, etc.). */
+  name: string;
+  leadId?: string;
+  hubspotCompanyId?: string;
+}
+
+/**
+ * Structured instruction the engine can apply on later HubSpot pulls / drafts.
+ * Free-text always kept in `FeedbackEntry.text`; instruction is optional parse aid.
+ */
+export type FeedbackInstruction =
+  | { kind: "skip_company"; companyName: string }
+  | { kind: "prefer_title"; titles: string[] }
+  | { kind: "never_pitch"; topic: string }
+  | { kind: "icp_tweak"; note: string }
+  | { kind: "tone"; note: string }
+  | { kind: "disqualify_pattern"; pattern: string }
+  | { kind: "geo_note"; note: string }
+  | { kind: "sequence_note"; note: string }
+  | { kind: "freeform" };
+
+export interface FeedbackEntry {
+  id: string;
+  category: FeedbackCategory;
+  target?: FeedbackTarget;
+  instruction: FeedbackInstruction;
+  /** Free-text Floor wrote (always persisted). */
+  text: string;
+  active: boolean;
+  source: FeedbackSource;
+  createdAt: string;
+  updatedAt: string;
+  disabledAt?: string;
+}
+
+export interface FeedbackStore {
+  version: 1;
+  entries: FeedbackEntry[];
+  updatedAt: string;
+}
+
+/** Result of applying active feedback to a lead set / draft context. */
+export interface FeedbackApplication {
+  skippedLeadIds: string[];
+  skippedCompanies: string[];
+  preferredTitles: string[];
+  neverPitchTopics: string[];
+  toneNotes: string[];
+  icpNotes: string[];
+  sequenceNotes: string[];
+  geoNotes: string[];
+  disqualifyPatterns: string[];
+  /** Human-readable bullets for digests / skill prompts. */
+  digestLines: string[];
+  appliedEntryIds: string[];
+}

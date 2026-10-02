@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { readState, upsertHubSpotLeads, updateLead } from "@/lib/db";
 import { defaultHubSpotConfig } from "@/lib/hubspot-config";
 import { pushLeadStageToHubSpot, syncHubSpotContacts } from "@/lib/hubspot";
+import { applyFeedbackToLeads, listFeedback } from "@/lib/feedback";
 
 export async function GET() {
   const state = await readState();
@@ -29,15 +30,34 @@ export async function POST(request: Request) {
       stageMap: state.hubspot?.stageMap,
       propertyMap: state.hubspot?.propertyMap,
     });
-    const { added, updated } = await upsertHubSpotLeads(result.upserted);
+    const feedbackEntries = await listFeedback({ activeOnly: true });
+    const applied = applyFeedbackToLeads(result.upserted, feedbackEntries);
+    // Persist skipped companies as disqualified so sequences reject them later.
+    const toUpsert = [
+      ...applied.kept,
+      ...applied.skipped.map((l) => ({
+        ...l,
+        stage: "disqualified" as const,
+        notes: [l.notes, "Skipped by Floor feedback learning"]
+          .filter(Boolean)
+          .join(" · "),
+      })),
+    ];
+    const { added, updated } = await upsertHubSpotLeads(toUpsert);
     return NextResponse.json({
       ...result,
+      upserted: applied.kept,
+      feedbackSkipped: applied.skipped.map((l) => ({
+        id: l.id,
+        firmName: l.firmName,
+      })),
+      feedbackApplication: applied.application,
       addedCount: added.length,
       updatedCount: updated.length,
       added,
       updated,
       governance:
-        "Human-in-the-loop: sync only imports CRM context. Sequences stay draft → approve → mark sent. No auto-blast.",
+        "Human-in-the-loop: sync only imports CRM context. Active Floor feedback applied (skip/prefer). Sequences stay draft → approve → mark sent. No auto-blast.",
     });
   }
 

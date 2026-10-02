@@ -95,6 +95,26 @@
         "After approve+mark_sent step status sent and lead stage contacted",
         "App does not transmit LinkedIn/email itself"
       ]
+    },
+    {
+      "id": "V-10",
+      "scenario": "Remember Floor feedback and apply on next HubSpot sync",
+      "request": "POST /api/feedback { action: remember, category: company, text: Skip company Peeters Accountants } then POST /api/hubspot sync",
+      "expectations": [
+        "Feedback entry persisted with category, text, timestamp, source, active=true",
+        "Sync response includes feedbackSkipped containing Peeters Accountants",
+        "Skipped firm stage disqualified or omitted from active upserted set",
+        "Governance note still draft → approve → mark sent"
+      ]
+    },
+    {
+      "id": "V-11",
+      "scenario": "Disable feedback so later runs ignore it",
+      "request": "POST /api/feedback { action: disable, id } then list",
+      "expectations": [
+        "Entry active=false with disabledAt set",
+        "applyFeedbackToLeads no longer skips that company"
+      ]
     }
   ],
   "invalid_cases": [
@@ -145,6 +165,21 @@
       "scenario": "Generate sequence for disqualified / strong-presence lead",
       "request": "POST /api/sequences { action: generate, leadId: disqualified }",
       "expectations": ["Response 422", "error mentions disqualified"]
+    },
+    {
+      "id": "I-09",
+      "scenario": "Feedback remember without text",
+      "request": "POST /api/feedback { action: remember, category: icp }",
+      "expectations": ["Response 400", "error mentions text"]
+    },
+    {
+      "id": "I-10",
+      "scenario": "Feedback cannot bypass approve-before-send",
+      "request": "Active never_pitch feedback + POST sequences mark_sent on draft step",
+      "expectations": [
+        "Response 400 still requires approve",
+        "Feedback applied to drafts only — no auto-send"
+      ]
     }
   ]
 }

@@ -7,6 +7,7 @@
     "test:evals": "node scripts/check-evals.mjs",
     "test:import": "node scripts/test-import.mjs",
     "test:hubspot": "node scripts/test-hubspot-sequences.mjs",
+    "test:feedback": "node scripts/test-feedback.mjs",
     "build": "next build",
     "start": "next start -H 127.0.0.1 -p 4317",
     "start:demo": "next start -H 127.0.0.1 -p 4341",

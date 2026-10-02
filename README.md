@@ -13,7 +13,7 @@ npm run dev
 npm run build && npm run start:demo   # http://127.0.0.1:4341
 ```
 
-Workspace state: `.data/workspace.json` (gitignored).
+Workspace state: `.data/workspace.json` + `.data/feedback.json` (gitignored).
 
 ## Skills (Floor / Claude / Cursor)
 
@@ -24,6 +24,7 @@ See **[docs/skills.md](./docs/skills.md)** for first-run steps.
 | `sales-hubspot-pull` | [`skills/sales-hubspot-pull/SKILL.md`](./skills/sales-hubspot-pull/SKILL.md) |
 | `sales-sequence-draft` | [`skills/sales-sequence-draft/SKILL.md`](./skills/sales-sequence-draft/SKILL.md) |
 | `sales-demo-book` | [`skills/sales-demo-book/SKILL.md`](./skills/sales-demo-book/SKILL.md) |
+| `sales-feedback-learn` | [`skills/sales-feedback-learn/SKILL.md`](./skills/sales-feedback-learn/SKILL.md) |
 | `sales-lead-run` | [`skills/sales-lead-run/SKILL.md`](./skills/sales-lead-run/SKILL.md) |
 
 Agent map: [AGENTS.md](./AGENTS.md). Plugin manifest: [`.cursor-plugin/plugin.json`](./.cursor-plugin/plugin.json).
@@ -34,6 +35,17 @@ Agent map: [AGENTS.md](./AGENTS.md). Plugin manifest: [`.cursor-plugin/plugin.js
 2. “Pull my Belgium HubSpot companies and show company notes.”
 3. “Draft LinkedIn + email sequences” → **approve** → send yourself → mark sent.
 4. “Book demo with \<AE\>” → use that AE’s calendar link → after meeting set Completed / Rescheduled / Cancelled.
+5. “Remember this feedback: skip company X / prefer Partner titles” → next pull applies it.
+
+## Feedback learning
+
+| Path | How |
+|---|---|
+| UI | **Feedback** tab — form + disable/delete list; per-lead graduation-cap **Teach agent** |
+| Skill | “Remember this feedback: …” → `sales-feedback-learn` |
+| Storage | `.data/feedback.json` (gitignored); promote to `skills/memory/FEEDBACK.md` for session-only agents |
+| Apply | HubSpot sync, sequence generate, outreach draft, and `sales-lead-run` load **active** feedback |
+| Guardrail | Feedback never auto-sends; draft → approve → mark sent still required |
 
 ## HubSpot connector (web app fallback)
 
@@ -80,12 +92,14 @@ Import panel defaults geo filter to **BE + NL**. Prefer HubSpot when the interna
 | `npm run test:evals` | Governance eval structure |
 | `npm run test:import` | Sales Nav CSV / BE-first geo unit checks |
 | `npm run test:hubspot` | HubSpot mock + sequence unit checks |
+| `npm run test:feedback` | Feedback persist + apply unit checks |
 | `npm run lint` / `build` | Quality gates |
 
 ## API
 
 - `GET/POST /api/hubspot` — status / `sync` / `push_stage`
 - `GET/POST /api/sequences` — list / `generate` / `update_step` / `approve_step` / `mark_sent` / `skip_step`
+- `GET/POST /api/feedback` — list / `remember` / `enable` / `disable` / `delete` (`?format=markdown`)
 - `GET/POST /api/leads` — list / Sales Nav import / demo generate / stage
 - `GET/POST /api/outreach` — single-touch drafts
 - `GET/POST /api/bookings` — AE demos (per-AE calendar URLs)

@@ -13,6 +13,9 @@
 | T-06 | Post-demo outcome | Bookings tab / skill → Completed / Rescheduled / Cancelled | Stage + HubSpot EN writeback |
 | T-07 | Governance audit | Open `/governance` | Checklist signed off |
 | T-SK-01 | Cursor/Claude session | Follow [docs/skills.md](./skills.md) first-run | Skills produce BE-first pull + drafts + booking CTA |
+| T-FB-01 | Floor steers ICP / company / tone | Feedback tab **or** “Remember this feedback: …” / Teach agent on a lead | Entry in `.data/feedback.json`; visible in Feedback list |
+| T-FB-02 | Next HubSpot sync / sequence | Sync or Generate after active feedback | Skip companies / prefer titles / tone applied; still draft-only |
+| T-FB-03 | Fix a bad rule | Feedback tab → Disable or Delete | Entry inactive/removed; later runs ignore it |
 
 ## HubSpot setup (Floor / ops)
 
@@ -33,6 +36,7 @@
 | A-01 | `sales-hubspot-pull` | BE-first companies + company notes via session HubSpot tools |
 | A-02 | `sales-sequence-draft` | LI + email drafts; approve before send |
 | A-03 | `sales-demo-book` | Per-AE calendar links; post-demo outcomes |
-| A-04 | `sales-lead-run` | Orchestrates A-01 → A-02 → A-03 |
+| A-04 | `sales-lead-run` | Orchestrates A-01 → A-02 → A-03 (loads feedback first) |
+| A-05 | `sales-feedback-learn` | Persist / list / disable Floor feedback memory |
 
-This slice implements T-HS-01, T-SEQ-01–03, T-05–06, T-SK-01, plus prior T-01. Auto-send remains **out of scope**.
+This slice implements T-HS-01, T-SEQ-01–03, T-05–06, T-SK-01, T-FB-01–03, plus prior T-01. Auto-send remains **out of scope**. Feedback never bypasses HITL.
