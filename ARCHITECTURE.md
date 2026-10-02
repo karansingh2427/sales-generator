@@ -1,44 +1,50 @@
 # Architecture
 
-Sales Generator is a **BDR workflow OS** for Willow: find lawyer-firm leads, draft personalized outreach,
-book AE demos — with governance docs mirroring the [agent-data/job-search](https://github.com/agent-data/job-search) pattern.
+Sales Generator is a **BDR workflow OS** for Willow: sync HubSpot **company** agent notes, draft multi-channel
+LinkedIn + email sequences (human approve), fall back to Sales Nav CSV, book demos on **per-AE calendar links** — with governance
+docs and a **skill pack** mirroring [agent-data/job-search](https://github.com/agent-data/job-search). **Belgium first**, NL second, BE+NL only.
 
 ## OS model
 
 | OS concept | In Sales Generator |
 |---|---|
-| Kernel / shell | Cursor agent or human BDR using the web UI |
-| Programs | Pipeline UI, API routes (`/api/leads`, `/api/outreach`, `/api/bookings`) |
-| Shared libraries | `src/lib/outreach-engine.ts`, `src/lib/db.ts`, `src/lib/mock-leads.ts` |
+| Kernel / shell | Cursor/Claude agent (skills) or human BDR using the web UI |
+| Programs | `skills/*`, Pipeline UI, `/api/hubspot`, `/api/sequences`, `/api/leads`, `/api/outreach`, `/api/bookings` |
+| Shared libraries | `hubspot.ts`, `sequence-engine.ts`, `icp.ts`, `outreach-engine.ts`, `sales-nav-import.ts`, `db.ts` |
 | Filesystem | `.data/workspace.json` (local, never committed) |
-| System calls | Future: Apollo, LinkedIn, HubSpot, Calendly (mocked in MVP) |
-| Cron | Future: scheduled lead refresh + digest (not in MVP) |
+| System calls | HubSpot MCP/session tools (preferred) or CRM API (optional token); Sales Nav CSV; per-AE calendar links |
+| Cron | Future: scheduled sync + digest (not this slice) |
 
 ## Product domains
 
-| Domain | Implements | Grade (MVP) |
+| Domain | Implements | Grade |
 |---|---|---|
-| `lead-discovery` | Mock generate + seed lawyer ICP list | adequate |
-| `outreach-drafting` | Template + rationale engine (Claude-for-sales style) | adequate |
-| `demo-scheduling` | AE roster + mock meet link | adequate |
-| `pipeline-state` | Stage machine on leads | strong |
+| `crm-ingest` | HubSpot sync + company notes + stage/property maps | strong |
+| `sequence-drafting` | Multi-step LI + email drafts, approve/mark sent | strong |
+| `lead-discovery` | Sales Nav CSV fallback + BE-first ICP | adequate |
+| `outreach-drafting` | Single-touch templates + CRM rationale | adequate |
+| `demo-scheduling` | AE roster + per-AE calendar links | adequate |
+| `pipeline-state` | Stage machine incl. post-demo outcomes | strong |
 | `error-surfacing` | API 4xx with plain errors | adequate |
 
 ## Architectural layers
 
-| Layer | Role | Grade (MVP) |
+| Layer | Role | Grade |
 |---|---|---|
-| `deterministic-core` | Validation, stage updates, seed data | strong |
-| `shared-references` | PRD, RULES, TASKS, GOVERNANCE in `docs/` | strong |
-| `skill-layer` | Not shipped as skills in MVP — UI replaces conversational front door | thin |
-| `hooks-guards` | `scripts/check-evals.mjs`, ESLint, TypeScript | adequate |
-| `tests-evals` | `tests/evals.json` structural + scenario cases | adequate |
+| `deterministic-core` | HubSpot mock, ICP scoring, sequence templates, CSV map | strong |
+| `shared-references` | PRD, RULES, TASKS, GOVERNANCE | strong |
+| `skill-layer` | `skills/sales-*` + `.cursor-plugin` + AGENTS.md map | strong |
+| `hooks-guards` | `check-evals`, `test-import`, `test-hubspot`, ESLint, TS | adequate |
+| `tests-evals` | `tests/evals.json` + fixtures | adequate |
 
 ## Data flow
 
-1. BDR opens Pipeline → `GET /api/leads` hydrates UI from `.data/workspace.json`.
-2. **Generate leads** → `POST /api/leads` `{ action: "generate" }` appends mock firms.
-3. **Draft outreach** → `POST /api/outreach` writes draft + sets stage `outreach_drafted`.
-4. **Book demo** → `POST /api/bookings` creates booking + sets stage `demo_booked`.
-
-Companion grading: [docs/QUALITY_SCORE.md](docs/QUALITY_SCORE.md).
+```
+[Lead-gen agent] → HubSpot Company notes
+        ↓
+sales-hubspot-pull / /api/hubspot (BE first)
+        ↓
+sales-sequence-draft / /api/sequences  (approve → mark sent)
+        ↓
+sales-demo-book / /api/bookings  (per-AE link → Completed|Rescheduled|Cancelled)
+```

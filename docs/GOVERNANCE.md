@@ -4,28 +4,35 @@
 
 | Class | Examples | Storage | Git |
 |---|---|---|---|
-| Public | Willow marketing copy, ICP rules | `src/lib/willow-context.ts` | Yes |
-| Mock PII | Seed leads with `.example` emails | `.data/workspace.json` | No (gitignored) |
-| Live PII | Real prospects (future) | Encrypted store + DPA | Never |
-| Secrets | `OPENAI_API_KEY`, Apollo | `.env.local` | Never |
+| Public | Willow marketing copy, ICP rules, BE-first geo defaults, skills | `src/lib/willow-context.ts`, `src/lib/icp.ts`, `src/lib/geo.ts`, `skills/` | Yes |
+| Mock PII | Demo / mock HubSpot leads with `.example` emails | `.data/workspace.json` | No (gitignored) |
+| Live PII | HubSpot sync + Sales Nav CSV imports | `.data/workspace.json` on BDR machine | Never |
+| Secrets | Optional `HUBSPOT_ACCESS_TOKEN`, `OPENAI_API_KEY` | `.env.local` | Never |
 
 ## Consent & automation
 
-- **No auto-send** in MVP — operator explicitly marks sent.
-- Future sequences require documented opt-in and unsubscribe (EU GDPR alignment with Willow product story).
+- **No auto-send** — Floor must **approve** each sequence step, then **mark sent** after sending outside the app/skill.
+- Floor asked for full automation; product default remains human-in-the-loop until Willow policy + explicit OK.
+- **No silent HubSpot write storms** — stage push is explicit; sync is operator-triggered.
+- **No silent CSV import** — Sales Nav commit requires human-selected rows.
+- Skills prefer **session HubSpot MCP/tools**; do not require embedding a private-app token in the web app.
+- Future auto-sequences require documented opt-in and unsubscribe (EU GDPR; BE + NL book).
+- **CRM language:** HubSpot writebacks English-only; outreach drafts may be edited freely.
 
 ## Model use
 
-- Default: deterministic templates in `outreach-engine.ts` (auditable, no token spend).
-- Optional: `OPENAI_API_KEY` + `useLiveModel: true` reserved for v2; must log prompt hash externally.
+- Default: deterministic templates in `outreach-engine.ts` + `sequence-engine.ts` (auditable).
+- Skills: prose drafts following RULES; human approve still required.
+- Optional: `OPENAI_API_KEY` + `useLiveModel: true` reserved for v2.
 
-## Threat model (MVP)
+## Threat model (this slice)
 
-- Local JSON workspace readable on disk — acceptable for single-BDR dev machine only.
-- API routes unauthenticated — **do not expose** dev server to public internet without auth layer.
+- Local JSON workspace readable on disk — single-BDR (Floor) machine only.
+- API routes unauthenticated — **do not expose** dev server publicly without auth.
+- HubSpot access via Floor’s Claude session or optional private-app token — rotate if leaked; delete `.data/workspace.json` when rotating machines.
 
 ## Incident response
 
-1. Revoke keys in `.env.local`.
-2. Delete `.data/workspace.json`.
+1. Revoke keys in `.env.local` (HubSpot private app + OpenAI) and/or disconnect HubSpot from Claude/Cursor if compromised.
+2. Delete `.data/workspace.json` (clears imported PII).
 3. File issue with eval case ID if behavior regressed.
