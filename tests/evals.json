@@ -25,21 +25,22 @@
     },
     {
       "id": "V-03",
-      "scenario": "Book demo with valid AE",
+      "scenario": "Book demo with valid AE on per-AE calendar link",
       "request": "POST /api/bookings { leadId: lead_8, aeName: Sarah Chen, scheduledAt: future ISO, durationMinutes: 30 }",
       "expectations": [
-        "Response 200 with booking.meetingLink",
-        "Lead stage demo_booked"
+        "Response 200 with booking.meetingLink matching AE calendar URL pattern",
+        "Lead stage demo_booked",
+        "Not a shared Calendly URL"
       ]
     },
     {
       "id": "V-04",
-      "scenario": "Preview Sales Nav CSV with default BE+NL geo filter",
-      "request": "POST /api/leads { action: import_preview, csvText: <fixture>, geoFilter: [BE, NL], minScore: 70 }",
+      "scenario": "Preview Sales Nav CSV with default NL pilot geo filter",
+      "request": "POST /api/leads { action: import_preview, csvText: <fixture>, geoFilter: [NL], minScore: 70 }",
       "expectations": [
         "Response 200 with preview.rows length matching fixture",
-        "preview.geoFilter includes BE and NL",
-        "BE/NL lawyer rows score higher than US-only rows",
+        "preview.geoFilter is NL (BE available when opted in)",
+        "NL lawyer rows pass filter; BE rows filtered unless BE selected",
         "Column mapping auto-detects First Name / Company / LinkedIn URL aliases"
       ]
     },
@@ -64,13 +65,23 @@
     },
     {
       "id": "V-07",
-      "scenario": "HubSpot sync in mock mode without token",
+      "scenario": "HubSpot sync in mock mode without token (company notes)",
       "request": "POST /api/hubspot { action: sync } with HUBSPOT_ACCESS_TOKEN unset",
       "expectations": [
         "Response 200 mode === mock",
-        "upserted leads include CRM whyGood/opener",
+        "upserted leads include CRM whyGood/opener from company notes/props",
         "source === hubspot",
+        "companyNotesFetched >= 1",
         "strong social presence leads flagged (skippedStrongPresence >= 1 or stage disqualified)"
+      ]
+    },
+    {
+      "id": "V-09",
+      "scenario": "Post-demo stage push Completed / Rescheduled / Cancelled",
+      "request": "POST /api/hubspot { action: push_stage, leadId, stage: demo_completed|demo_rescheduled|demo_cancelled }",
+      "expectations": [
+        "Lead stage updates to chosen post-demo outcome",
+        "HubSpot push detail notes English CRM language"
       ]
     },
     {

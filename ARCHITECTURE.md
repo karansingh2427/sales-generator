@@ -1,8 +1,8 @@
 # Architecture
 
-Sales Generator is a **BDR workflow OS** for Willow: sync HubSpot CRM agent notes, draft multi-channel
-LinkedIn + email sequences (human approve), fall back to Sales Nav CSV, book AE demos — with governance
-docs mirroring [agent-data/job-search](https://github.com/agent-data/job-search).
+Sales Generator is a **BDR workflow OS** for Willow: sync HubSpot **company** agent notes, draft multi-channel
+LinkedIn + email sequences (human approve), fall back to Sales Nav CSV, book demos on **per-AE calendar links** — with governance
+docs mirroring [agent-data/job-search](https://github.com/agent-data/job-search). NL-first pilot.
 
 ## OS model
 
@@ -12,19 +12,19 @@ docs mirroring [agent-data/job-search](https://github.com/agent-data/job-search)
 | Programs | Pipeline UI, `/api/hubspot`, `/api/sequences`, `/api/leads`, `/api/outreach`, `/api/bookings` |
 | Shared libraries | `hubspot.ts`, `sequence-engine.ts`, `icp.ts`, `outreach-engine.ts`, `sales-nav-import.ts`, `db.ts` |
 | Filesystem | `.data/workspace.json` (local, never committed) |
-| System calls | HubSpot CRM API (live or mock); Sales Nav CSV; future Calendly |
+| System calls | HubSpot CRM API (live or mock; company notes); Sales Nav CSV; per-AE calendar links |
 | Cron | Future: scheduled sync + digest (not this slice) |
 
 ## Product domains
 
 | Domain | Implements | Grade |
 |---|---|---|
-| `crm-ingest` | HubSpot sync + mock mode + stage/property maps | strong |
+| `crm-ingest` | HubSpot sync + company notes + stage/property maps | strong |
 | `sequence-drafting` | Multi-step LI + email drafts, approve/mark sent | strong |
-| `lead-discovery` | Sales Nav CSV fallback + BE/NL ICP | adequate |
+| `lead-discovery` | Sales Nav CSV fallback + NL-first ICP | adequate |
 | `outreach-drafting` | Single-touch templates + CRM rationale | adequate |
-| `demo-scheduling` | AE roster + mock meet link | adequate |
-| `pipeline-state` | Stage machine on leads | strong |
+| `demo-scheduling` | AE roster + per-AE calendar links | adequate |
+| `pipeline-state` | Stage machine incl. post-demo outcomes | strong |
 | `error-surfacing` | API 4xx with plain errors | adequate |
 
 ## Architectural layers

@@ -4,7 +4,7 @@
 
 | Class | Examples | Storage | Git |
 |---|---|---|---|
-| Public | Willow marketing copy, ICP rules, BE/NL geo defaults | `src/lib/willow-context.ts`, `src/lib/icp.ts`, `src/lib/geo.ts` | Yes |
+| Public | Willow marketing copy, ICP rules, NL-first geo defaults | `src/lib/willow-context.ts`, `src/lib/icp.ts`, `src/lib/geo.ts` | Yes |
 | Mock PII | Demo / mock HubSpot leads with `.example` emails | `.data/workspace.json` | No (gitignored) |
 | Live PII | HubSpot sync + Sales Nav CSV imports | `.data/workspace.json` on BDR machine | Never |
 | Secrets | `HUBSPOT_ACCESS_TOKEN`, `OPENAI_API_KEY` | `.env.local` | Never |
@@ -15,7 +15,8 @@
 - Floor asked for full automation; product default remains human-in-the-loop until Willow policy + explicit OK.
 - **No silent HubSpot write storms** — stage push is explicit `push_stage`; sync is operator-triggered.
 - **No silent CSV import** — Sales Nav commit requires human-selected rows.
-- Future auto-sequences require documented opt-in and unsubscribe (EU GDPR; BE/NL book).
+- Future auto-sequences require documented opt-in and unsubscribe (EU GDPR; NL pilot / BE book).
+- **CRM language:** HubSpot writebacks English-only; outreach drafts may be edited freely.
 
 ## Model use
 

@@ -13,15 +13,17 @@ export function scoreLeadRationale(lead: Lead): string {
   if (lead.vertical && lead.vertical !== "other")
     reasons.push(`Vertical: ${lead.vertical}.`);
   if (
-    lead.geoCode === "BE" ||
     lead.geoCode === "NL" ||
-    /\b(BE|NL|Belgium|Netherlands|Brussels|Amsterdam|Antwerp|Ghent|Rotterdam)\b/i.test(
-      lead.location,
-    )
+    /\b(NL|Netherlands|Amsterdam|Rotterdam|Utrecht|Eindhoven)\b/i.test(lead.location)
   )
-    reasons.push("Belgium/Netherlands — core Willow market.");
+    reasons.push("Netherlands — Floor’s NL pilot experiment.");
+  else if (
+    lead.geoCode === "BE" ||
+    /\b(BE|Belgium|Brussels|Antwerp|Ghent)\b/i.test(lead.location)
+  )
+    reasons.push("Belgium — available market (opt-in to pilot filter).");
   else if (/\b(LU|UK|DE|FR|IE|CH)\b/i.test(lead.location))
-    reasons.push("Nearby EU — secondary to BE/NL book.");
+    reasons.push("Nearby EU — secondary to NL pilot.");
   const angles = inferOpportunityAngles(lead);
   reasons.push(...describeAngles(angles));
   if (lead.crm?.rightContact) reasons.push(`Right contact: ${lead.crm.rightContact}.`);
@@ -59,7 +61,7 @@ export function draftOutreach(
       channel,
       body: `Hi ${name} — ${opener || `I noticed ${lead.firmName} may have room on LinkedIn around ${angles}.`}
 
-Willow drafts posts in your firm's voice (EU/GDPR). Worth a 30-min live demo where we show drafts for ${lead.firmName}?
+Willow drafts posts in your firm's voice (EU/GDPR). Worth a 30-min live demo? We book on the AE’s calendar link (same as our usual demo handoff).
 
 — ${bdrName}, Willow`,
       rationale,
@@ -74,7 +76,7 @@ ${opener || `I noticed ${lead.firmName}'s ${lead.practiceArea.toLowerCase()} wor
 
 Willow helps professional-services and expertise B2B firms post steadily in their own voice: quarterly calendars, drafts from a business profile, and a coach. ${WILLOW_PITCH.valueProps[0]}
 
-${WILLOW_PITCH.demoCta} Open to 30 minutes this or next week?
+${WILLOW_PITCH.demoCta} Reply with a time that works, or book via the AE calendar link we send after you confirm interest.
 
 Best,
 ${bdrName}

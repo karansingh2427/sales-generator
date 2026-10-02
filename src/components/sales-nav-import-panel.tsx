@@ -275,7 +275,7 @@ export function SalesNavImportPanel({ onImported, onError, onStatus }: Props) {
 
         <div className="flex flex-wrap items-end gap-4">
           <div className="space-y-2">
-            <Label className="text-xs">Geo filter (default BE + NL)</Label>
+            <Label className="text-xs">Geo filter (default NL pilot · BE available)</Label>
             <div className="flex flex-wrap gap-1.5">
               {GEO_OPTIONS.map((code) => {
                 const on = geoFilter.includes(code);

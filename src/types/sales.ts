@@ -5,7 +5,18 @@ export type LeadStage =
   | "contacted"
   | "replied"
   | "demo_booked"
+  /** Post–Demo Booked outcomes Floor confirmed (HubSpot). */
+  | "demo_completed"
+  | "demo_rescheduled"
+  | "demo_cancelled"
   | "disqualified";
+
+/** Stages after Demo Booked — Floor: “Completed, Rescheduled or Cancelled. That's it.” */
+export const POST_DEMO_STAGES: LeadStage[] = [
+  "demo_completed",
+  "demo_rescheduled",
+  "demo_cancelled",
+];
 
 export type LeadSource =
   | "hubspot"
@@ -136,9 +147,10 @@ export interface DemoBooking {
   aeName: string;
   scheduledAt: string;
   durationMinutes: number;
+  /** Per-AE calendar booking URL (not a shared Calendly). */
   meetingLink: string;
   notes?: string;
-  status: "scheduled" | "completed" | "no_show" | "cancelled";
+  status: "scheduled" | "completed" | "rescheduled" | "cancelled" | "no_show";
   createdAt: string;
 }
 
@@ -147,6 +159,11 @@ export interface HubSpotStageMap {
   [hubspotLabel: string]: LeadStage;
 }
 
+/**
+ * Optional structured properties when present on Company (preferred) or Contact.
+ * Floor’s lead-gen agent primarily leaves a **company-level HubSpot note**
+ * (why-good / opener / right contact in the note body) — not contact-only.
+ */
 export interface HubSpotPropertyMap {
   whyGood: string;
   opener: string;

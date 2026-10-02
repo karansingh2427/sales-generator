@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { RefreshCw, Cloud, CloudOff } from "lucide-react";
+import { STAGE_UI_LABELS } from "@/lib/hubspot-config";
 
 export type HubSpotStatus = {
   mode: "mock" | "live";
@@ -44,11 +45,13 @@ export function HubSpotSyncPanel({ initialStatus, onSynced, onError, onStatus }:
       const updated = data.updatedCount ?? 0;
       onSynced(added, updated);
       const skip = data.skippedStrongPresence ?? 0;
+      const coNotes = data.companyNotesFetched ?? 0;
       onStatus(
         `HubSpot ${data.mode} sync: ${added} new, ${updated} updated` +
+          (coNotes ? ` · ${coNotes} company note(s)` : "") +
           (skip ? ` · ${skip} strong-presence flagged/skipped for outreach` : "") +
           (data.errors?.length ? ` · ${data.errors.length} warning(s)` : "") +
-          ". Build a sequence from CRM notes next — drafts only.",
+          ". Build a sequence from company CRM notes next — drafts only.",
       );
     } catch {
       onError("HubSpot sync network error.");
@@ -70,8 +73,9 @@ export function HubSpotSyncPanel({ initialStatus, onSynced, onError, onStatus }:
             HubSpot CRM sync
           </CardTitle>
           <CardDescription>
-            Hero path: pull contacts + agent notes (why-good, opener, right contact). Sales Nav CSV
-            remains a fallback below.
+            Hero path: pull <strong>company-level</strong> agent notes (why-good, opener, right
+            contact). Contact props are fallback only. Sales Nav CSV remains below. CRM writebacks
+            stay English.
           </CardDescription>
         </div>
         <div className="flex items-center gap-2">
@@ -90,10 +94,23 @@ export function HubSpotSyncPanel({ initialStatus, onSynced, onError, onStatus }:
           <p className="text-xs">Last sync: {new Date(status.lastSyncAt).toLocaleString()}</p>
         )}
         <p className="text-xs">
+          Post–Demo Booked stages:{" "}
+          <Badge variant="outline" className="text-[10px]">
+            {STAGE_UI_LABELS.demo_completed}
+          </Badge>{" "}
+          <Badge variant="outline" className="text-[10px]">
+            {STAGE_UI_LABELS.demo_rescheduled}
+          </Badge>{" "}
+          <Badge variant="outline" className="text-[10px]">
+            {STAGE_UI_LABELS.demo_cancelled}
+          </Badge>
+        </p>
+        <p className="text-xs">
           Set <code className="rounded bg-muted px-1">HUBSPOT_ACCESS_TOKEN</code> in{" "}
           <code className="rounded bg-muted px-1">.env.local</code> for live sync. Optional:{" "}
           <code className="rounded bg-muted px-1">HUBSPOT_STAGE_MAP</code>,{" "}
-          <code className="rounded bg-muted px-1">HUBSPOT_PROPERTY_MAP</code>.
+          <code className="rounded bg-muted px-1">HUBSPOT_PROPERTY_MAP</code> (company props
+          preferred).
         </p>
       </CardContent>
     </Card>

@@ -32,10 +32,11 @@ import type { Lead } from "../src/types/sales.ts";
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const csv = fs.readFileSync(path.join(root, "tests/fixtures/sales-nav-sample.csv"), "utf8");
 
-assert.deepEqual(DEFAULT_GEO_FILTER, ["BE", "NL"]);
+assert.deepEqual(DEFAULT_GEO_FILTER, ["NL"]);
 assert.equal(detectGeoCode("Brussels, Belgium"), "BE");
 assert.equal(detectGeoCode("Amsterdam, Netherlands"), "NL");
 assert.equal(detectGeoCode("New York, United States"), "OTHER");
+assert.ok(geoScoreBonus("NL") > geoScoreBonus("BE"));
 assert.ok(geoScoreBonus("BE") > geoScoreBonus("DE"));
 assert.ok(geoScoreBonus("NL") > geoScoreBonus("OTHER"));
 
@@ -61,17 +62,25 @@ const existing: Lead[] = [{
   createdAt: new Date().toISOString(),
 }];
 
-const preview = previewSalesNavCsv(csv, existing, { geoFilter: ["BE", "NL"], minScore: 70 });
+const preview = previewSalesNavCsv(csv, existing, { geoFilter: ["NL"], minScore: 70 });
 assert.equal(preview.rows.length, 5);
-assert.ok(preview.geoFilter.includes("BE") && preview.geoFilter.includes("NL"));
+assert.ok(preview.geoFilter.includes("NL"));
+assert.ok(!preview.geoFilter.includes("BE") || preview.geoFilter.length === 1);
 
 const be = preview.rows.find(r => r.firmName.includes("Janssens"));
+const nl = preview.rows.find(r => r.firmName.includes("Bakker"));
 const us = preview.rows.find(r => r.firmName.includes("Doe"));
 assert.ok(be, "BE lawyer row present");
+assert.ok(nl, "NL lawyer row present");
 assert.ok(us, "US row present");
-assert.equal(be!.passesGeoFilter, true);
+assert.equal(be!.passesGeoFilter, false, "BE filtered out of NL-only pilot default");
+assert.equal(nl!.passesGeoFilter, true);
 assert.equal(us!.passesGeoFilter, false);
-assert.ok(be!.icpScore > us!.icpScore, "BE lawyer scores higher than US row");
+assert.ok(nl!.icpScore > us!.icpScore, "NL lawyer scores higher than US row");
+
+const previewBoth = previewSalesNavCsv(csv, existing, { geoFilter: ["BE", "NL"], minScore: 70 });
+const beBoth = previewBoth.rows.find(r => r.firmName.includes("Janssens"));
+assert.equal(beBoth!.passesGeoFilter, true, "BE available when opted into filter");
 
 const dupRow = preview.rows.find(r => r.firmName.includes("Bakker"));
 assert.ok(dupRow?.isDuplicate, "existing email/LinkedIn marked duplicate");
@@ -79,7 +88,7 @@ assert.ok(dupRow?.isDuplicate, "existing email/LinkedIn marked duplicate");
 const dup = findDuplicate({ email: "p.bakker@bakkerlegal.nl", linkedInUrl: "" }, existing);
 assert.ok(dup);
 
-console.log("test:import OK — geo defaults, mapping, scoring, dedupe");
+console.log("test:import OK — NL pilot geo defaults, mapping, scoring, dedupe");
 `,
 );
 

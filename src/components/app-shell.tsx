@@ -23,7 +23,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </div>
             <div>
               <p className="text-sm font-semibold leading-tight">Sales Generator</p>
-              <p className="text-xs text-muted-foreground">Willow BDR · HubSpot + sequences</p>
+              <p className="text-xs text-muted-foreground">Willow BDR · NL pilot · HubSpot + sequences</p>
             </div>
           </div>
           <nav className="flex items-center gap-1">
@@ -47,7 +47,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </header>
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6">{children}</main>
       <footer className="border-t py-3 text-center text-xs text-muted-foreground">
-        Prototype for Floor Hoefkens · HubSpot mock until token · draft → approve → mark sent
+        Prototype for Floor Hoefkens · NL pilot · company notes · draft → approve → mark sent
       </footer>
     </div>
   );

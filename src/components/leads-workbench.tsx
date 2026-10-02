@@ -46,15 +46,20 @@ const STAGE_LABEL: Record<Lead["stage"], string> = {
   contacted: "Contacted",
   replied: "Replied",
   demo_booked: "Demo booked",
+  demo_completed: "Demo completed",
+  demo_rescheduled: "Demo rescheduled",
+  demo_cancelled: "Demo cancelled",
   disqualified: "Disqualified",
 };
 
 function stageVariant(stage: Lead["stage"]) {
-  if (stage === "demo_booked") return "default" as const;
-  if (stage === "disqualified") return "outline" as const;
-  if (stage === "replied") return "secondary" as const;
+  if (stage === "demo_booked" || stage === "demo_completed") return "default" as const;
+  if (stage === "disqualified" || stage === "demo_cancelled") return "outline" as const;
+  if (stage === "replied" || stage === "demo_rescheduled") return "secondary" as const;
   return "outline" as const;
 }
+
+type AeRosterEntry = { name: string; calendarUrl: string };
 
 type WorkbenchProps = {
   initialLeads: Lead[];
@@ -63,6 +68,7 @@ type WorkbenchProps = {
   initialSequences: OutreachSequence[];
   hubspotStatus: HubSpotStatus;
   aes: string[];
+  aeRoster?: AeRosterEntry[];
 };
 
 export function LeadsWorkbench({
@@ -72,6 +78,7 @@ export function LeadsWorkbench({
   initialSequences,
   hubspotStatus,
   aes,
+  aeRoster = [],
 }: WorkbenchProps) {
   const [leads, setLeads] = useState<Lead[]>(initialLeads);
   const [outreach, setOutreach] = useState<OutreachDraft[]>(initialOutreach);
@@ -115,10 +122,15 @@ export function LeadsWorkbench({
   }, []);
 
   const stats = useMemo(() => {
-    const active = leads.filter((l) => l.stage !== "disqualified");
+    const active = leads.filter((l) => l.stage !== "disqualified" && l.stage !== "demo_cancelled");
     return {
       total: active.length,
-      demos: leads.filter((l) => l.stage === "demo_booked").length,
+      demos: leads.filter(
+        (l) =>
+          l.stage === "demo_booked" ||
+          l.stage === "demo_completed" ||
+          l.stage === "demo_rescheduled",
+      ).length,
       drafts: outreach.length,
       coldCallsAvoided: active.filter((l) => l.stage !== "new").length,
     };
@@ -172,6 +184,27 @@ export function LeadsWorkbench({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "update_stage", leadId: lead.id, stage: "contacted" }),
     });
+    await refresh();
+  }
+
+  async function setPostDemoStage(
+    lead: Lead,
+    stage: "demo_completed" | "demo_rescheduled" | "demo_cancelled",
+  ) {
+    setError(null);
+    const res = await fetch("/api/hubspot", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "push_stage", leadId: lead.id, stage }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      setError(data.error ?? "Stage update failed.");
+      return;
+    }
+    setStatus(
+      `Post-demo stage → ${STAGE_LABEL[stage]} (HubSpot writeback English-only).`,
+    );
     await refresh();
   }
 
@@ -436,8 +469,14 @@ export function LeadsWorkbench({
                           </Button>
                           <Button
                             size="sm"
-                            disabled={lead.stage === "disqualified" || lead.stage === "demo_booked"}
+                            disabled={
+                              lead.stage === "disqualified" ||
+                              lead.stage === "demo_booked" ||
+                              lead.stage === "demo_completed" ||
+                              lead.stage === "demo_cancelled"
+                            }
                             onClick={() => openBook(lead)}
+                            title="Book on AE calendar link"
                           >
                             <CalendarPlus className="h-3.5 w-3.5" />
                           </Button>
@@ -505,7 +544,11 @@ export function LeadsWorkbench({
           <Card>
             <CardHeader>
               <CardTitle>AE handoff</CardTitle>
-              <CardDescription>Book 30-minute Willow Create demos for account executives.</CardDescription>
+              <CardDescription>
+                Book 30-minute Willow demos on each AE’s calendar link (same pattern Floor uses after
+                cold calls — not a shared Calendly). After Demo Booked → Completed | Rescheduled |
+                Cancelled.
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
               {bookings.length === 0 && (
@@ -514,19 +557,59 @@ export function LeadsWorkbench({
               {bookings.map((b) => {
                 const lead = leads.find((l) => l.id === b.leadId);
                 return (
-                  <div key={b.id} className="flex flex-wrap items-center justify-between gap-2 rounded-lg border p-3">
+                  <div
+                    key={b.id}
+                    className="flex flex-wrap items-center justify-between gap-2 rounded-lg border p-3"
+                  >
                     <div>
                       <p className="font-medium">{lead?.firmName}</p>
                       <p className="text-sm text-muted-foreground">
                         AE: {b.aeName} · {new Date(b.scheduledAt).toLocaleString()}
+                        {lead ? ` · ${STAGE_LABEL[lead.stage]}` : ""}
                       </p>
+                      {lead?.stage === "demo_booked" && (
+                        <div className="mt-2 flex flex-wrap gap-1">
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            onClick={() => void setPostDemoStage(lead, "demo_completed")}
+                          >
+                            Demo completed
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => void setPostDemoStage(lead, "demo_rescheduled")}
+                          >
+                            Rescheduled
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => void setPostDemoStage(lead, "demo_cancelled")}
+                          >
+                            Cancelled
+                          </Button>
+                        </div>
+                      )}
                     </div>
-                    <a href={b.meetingLink} className="text-sm text-primary underline">
-                      Meeting link
+                    <a
+                      href={b.meetingLink}
+                      className="text-sm text-primary underline"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      AE calendar link
                     </a>
                   </div>
                 );
               })}
+              {aeRoster.length > 0 && (
+                <p className="text-xs text-muted-foreground">
+                  Roster calendar URLs (placeholders until Floor pastes real AE links):{" "}
+                  {aeRoster.map((a) => a.name).join(", ")}.
+                </p>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -580,7 +663,10 @@ export function LeadsWorkbench({
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Book Willow demo</DialogTitle>
-            <DialogDescription>{selected?.firmName}</DialogDescription>
+            <DialogDescription>
+              {selected?.firmName} — uses the selected AE’s calendar link (manual AE link pattern,
+              not a shared Calendly).
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-3">
             <div>
@@ -596,6 +682,9 @@ export function LeadsWorkbench({
                   {aes.map((ae) => (
                     <SelectItem key={ae} value={ae}>
                       {ae}
+                      {aeRoster.find((r) => r.name === ae)
+                        ? " · personal calendar link"
+                        : ""}
                     </SelectItem>
                   ))}
                 </SelectContent>

@@ -141,9 +141,13 @@ export async function upsertHubSpotLeads(incoming: Lead[]): Promise<{
         ...lead,
         id: state.leads[idx].id,
         createdAt: state.leads[idx].createdAt,
-        // Preserve local pipeline progress unless HubSpot says DQ / demo booked
+        // Preserve local pipeline progress unless HubSpot says DQ / demo booked+
         stage:
-          lead.stage === "disqualified" || lead.stage === "demo_booked"
+          lead.stage === "disqualified" ||
+          lead.stage === "demo_booked" ||
+          lead.stage === "demo_completed" ||
+          lead.stage === "demo_rescheduled" ||
+          lead.stage === "demo_cancelled"
             ? lead.stage
             : state.leads[idx].stage === "new" || state.leads[idx].stage === "qualified"
               ? lead.stage

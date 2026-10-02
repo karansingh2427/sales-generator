@@ -25,8 +25,20 @@ if (!rules.includes("disqualified")) {
   console.error("RULES.md must mention disqualified leads");
   ok = false;
 }
-if (!rules.includes("Belgium") && !rules.includes("BE + NL")) {
-  console.error("RULES.md must mention Belgium / BE+NL geography");
+if (!rules.includes("Netherlands") && !rules.includes("NL")) {
+  console.error("RULES.md must mention Netherlands / NL pilot geography");
+  ok = false;
+}
+if (!rules.includes("Belgium") && !rules.includes("BE")) {
+  console.error("RULES.md must mention Belgium as available market");
+  ok = false;
+}
+if (!rules.includes("company") && !rules.includes("Company")) {
+  console.error("RULES.md must mention company-level HubSpot notes");
+  ok = false;
+}
+if (!rules.includes("English")) {
+  console.error("RULES.md must mention English CRM language");
   ok = false;
 }
 if (!rules.includes("approve") && !rules.includes("auto-send") && !rules.includes("auto-blast")) {
@@ -39,7 +51,7 @@ if (!rules.includes("HubSpot")) {
 }
 
 const ids = [...evals.valid_cases, ...evals.invalid_cases].map((c) => c.id);
-for (const required of ["V-04", "V-05", "V-07", "V-08", "I-05", "I-06", "I-07", "I-08"]) {
+for (const required of ["V-04", "V-05", "V-07", "V-08", "V-09", "I-05", "I-06", "I-07", "I-08"]) {
   if (!ids.includes(required)) {
     console.error(`Missing eval case ${required}`);
     ok = false;

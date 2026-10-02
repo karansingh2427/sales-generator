@@ -10,6 +10,7 @@ import type {
 import {
   DEFAULT_PROPERTY_MAP,
   DEFAULT_STAGE_MAP,
+  HUBSPOT_ENGLISH_STAGE_LABELS,
   mapHubSpotStage,
   resolveHubSpotMode,
 } from "@/lib/hubspot-config";
@@ -21,6 +22,8 @@ export type HubSpotSyncResult = {
   contactsFetched: number;
   companiesFetched: number;
   notesFetched: number;
+  /** Notes associated at company level (Floor’s agent handoff). */
+  companyNotesFetched: number;
   upserted: Lead[];
   skippedStrongPresence: number;
   errors: string[];
@@ -35,11 +38,14 @@ type HsContact = {
 type HsCompany = {
   id: string;
   properties: Record<string, string | null | undefined>;
+  associations?: { notes?: string[] };
 };
 
 type HsNote = {
   id: string;
   properties: Record<string, string | null | undefined>;
+  /** Floor: agent leaves notes on the **company**, not contact-only. */
+  companyIds?: string[];
   contactIds?: string[];
 };
 
@@ -60,7 +66,11 @@ async function hsFetch(
   });
 }
 
-/** Mock CRM payload: lead-gen agent already wrote why/opener/contact notes. */
+/**
+ * Mock CRM payload: lead-gen agent wrote **company-level** notes
+ * (why-good, opener, right contact). Structured props may also sit on company.
+ * CRM language: English (Floor confirmed).
+ */
 export function mockHubSpotPayload(): {
   contacts: HsContact[];
   companies: HsCompany[];
@@ -76,7 +86,15 @@ export function mockHubSpotPayload(): {
           country: "Belgium",
           industry: "Accounting",
           numberofemployees: "35",
+          sg_why_good:
+            "Accountancy decision maker; LinkedIn posts only 2× in 90 days — consistency gap.",
+          sg_opener:
+            "Open with their Q3 tax calendar content vs empty firm page — vacancies posted, no storytelling.",
+          sg_right_contact: "Els Peeters (Managing Partner)",
+          sg_social_presence: "weak",
+          sg_vertical: "accountancy",
         },
+        associations: { notes: ["nt_301"] },
       },
       {
         id: "co_102",
@@ -86,7 +104,13 @@ export function mockHubSpotPayload(): {
           country: "Netherlands",
           industry: "Legal Services",
           numberofemployees: "42",
+          sg_why_good: "Litigation partner; firm voice thin on LinkedIn vs competitors.",
+          sg_opener: "Ask about partner time vs content quality — Willow drafts in firm voice.",
+          sg_right_contact: "Joost van Dijk (Partner)",
+          sg_social_presence: "inconsistent",
+          sg_vertical: "legal",
         },
+        associations: { notes: ["nt_302"] },
       },
       {
         id: "co_103",
@@ -96,7 +120,14 @@ export function mockHubSpotPayload(): {
           country: "Belgium",
           industry: "Human Resources",
           numberofemployees: "18",
+          sg_why_good:
+            "Exec search founder; open vacancies online with no company storytelling.",
+          sg_opener: "Tie open roles to visibility — expertise B2B buyers check LinkedIn first.",
+          sg_right_contact: "Amélie Dubois (Founder)",
+          sg_social_presence: "weak",
+          sg_vertical: "hr_recruitment",
         },
+        associations: { notes: ["nt_303"] },
       },
       {
         id: "co_104",
@@ -106,7 +137,13 @@ export function mockHubSpotPayload(): {
           country: "Netherlands",
           industry: "Information Technology",
           numberofemployees: "55",
+          sg_why_good: "IT founder; content mix is pure product promo — no expertise posts.",
+          sg_opener: "Content mix angle: buyers want founder POV, not feature dumps.",
+          sg_right_contact: "Mark de Vries (Founder)",
+          sg_social_presence: "inconsistent",
+          sg_vertical: "it",
         },
+        associations: { notes: ["nt_304"] },
       },
       {
         id: "co_105",
@@ -116,7 +153,13 @@ export function mockHubSpotPayload(): {
           country: "Belgium",
           industry: "Marketing",
           numberofemployees: "22",
+          sg_why_good: "Already polished social presence — agent flagged skip.",
+          sg_opener: "N/A — strong presence",
+          sg_right_contact: "Lana Verstraeten",
+          sg_social_presence: "strong",
+          sg_vertical: "expertise_b2b",
         },
+        associations: { notes: ["nt_305"] },
       },
     ],
     contacts: [
@@ -131,15 +174,8 @@ export function mockHubSpotPayload(): {
           city: "Antwerp",
           country: "Belgium",
           lifecyclestage: "marketingqualifiedlead",
-          sg_why_good:
-            "Accountancy decision maker; LinkedIn posts only 2× in 90 days — consistency gap.",
-          sg_opener:
-            "Open with their Q3 tax calendar content vs empty firm page — vacancies posted, no storytelling.",
-          sg_right_contact: "Els Peeters (Managing Partner)",
-          sg_social_presence: "weak",
-          sg_vertical: "accountancy",
         },
-        associations: { companies: ["co_101"], notes: ["nt_301"] },
+        associations: { companies: ["co_101"] },
       },
       {
         id: "ct_202",
@@ -152,13 +188,8 @@ export function mockHubSpotPayload(): {
           city: "Amsterdam",
           country: "Netherlands",
           lifecyclestage: "salesqualifiedlead",
-          sg_why_good: "Litigation partner; firm voice thin on LinkedIn vs competitors.",
-          sg_opener: "Ask about partner time vs content quality — Willow drafts in firm voice.",
-          sg_right_contact: "Joost van Dijk (Partner)",
-          sg_social_presence: "inconsistent",
-          sg_vertical: "legal",
         },
-        associations: { companies: ["co_102"], notes: ["nt_302"] },
+        associations: { companies: ["co_102"] },
       },
       {
         id: "ct_203",
@@ -170,14 +201,8 @@ export function mockHubSpotPayload(): {
           city: "Brussels",
           country: "Belgium",
           lifecyclestage: "lead",
-          sg_why_good:
-            "Exec search founder; open vacancies online with no company storytelling.",
-          sg_opener: "Tie open roles to visibility — expertise B2B buyers check LinkedIn first.",
-          sg_right_contact: "Amélie Dubois (Founder)",
-          sg_social_presence: "weak",
-          sg_vertical: "hr_recruitment",
         },
-        associations: { companies: ["co_103"], notes: ["nt_303"] },
+        associations: { companies: ["co_103"] },
       },
       {
         id: "ct_204",
@@ -189,13 +214,8 @@ export function mockHubSpotPayload(): {
           city: "Utrecht",
           country: "Netherlands",
           lifecyclestage: "opportunity",
-          sg_why_good: "IT founder; content mix is pure product promo — no expertise posts.",
-          sg_opener: "Content mix angle: buyers want founder POV, not feature dumps.",
-          sg_right_contact: "Mark de Vries (Founder)",
-          sg_social_presence: "inconsistent",
-          sg_vertical: "it",
         },
-        associations: { companies: ["co_104"], notes: ["nt_304"] },
+        associations: { companies: ["co_104"] },
       },
       {
         id: "ct_205",
@@ -207,52 +227,48 @@ export function mockHubSpotPayload(): {
           city: "Ghent",
           country: "Belgium",
           lifecyclestage: "other",
-          sg_why_good: "Already polished social presence — agent flagged skip.",
-          sg_opener: "N/A — strong presence",
-          sg_right_contact: "Lana Verstraeten",
-          sg_social_presence: "strong",
-          sg_vertical: "expertise_b2b",
         },
-        associations: { companies: ["co_105"], notes: ["nt_305"] },
+        associations: { companies: ["co_105"] },
       },
     ],
     notes: [
       {
         id: "nt_301",
-        contactIds: ["ct_201"],
+        companyIds: ["co_101"],
         properties: {
           hs_note_body:
-            "Lead-gen agent: why-good = consistency gap for Peeters Accountants. Opener ready. Right contact = Els Peeters (Managing Partner).",
+            "Lead-gen agent (company note, EN): why-good = consistency gap for Peeters Accountants. Opener ready. Right contact = Els Peeters (Managing Partner).",
         },
       },
       {
         id: "nt_302",
-        contactIds: ["ct_202"],
+        companyIds: ["co_102"],
         properties: {
           hs_note_body:
-            "Agent note: content quality thin vs peer NL firms. Partner Joost is the buyer.",
+            "Company note (EN): content quality thin vs peer NL firms. Partner Joost is the buyer.",
         },
       },
       {
         id: "nt_303",
-        contactIds: ["ct_203"],
+        companyIds: ["co_103"],
         properties: {
           hs_note_body:
-            "Open vacancies unused online — no employer brand story. Founder Amélie decides.",
+            "Company note (EN): open vacancies unused online — no employer brand story. Founder Amélie decides.",
         },
       },
       {
         id: "nt_304",
-        contactIds: ["ct_204"],
+        companyIds: ["co_104"],
         properties: {
-          hs_note_body: "Content mix skewed to promo. Founder Mark owns LinkedIn strategy.",
+          hs_note_body:
+            "Company note (EN): content mix skewed to promo. Founder Mark owns LinkedIn strategy.",
         },
       },
       {
         id: "nt_305",
-        contactIds: ["ct_205"],
+        companyIds: ["co_105"],
         properties: {
-          hs_note_body: "SKIP: SocialPro already has excellent social presence.",
+          hs_note_body: "SKIP (company note, EN): SocialPro already has excellent social presence.",
         },
       },
     ],
@@ -264,18 +280,31 @@ function companyById(companies: HsCompany[], id?: string): HsCompany | undefined
   return companies.find((c) => c.id === id);
 }
 
+/** Prefer company-level notes (Floor’s agent handoff); contact notes are fallback only. */
+function notesForCompany(notes: HsNote[], companyId?: string): HsNote[] {
+  if (!companyId) return [];
+  return notes.filter((n) => n.companyIds?.includes(companyId));
+}
+
 function notesForContact(notes: HsNote[], contactId: string): HsNote[] {
   return notes.filter((n) => n.contactIds?.includes(contactId));
 }
 
 function buildCrmContext(
-  props: Record<string, string | null | undefined>,
+  companyProps: Record<string, string | null | undefined>,
+  contactProps: Record<string, string | null | undefined>,
   noteBodies: string[],
   propertyMap: HubSpotPropertyMap,
 ): CrmAgentContext {
-  const whyGood = props[propertyMap.whyGood] ?? undefined;
-  const opener = props[propertyMap.opener] ?? undefined;
-  const rightContact = props[propertyMap.rightContact] ?? undefined;
+  // Company props preferred (agent handoff surface), then contact props, then note body.
+  const whyGood =
+    companyProps[propertyMap.whyGood] ?? contactProps[propertyMap.whyGood] ?? undefined;
+  const opener =
+    companyProps[propertyMap.opener] ?? contactProps[propertyMap.opener] ?? undefined;
+  const rightContact =
+    companyProps[propertyMap.rightContact] ??
+    contactProps[propertyMap.rightContact] ??
+    undefined;
   const rawNote = noteBodies.filter(Boolean).join("\n\n") || undefined;
   return {
     whyGood: whyGood || undefined,
@@ -304,13 +333,16 @@ function contactToLead(
   const practiceArea = industry || "Expertise B2B";
   const firmSize = String(cp.numberofemployees ?? "unknown");
   const socialPresence = parseSocialPresence(
-    p[propertyMap.socialPresence] as string | undefined,
+    (cp[propertyMap.socialPresence] as string | undefined) ??
+      (p[propertyMap.socialPresence] as string | undefined),
   ) as SocialPresenceSignal;
-  const verticalProp = p[propertyMap.vertical] as ExpertiseVertical | undefined;
+  const verticalProp = (cp[propertyMap.vertical] ?? p[propertyMap.vertical]) as
+    | ExpertiseVertical
+    | undefined;
   const noteBodies = notes
     .map((n) => n.properties.hs_note_body)
     .filter((x): x is string => typeof x === "string");
-  const crm = buildCrmContext(p, noteBodies, propertyMap);
+  const crm = buildCrmContext(cp, p, noteBodies, propertyMap);
   const scored = scoreExpertiseIcp({
     title,
     firmName,
@@ -341,7 +373,7 @@ function contactToLead(
     title,
     email: p.email ?? `${contact.id}@hubspot.example`,
     linkedInUrl: p.hs_linkedin_url || p.linkedin_url || undefined,
-    location: location || "Belgium",
+    location: location || "Netherlands",
     practiceArea,
     firmSize,
     icpScore: scored.score,
@@ -366,7 +398,7 @@ async function fetchLiveContacts(token: string): Promise<{
   errors: string[];
 }> {
   const errors: string[] = [];
-  const props = [
+  const contactProps = [
     "firstname",
     "lastname",
     "jobtitle",
@@ -375,6 +407,14 @@ async function fetchLiveContacts(token: string): Promise<{
     "city",
     "country",
     "lifecyclestage",
+  ].join(",");
+
+  const companyProps = [
+    "name",
+    "city",
+    "country",
+    "industry",
+    "numberofemployees",
     DEFAULT_PROPERTY_MAP.whyGood,
     DEFAULT_PROPERTY_MAP.opener,
     DEFAULT_PROPERTY_MAP.rightContact,
@@ -389,7 +429,7 @@ async function fetchLiveContacts(token: string): Promise<{
   try {
     const res = await hsFetch(
       token,
-      `/crm/v3/objects/contacts?limit=50&properties=${encodeURIComponent(props)}&associations=companies,notes`,
+      `/crm/v3/objects/contacts?limit=50&properties=${encodeURIComponent(contactProps)}&associations=companies`,
     );
     if (!res.ok) {
       errors.push(`HubSpot contacts ${res.status}: ${await res.text()}`);
@@ -408,11 +448,10 @@ async function fetchLiveContacts(token: string): Promise<{
     for (const row of data.results ?? []) {
       const companyIds =
         row.associations?.companies?.results?.map((r) => r.id) ?? [];
-      const noteIds = row.associations?.notes?.results?.map((r) => r.id) ?? [];
       contacts.push({
         id: row.id,
         properties: row.properties,
-        associations: { companies: companyIds, notes: noteIds },
+        associations: { companies: companyIds },
       });
     }
   } catch (e) {
@@ -425,7 +464,7 @@ async function fetchLiveContacts(token: string): Promise<{
     try {
       const res = await hsFetch(
         token,
-        `/crm/v3/objects/companies/${id}?properties=name,city,country,industry,numberofemployees`,
+        `/crm/v3/objects/companies/${id}?properties=${encodeURIComponent(companyProps)}&associations=notes`,
       );
       if (!res.ok) {
         errors.push(`Company ${id}: ${res.status}`);
@@ -434,14 +473,20 @@ async function fetchLiveContacts(token: string): Promise<{
       const row = (await res.json()) as {
         id: string;
         properties: Record<string, string | null>;
+        associations?: Record<string, { results?: Array<{ id: string }> }>;
       };
-      companies.push({ id: row.id, properties: row.properties });
+      const noteIds = row.associations?.notes?.results?.map((r) => r.id) ?? [];
+      companies.push({
+        id: row.id,
+        properties: row.properties,
+        associations: { notes: noteIds },
+      });
     } catch (e) {
       errors.push(`Company ${id}: ${e instanceof Error ? e.message : String(e)}`);
     }
   }
 
-  const noteIds = [...new Set(contacts.flatMap((c) => c.associations?.notes ?? []))];
+  const noteIds = [...new Set(companies.flatMap((c) => c.associations?.notes ?? []))];
   for (const id of noteIds.slice(0, 50)) {
     try {
       const res = await hsFetch(token, `/crm/v3/objects/notes/${id}?properties=hs_note_body`);
@@ -453,10 +498,10 @@ async function fetchLiveContacts(token: string): Promise<{
         id: string;
         properties: Record<string, string | null>;
       };
-      const contactIds = contacts
+      const companyIdsForNote = companies
         .filter((c) => c.associations?.notes?.includes(id))
         .map((c) => c.id);
-      notes.push({ id: row.id, properties: row.properties, contactIds });
+      notes.push({ id: row.id, properties: row.properties, companyIds: companyIdsForNote });
     } catch (e) {
       errors.push(`Note ${id}: ${e instanceof Error ? e.message : String(e)}`);
     }
@@ -503,12 +548,17 @@ export async function syncHubSpotContacts(options?: {
 
   const upserted: Lead[] = [];
   let skippedStrongPresence = 0;
+  let companyNotesFetched = 0;
 
   for (const contact of contacts) {
     const coId = contact.associations?.companies?.[0];
     const company = companyById(companies, coId);
-    const cNotes = notesForContact(notes, contact.id);
-    const lead = contactToLead(contact, company, cNotes, stageMap, propertyMap);
+    const companyNotes = notesForCompany(notes, coId);
+    const contactNotes = notesForContact(notes, contact.id);
+    // Company notes are the agent handoff; contact notes only if company has none.
+    const effectiveNotes = companyNotes.length > 0 ? companyNotes : contactNotes;
+    if (companyNotes.length > 0) companyNotesFetched += companyNotes.length;
+    const lead = contactToLead(contact, company, effectiveNotes, stageMap, propertyMap);
     if (lead.socialPresence === "strong") skippedStrongPresence += 1;
     upserted.push(lead);
   }
@@ -518,52 +568,70 @@ export async function syncHubSpotContacts(options?: {
     contactsFetched: contacts.length,
     companiesFetched: companies.length,
     notesFetched: notes.length,
+    companyNotesFetched,
     upserted,
     skippedStrongPresence,
     errors,
   };
 }
 
-/** Push internal stage back to HubSpot lifecycle (no-op in mock). */
+/**
+ * Push internal stage back to HubSpot (English labels only — Floor CRM language rule).
+ * No-op in mock mode.
+ */
 export async function pushLeadStageToHubSpot(
   lead: Lead,
   stage: LeadStage,
   token?: string | null,
-): Promise<{ ok: boolean; mode: "mock" | "live"; detail: string }> {
+): Promise<{ ok: boolean; mode: "mock" | "live"; detail: string; crmLanguage: "en" }> {
   const t = token ?? process.env.HUBSPOT_ACCESS_TOKEN ?? null;
   const mode = resolveHubSpotMode(t);
+  const englishLabel = HUBSPOT_ENGLISH_STAGE_LABELS[stage] ?? "lead";
   if (mode === "mock" || !t || !lead.hubspotContactId) {
     return {
       ok: true,
       mode: "mock",
-      detail: `Mock stage sync: ${lead.contactName} → ${stage} (no HubSpot write)`,
+      detail: `Mock stage sync (EN): ${lead.contactName} → ${englishLabel} (no HubSpot write)`,
+      crmLanguage: "en",
     };
   }
-  const reverse: Record<LeadStage, string> = {
-    new: "lead",
-    qualified: "marketingqualifiedlead",
-    outreach_drafted: "opportunity",
-    contacted: "opportunity",
-    replied: "opportunity",
-    demo_booked: "customer",
-    disqualified: "other",
-  };
   try {
+    const properties: Record<string, string> = {
+      lifecyclestage:
+        stage === "demo_booked" ||
+        stage === "demo_completed" ||
+        stage === "demo_rescheduled" ||
+        stage === "demo_cancelled"
+          ? "customer"
+          : englishLabel.toLowerCase().replace(/\s+/g, ""),
+    };
+    if (
+      stage === "demo_completed" ||
+      stage === "demo_rescheduled" ||
+      stage === "demo_cancelled" ||
+      stage === "demo_booked"
+    ) {
+      properties.sg_demo_outcome = englishLabel;
+    }
     const res = await hsFetch(t, `/crm/v3/objects/contacts/${lead.hubspotContactId}`, {
       method: "PATCH",
-      body: JSON.stringify({
-        properties: { lifecyclestage: reverse[stage] ?? "lead" },
-      }),
+      body: JSON.stringify({ properties }),
     });
     if (!res.ok) {
-      return { ok: false, mode: "live", detail: await res.text() };
+      return { ok: false, mode: "live", detail: await res.text(), crmLanguage: "en" };
     }
-    return { ok: true, mode: "live", detail: `Updated HubSpot contact ${lead.hubspotContactId}` };
+    return {
+      ok: true,
+      mode: "live",
+      detail: `Updated HubSpot contact ${lead.hubspotContactId} (EN: ${englishLabel})`,
+      crmLanguage: "en",
+    };
   } catch (e) {
     return {
       ok: false,
       mode: "live",
       detail: e instanceof Error ? e.message : String(e),
+      crmLanguage: "en",
     };
   }
 }

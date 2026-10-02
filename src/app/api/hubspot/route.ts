@@ -14,8 +14,8 @@ export async function GET() {
     stageMap: cfg.stageMap,
     propertyMap: cfg.propertyMap,
     note: tokenSet
-      ? "HUBSPOT_ACCESS_TOKEN set — sync will call HubSpot CRM API."
-      : "No HUBSPOT_ACCESS_TOKEN — sync uses mock CRM notes (why/opener/contact).",
+      ? "HUBSPOT_ACCESS_TOKEN set — sync will call HubSpot CRM API (company notes preferred)."
+      : "No HUBSPOT_ACCESS_TOKEN — sync uses mock company-level CRM notes (why/opener/contact).",
   });
 }
 

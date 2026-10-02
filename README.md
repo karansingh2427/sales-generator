@@ -1,8 +1,8 @@
 # Sales Generator (Willow BDR)
 
-Prototype for **Floor Hoefkens** (BDR @ [Willow](https://willow.co/)): **HubSpot CRM sync** of lead-gen agent notes → **multi-channel LinkedIn + email sequence drafts** (approve → mark sent) → AE demo booking. Sales Nav CSV import remains a fallback.
+Prototype for **Floor Hoefkens** (BDR @ [Willow](https://willow.co/)): **HubSpot CRM sync** of lead-gen **company notes** → **multi-channel LinkedIn + email sequence drafts** (approve → mark sent) → **per-AE calendar** demo booking. Sales Nav CSV import remains a fallback.
 
-**Geography:** Belgium & the Netherlands first. **Governance:** human-in-the-loop — nothing auto-blasts.
+**Geography:** **Netherlands-first pilot** (Belgium available). **Governance:** human-in-the-loop — nothing auto-blasts. **CRM language:** English writebacks.
 
 ## Quick start
 
@@ -19,32 +19,36 @@ Workspace state: `.data/workspace.json` (gitignored).
 
 | Mode | When | Behavior |
 |---|---|---|
-| **Mock** | `HUBSPOT_ACCESS_TOKEN` unset | Syncs demo contacts/companies/notes with why-good, opener, right contact |
-| **Live** | Token set in `.env.local` | Calls HubSpot CRM API (contacts + companies + notes), upserts into workspace |
+| **Mock** | `HUBSPOT_ACCESS_TOKEN` unset | Syncs demo contacts/companies + **company-level** notes (why-good, opener, right contact) |
+| **Live** | Token set in `.env.local` | Calls HubSpot CRM API; prefers company notes/props over contact-only |
 
 ```bash
 # .env.local
 HUBSPOT_ACCESS_TOKEN=pat-xxx   # private app token
 
-# Optional JSON maps (defaults documented in src/lib/hubspot-config.ts)
-HUBSPOT_STAGE_MAP={"marketingqualifiedlead":"qualified","demo booked":"demo_booked"}
+# Optional JSON maps (defaults in src/lib/hubspot-config.ts)
+HUBSPOT_STAGE_MAP={"demo booked":"demo_booked","demo completed":"demo_completed","demo rescheduled":"demo_rescheduled","demo cancelled":"demo_cancelled"}
 HUBSPOT_PROPERTY_MAP={"whyGood":"sg_why_good","opener":"sg_opener","rightContact":"sg_right_contact","socialPresence":"sg_social_presence","vertical":"sg_vertical"}
 ```
 
-**Still needed from Floor/ops:** confirm CRM=HubSpot, token owner, real pipeline stage labels, actual property names for agent notes.
+**Still needed from Floor/ops:** token owner, pre–Demo Booked stage labels, real AE calendar URLs, outreach language(s).
 
 ## Sequences (Floor’s #1 ask)
 
-1. Sync HubSpot (or pick any lead).
+1. Sync HubSpot (or pick any lead) — NL pilot filter by default on CSV path.
 2. **Sequences** tab → Generate (LinkedIn connect/message → wait → follow-up → email).
 3. Edit drafts → **Approve** → send in LinkedIn/email client → **Mark sent**.
 4. App never transmits messages itself.
 
-Opportunity angles encoded: consistency, content quality/mix, visibility, open vacancies — plus CRM opener/rationale. Strong social presence → disqualified / no sequence.
+Opportunity angles encoded: consistency, content quality/mix, visibility, open vacancies — plus company CRM opener/rationale. Strong social presence → disqualified / no sequence.
+
+## Demo booking
+
+Bookings use each AE’s **personal calendar link** (same mechanism Floor uses after cold calls) — not a single shared Calendly. After Demo Booked, set **Completed / Rescheduled / Cancelled**.
 
 ## Sales Nav CSV (fallback)
 
-Import panel still supports Lead List CSV with BE+NL default geo filter. Prefer HubSpot when the internal lead agent already wrote CRM notes.
+Import panel defaults geo filter to **NL** (BE toggle still available). Prefer HubSpot when the internal lead agent already wrote company notes.
 
 ## Scripts
 
@@ -53,7 +57,7 @@ Import panel still supports Lead List CSV with BE+NL default geo filter. Prefer 
 | `npm run dev` | Dev server **4317** |
 | `npm run start:demo` | Production server **4341** |
 | `npm run test:evals` | Governance eval structure |
-| `npm run test:import` | Sales Nav CSV unit checks |
+| `npm run test:import` | Sales Nav CSV / NL geo unit checks |
 | `npm run test:hubspot` | HubSpot mock + sequence unit checks |
 | `npm run lint` / `build` | Quality gates |
 
@@ -63,7 +67,7 @@ Import panel still supports Lead List CSV with BE+NL default geo filter. Prefer 
 - `GET/POST /api/sequences` — list / `generate` / `update_step` / `approve_step` / `mark_sent` / `skip_step`
 - `GET/POST /api/leads` — list / Sales Nav import / demo generate / stage
 - `GET/POST /api/outreach` — single-touch drafts
-- `GET/POST /api/bookings` — AE demos
+- `GET/POST /api/bookings` — AE demos (per-AE calendar URLs)
 
 ## Governance
 

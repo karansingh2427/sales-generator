@@ -2,7 +2,8 @@ import type { HubSpotConfig, HubSpotPropertyMap, HubSpotStageMap, LeadStage } fr
 
 /**
  * Configurable HubSpot stage labels → internal stages.
- * Floor/ops can override via HUBSPOT_STAGE_MAP JSON env (label:stage pairs).
+ * Floor confirmed post–Demo Booked: Demo Completed | Rescheduled | Cancelled.
+ * Pre–Demo Booked labels still TBD from ops — override via HUBSPOT_STAGE_MAP.
  */
 export const DEFAULT_STAGE_MAP: HubSpotStageMap = {
   lead: "new",
@@ -17,15 +18,27 @@ export const DEFAULT_STAGE_MAP: HubSpotStageMap = {
   contacted: "contacted",
   "demo booked": "demo_booked",
   "appointment scheduled": "demo_booked",
-  customer: "demo_booked",
-  evangelist: "demo_booked",
+  "demo completed": "demo_completed",
+  "demo_completed": "demo_completed",
+  completed: "demo_completed",
+  "demo rescheduled": "demo_rescheduled",
+  "demo_rescheduled": "demo_rescheduled",
+  rescheduled: "demo_rescheduled",
+  "demo cancelled": "demo_cancelled",
+  "demo_cancelled": "demo_cancelled",
+  cancelled: "demo_cancelled",
+  canceled: "demo_cancelled",
+  customer: "demo_completed",
+  evangelist: "demo_completed",
   other: "disqualified",
   unqualified: "disqualified",
 };
 
 /**
- * Property names for lead-gen agent fields on HubSpot contacts.
- * Override with HUBSPOT_PROPERTY_MAP JSON env when Floor confirms schema.
+ * Optional structured properties for agent fields.
+ * Floor’s handoff is primarily a **company-level HubSpot note** (why / opener / right contact).
+ * Property names below are fallbacks when ops also sets custom props on Company (preferred)
+ * or Contact — not a contact-only model.
  */
 export const DEFAULT_PROPERTY_MAP: HubSpotPropertyMap = {
   whyGood: "sg_why_good",
@@ -33,6 +46,34 @@ export const DEFAULT_PROPERTY_MAP: HubSpotPropertyMap = {
   rightContact: "sg_right_contact",
   socialPresence: "sg_social_presence",
   vertical: "sg_vertical",
+};
+
+/** Human-readable stage labels for UI / HubSpot English writebacks. */
+export const STAGE_UI_LABELS: Record<LeadStage, string> = {
+  new: "New",
+  qualified: "Qualified",
+  outreach_drafted: "Draft ready",
+  contacted: "Contacted",
+  replied: "Replied",
+  demo_booked: "Demo booked",
+  demo_completed: "Demo completed",
+  demo_rescheduled: "Demo rescheduled",
+  demo_cancelled: "Demo cancelled",
+  disqualified: "Disqualified",
+};
+
+/** English HubSpot lifecycle/deal labels used when pushing stages (CRM stays English). */
+export const HUBSPOT_ENGLISH_STAGE_LABELS: Record<LeadStage, string> = {
+  new: "lead",
+  qualified: "marketingqualifiedlead",
+  outreach_drafted: "opportunity",
+  contacted: "opportunity",
+  replied: "opportunity",
+  demo_booked: "Demo Booked",
+  demo_completed: "Demo Completed",
+  demo_rescheduled: "Demo Rescheduled",
+  demo_cancelled: "Demo Cancelled",
+  disqualified: "other",
 };
 
 export function parseStageMap(raw: string | undefined): HubSpotStageMap {

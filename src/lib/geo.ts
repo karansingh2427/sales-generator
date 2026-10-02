@@ -1,11 +1,18 @@
-/** Geography defaults for Willow BDR — Floor’s book is BE + NL first. */
+/** Geography defaults for Willow BDR — Floor’s NL-first pilot (BE still available). */
 
 export type GeoCode = "BE" | "NL" | "LU" | "DE" | "FR" | "UK" | "IE" | "CH" | "OTHER";
 
-export type GeoTier = "core" | "benelux" | "nearby_eu" | "other";
+export type GeoTier = "pilot" | "core" | "benelux" | "nearby_eu" | "other";
 
-/** Default import filter: Belgium + Netherlands. */
-export const DEFAULT_GEO_FILTER: GeoCode[] = ["BE", "NL"];
+/**
+ * Default import / experiment filter: Netherlands only.
+ * Belgium remains in the model and filter UI — Floor can opt BE back in.
+ */
+export const DEFAULT_GEO_FILTER: GeoCode[] = ["NL"];
+
+/** Markets Floor covers (pilot + available). */
+export const PILOT_GEO: GeoCode = "NL";
+export const AVAILABLE_GEO: GeoCode[] = ["NL", "BE"];
 
 export const GEO_LABELS: Record<GeoCode, string> = {
   BE: "Belgium",
@@ -110,20 +117,23 @@ export function detectGeoCode(...parts: (string | undefined | null)[]): GeoCode 
 }
 
 export function geoTier(code: GeoCode): GeoTier {
-  if (code === "BE" || code === "NL") return "core";
+  if (code === "NL") return "pilot";
+  if (code === "BE") return "core";
   if (code === "LU") return "benelux";
   if (code === "DE" || code === "FR" || code === "UK" || code === "IE" || code === "CH")
     return "nearby_eu";
   return "other";
 }
 
-/** ICP score bonus: core BE/NL highest, then Benelux, nearby EU, else 0. */
+/** ICP score bonus: NL pilot highest, then BE, Benelux, nearby EU. */
 export function geoScoreBonus(code: GeoCode): number {
   switch (geoTier(code)) {
+    case "pilot":
+      return 20;
     case "core":
-      return 18;
+      return 14;
     case "benelux":
-      return 12;
+      return 10;
     case "nearby_eu":
       return 6;
     default:

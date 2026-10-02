@@ -55,7 +55,7 @@ function draftLinkedInMessage(
     return {
       body: `Hi ${name} — quick follow-up. Still seeing room on ${lead.firmName}'s LinkedIn around ${angleBits}.
 
-Willow drafts a quarter of posts in your voice (${WILLOW_PITCH.valueProps[0]}). Open to a 30-min live demo where we draft for ${lead.firmName}?
+Willow drafts a quarter of posts in your voice (${WILLOW_PITCH.valueProps[0]}). Open to a 30-min live demo? We book on the AE’s personal calendar link (not a shared Calendly).
 
 — ${bdrName}`,
       rationale: whyBlock(lead, angles),
@@ -85,11 +85,11 @@ function draftEmail(
 
 ${hook}
 
-I work with Belgian & Dutch expertise firms (accountancy, legal, IT, HR/search, coaching) that need to show expertise online — without pulling decision makers into content production.
+I work with Dutch & Belgian expertise firms (accountancy, legal, IT, HR/search, coaching) — NL pilot first — that need to show expertise online — without pulling decision makers into content production.
 
 Willow: quarterly calendars, drafts in your voice, coach who knows professional services. ${WILLOW_PITCH.valueProps[2]}
 
-${WILLOW_PITCH.demoCta} Open to 30 minutes this or next week?
+${WILLOW_PITCH.demoCta} Reply to confirm interest and we’ll send the AE’s calendar link.
 
 Best,
 ${bdrName}

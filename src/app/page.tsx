@@ -3,7 +3,7 @@ import { LeadsWorkbench } from "@/components/leads-workbench";
 import type { HubSpotStatus } from "@/components/hubspot-sync-panel";
 import { readState } from "@/lib/db";
 import { defaultHubSpotConfig } from "@/lib/hubspot-config";
-import { DEFAULT_AES } from "@/lib/willow-context";
+import { aeNames, DEFAULT_AES } from "@/lib/willow-context";
 
 export const dynamic = "force-dynamic";
 
@@ -16,8 +16,8 @@ export default async function HomePage() {
     tokenConfigured: tokenSet,
     lastSyncAt: cfg.lastSyncAt ?? null,
     note: tokenSet
-      ? "HUBSPOT_ACCESS_TOKEN set — sync will call HubSpot CRM API."
-      : "No HUBSPOT_ACCESS_TOKEN — sync uses mock CRM notes (why/opener/contact).",
+      ? "HUBSPOT_ACCESS_TOKEN set — sync will call HubSpot CRM API (company notes preferred)."
+      : "No HUBSPOT_ACCESS_TOKEN — sync uses mock company-level CRM notes (why/opener/contact).",
   };
 
   return (
@@ -28,7 +28,8 @@ export default async function HomePage() {
         initialBookings={state.bookings}
         initialSequences={state.sequences ?? []}
         hubspotStatus={hubspotStatus}
-        aes={[...DEFAULT_AES]}
+        aes={aeNames()}
+        aeRoster={[...DEFAULT_AES]}
       />
     </AppShell>
   );
