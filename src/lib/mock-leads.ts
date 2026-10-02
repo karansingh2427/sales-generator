@@ -15,7 +15,14 @@ const BASE: Omit<Lead, "id" | "createdAt">[] = [
     stage: "new",
     source: "demo_sample",
     geoCode: "NL",
-    notes: "Active on LinkedIn; last post 8 weeks ago. Demo sample — not live Sales Nav.",
+    vertical: "legal",
+    socialPresence: "inconsistent",
+    notes: "Active on LinkedIn; last post 8 weeks ago. Demo sample — not live HubSpot.",
+    crm: {
+      whyGood: "Litigation-adjacent corporate firm; inconsistent posting cadence.",
+      opener: "Consistency gap vs peer NL firms — quarterly calendar angle.",
+      rightContact: "Sophie Van der Berg (Managing Partner)",
+    },
   },
   {
     firmName: "Advocatenkantoor De Clercq",
@@ -30,6 +37,8 @@ const BASE: Omit<Lead, "id" | "createdAt">[] = [
     stage: "qualified",
     source: "demo_sample",
     geoCode: "BE",
+    vertical: "legal",
+    socialPresence: "weak",
   },
   {
     firmName: "Bureau Lemaire Avocats",
@@ -43,20 +52,29 @@ const BASE: Omit<Lead, "id" | "createdAt">[] = [
     stage: "new",
     source: "demo_sample",
     geoCode: "BE",
+    vertical: "legal",
+    socialPresence: "weak",
   },
   {
-    firmName: "Rotterdam Legal Collective",
+    firmName: "Horizon Coaching Collective",
     contactName: "Anouk Vermeer",
-    title: "Head of Marketing",
-    email: "a.vermeer@rlc.nl",
+    title: "Founder",
+    email: "a.vermeer@horizoncoach.nl",
     linkedInUrl: "https://www.linkedin.com/in/example-anouk-vermeer",
     location: "Rotterdam, NL",
-    practiceArea: "Real estate",
-    firmSize: "50–100",
+    practiceArea: "Coaching / Advisory",
+    firmSize: "10–25",
     icpScore: 90,
     stage: "new",
     source: "demo_sample",
     geoCode: "NL",
+    vertical: "coaching",
+    socialPresence: "inconsistent",
+    crm: {
+      whyGood: "Coaching firm — expertise B2B; content mix is promo-only.",
+      opener: "Content mix: buyers want founder POV, not only offers.",
+      rightContact: "Anouk Vermeer (Founder)",
+    },
   },
   {
     firmName: "Hoffmann Rechtsanwälte",
@@ -70,12 +88,14 @@ const BASE: Omit<Lead, "id" | "createdAt">[] = [
     stage: "outreach_drafted",
     source: "demo_sample",
     geoCode: "DE",
+    vertical: "legal",
+    socialPresence: "unknown",
     notes: "Nearby EU — secondary to BE/NL unless Floor expands geo filter.",
   },
   {
     firmName: "Clarke & Doyle LLP",
     contactName: "Emily Clarke",
-    title: "Marketing Director",
+    title: "Operations Manager",
     email: "e.clarke@clarkedoyle.com",
     location: "Dublin, IE",
     practiceArea: "General practice",
@@ -84,6 +104,8 @@ const BASE: Omit<Lead, "id" | "createdAt">[] = [
     stage: "contacted",
     source: "demo_sample",
     geoCode: "IE",
+    vertical: "legal",
+    socialPresence: "inconsistent",
     lastTouchAt: new Date(Date.now() - 2 * 86400000).toISOString(),
   },
   {
@@ -98,6 +120,7 @@ const BASE: Omit<Lead, "id" | "createdAt">[] = [
     stage: "disqualified",
     source: "manual",
     geoCode: "NL",
+    vertical: "legal",
     notes: "Solo practitioner — below firm-size ICP.",
   },
   {
@@ -112,6 +135,8 @@ const BASE: Omit<Lead, "id" | "createdAt">[] = [
     stage: "replied",
     source: "demo_sample",
     geoCode: "BE",
+    vertical: "legal",
+    socialPresence: "weak",
     lastTouchAt: new Date(Date.now() - 86400000).toISOString(),
     notes: "Asked for demo next week — warm.",
   },
@@ -126,19 +151,18 @@ export function seedLeads(): Lead[] {
   }));
 }
 
-/** Labeled Demo / sample data fallback when Floor has no CSV handy. */
+/** Labeled Demo / sample data fallback when Floor has no HubSpot/CSV handy. */
 export function generateMockLead(filters: {
   practiceArea?: string;
   minScore?: number;
-  /** Prefer BE/NL cities for demo realism. */
   geoBias?: boolean;
 }): Lead {
   const areas = [
     "Corporate / M&A",
-    "Litigation",
-    "Employment",
-    "Real estate",
-    "IP / Tech",
+    "Accountancy",
+    "IT / SaaS",
+    "HR / Executive search",
+    "Coaching / Advisory",
   ];
   const cities = [
     ["Brussels", "BE"],
@@ -148,11 +172,13 @@ export function generateMockLead(filters: {
     ["Rotterdam", "NL"],
     ["Utrecht", "NL"],
   ] as const;
+  const titles = ["Partner", "Founder", "Operations Manager", "Managing Partner"];
   const [city, country] = cities[Math.floor(Math.random() * cities.length)];
   const practice =
     filters.practiceArea && filters.practiceArea !== "any"
       ? filters.practiceArea
       : areas[Math.floor(Math.random() * areas.length)];
+  const title = titles[Math.floor(Math.random() * titles.length)];
   const score = Math.min(
     98,
     Math.max(filters.minScore ?? 70, 80 + Math.floor(Math.random() * 18)),
@@ -161,10 +187,10 @@ export function generateMockLead(filters: {
   const suffix = id.slice(-4);
   return {
     id,
-    firmName: `${city} Legal Collective ${suffix}`,
+    firmName: `${city} Expertise Co ${suffix}`,
     contactName: "Alex Morgan",
-    title: "Head of Marketing",
-    email: `alex.morgan@${city.toLowerCase().replace(/\s/g, "")}legal.example`,
+    title,
+    email: `alex.morgan@${city.toLowerCase().replace(/\s/g, "")}expertise.example`,
     linkedInUrl: `https://www.linkedin.com/in/example-${suffix}`,
     location: `${city}, ${country}`,
     practiceArea: practice,
@@ -173,7 +199,14 @@ export function generateMockLead(filters: {
     stage: "new",
     source: "demo_sample",
     geoCode: detectGeoCode(`${city}, ${country}`),
-    notes: "Demo / sample data — replace with Sales Nav CSV import for live leads.",
+    vertical: "expertise_b2b",
+    socialPresence: "weak",
+    notes: "Demo / sample data — replace with HubSpot sync for live CRM notes.",
+    crm: {
+      whyGood: "Demo lead — weak social presence, decision-maker title.",
+      opener: "Consistency + visibility angles for expertise B2B.",
+      rightContact: `Alex Morgan (${title})`,
+    },
     createdAt: new Date().toISOString(),
   };
 }

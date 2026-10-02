@@ -1,66 +1,75 @@
 # Sales Generator (Willow BDR)
 
-Prototype automation for **Floor Hoefkens** (BDR @ [Willow](https://willow.co/)): **LinkedIn Sales Navigator CSV import** for Belgian & Dutch law-firm leads, AI-assisted outreach drafts, and AE demo booking — designed to minimize cold calling.
+Prototype for **Floor Hoefkens** (BDR @ [Willow](https://willow.co/)): **HubSpot CRM sync** of lead-gen agent notes → **multi-channel LinkedIn + email sequence drafts** (approve → mark sent) → AE demo booking. Sales Nav CSV import remains a fallback.
 
-**Geography:** most Willow clients are in **Belgium and the Netherlands**. Import geo filter defaults to **BE + NL**.
+**Geography:** Belgium & the Netherlands first. **Governance:** human-in-the-loop — nothing auto-blasts.
 
 ## Quick start
 
 ```bash
 npm install
 npm run dev
-# or for a stable local demo:
-npm run build && npm start
+# stable demo:
+npm run build && npm run start:demo   # http://127.0.0.1:4341
 ```
 
-Open [http://127.0.0.1:4317](http://127.0.0.1:4317). Workspace state persists in `.data/workspace.json` (created on first run, gitignored).
+Workspace state: `.data/workspace.json` (gitignored).
 
-Optional: set `OPENAI_API_KEY` in `.env.local` for future live model enrichment (MVP uses deterministic templates).
+## HubSpot connector
 
-## How Floor exports from Sales Nav & imports
+| Mode | When | Behavior |
+|---|---|---|
+| **Mock** | `HUBSPOT_ACCESS_TOKEN` unset | Syncs demo contacts/companies/notes with why-good, opener, right contact |
+| **Live** | Token set in `.env.local` | Calls HubSpot CRM API (contacts + companies + notes), upserts into workspace |
 
-1. In **LinkedIn Sales Navigator**, build or open a Lead List aimed at **Belgian / Dutch** law firms or professional-services contacts (title + geography filters in Sales Nav itself).
-2. Export the list as **CSV** (Lead List export — columns typically include First Name, Last Name, Title, Company, LinkedIn URL, Location, etc.).
-3. Open Sales Generator → **Leads** → **Import LinkedIn Sales Navigator**.
-4. Drag/drop or pick the CSV. Confirm column mapping (auto-detected aliases).
-5. Keep the default geo chips **BE** + **NL** (expand only if you intentionally want nearby EU).
-6. Review ICP scores, duplicates, and filtered rows → **Select suggested** or tick rows manually → **Import selected**.
-7. Draft email/InMail per lead and **mark sent** yourself — nothing auto-blasts.
+```bash
+# .env.local
+HUBSPOT_ACCESS_TOKEN=pat-xxx   # private app token
 
-**Demo without a CSV:** use the dashed **Demo / sample data** controls to add labeled BE/NL-biased sample leads for walkthroughs.
+# Optional JSON maps (defaults documented in src/lib/hubspot-config.ts)
+HUBSPOT_STAGE_MAP={"marketingqualifiedlead":"qualified","demo booked":"demo_booked"}
+HUBSPOT_PROPERTY_MAP={"whyGood":"sg_why_good","opener":"sg_opener","rightContact":"sg_right_contact","socialPresence":"sg_social_presence","vertical":"sg_vertical"}
+```
+
+**Still needed from Floor/ops:** confirm CRM=HubSpot, token owner, real pipeline stage labels, actual property names for agent notes.
+
+## Sequences (Floor’s #1 ask)
+
+1. Sync HubSpot (or pick any lead).
+2. **Sequences** tab → Generate (LinkedIn connect/message → wait → follow-up → email).
+3. Edit drafts → **Approve** → send in LinkedIn/email client → **Mark sent**.
+4. App never transmits messages itself.
+
+Opportunity angles encoded: consistency, content quality/mix, visibility, open vacancies — plus CRM opener/rationale. Strong social presence → disqualified / no sequence.
+
+## Sales Nav CSV (fallback)
+
+Import panel still supports Lead List CSV with BE+NL default geo filter. Prefer HubSpot when the internal lead agent already wrote CRM notes.
 
 ## Scripts
 
 | Command | Purpose |
 |---|---|
-| `npm run dev` | Dev server on port **4317** |
-| `npm run build` | Production build |
-| `npm run lint` | ESLint |
-| `npm run test:evals` | Validate governance + import eval cases |
-| `npm run test:import` | Unit checks for CSV map / geo / dedupe |
+| `npm run dev` | Dev server **4317** |
+| `npm run start:demo` | Production server **4341** |
+| `npm run test:evals` | Governance eval structure |
+| `npm run test:import` | Sales Nav CSV unit checks |
+| `npm run test:hubspot` | HubSpot mock + sequence unit checks |
+| `npm run lint` / `build` | Quality gates |
 
-## Governance (agent structure)
+## API
 
-Mirrors [agent-data/job-search](https://github.com/agent-data/job-search):
+- `GET/POST /api/hubspot` — status / `sync` / `push_stage`
+- `GET/POST /api/sequences` — list / `generate` / `update_step` / `approve_step` / `mark_sent` / `skip_step`
+- `GET/POST /api/leads` — list / Sales Nav import / demo generate / stage
+- `GET/POST /api/outreach` — single-touch drafts
+- `GET/POST /api/bookings` — AE demos
 
-- [AGENTS.md](./AGENTS.md) — entry map
-- [ARCHITECTURE.md](./ARCHITECTURE.md) — domains × layers
-- [docs/PRD.md](./docs/PRD.md) — requirements (BE/NL ICP, Sales Nav P0)
-- [docs/RULES.md](./docs/RULES.md) · [docs/TASKS.md](./docs/TASKS.md) · [docs/GOVERNANCE.md](./docs/GOVERNANCE.md)
-- [tests/evals.json](./tests/evals.json) — valid/invalid cases
+## Governance
 
-## API (local)
-
-- `GET/POST /api/leads` — list / `import_preview` / `import_commit` / demo `generate` / update stage
-- `GET/POST /api/outreach` — list / create draft
-- `GET/POST /api/bookings` — list / schedule demo
-
-## Still mock / out of scope this turn
-
-- Outreach templates (deterministic) — not live LLM unless key set later
-- AE booking meet links — mock URLs
-- **HubSpot** — next P0, not this PR
-- Sales Nav **API** — CSV only
+- [AGENTS.md](./AGENTS.md) · [ARCHITECTURE.md](./ARCHITECTURE.md)
+- [docs/PRD.md](./docs/PRD.md) · [RULES](./docs/RULES.md) · [TASKS](./docs/TASKS.md) · [GOVERNANCE](./docs/GOVERNANCE.md)
+- [tests/evals.json](./tests/evals.json)
 
 ## Stack
 

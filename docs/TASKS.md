@@ -2,30 +2,30 @@
 
 | Task ID | Trigger | Steps | Done when |
 |---|---|---|---|
-| T-01 | New Sales Nav list | Export Lead List CSV → Import panel → confirm BE+NL geo → map columns → select rows → Import | New `sales_nav_csv` rows in Leads tab |
-| T-01b | Demo without CSV | Demo / sample data → practice + count → Add demo samples | Labeled demo leads (BE/NL-biased) |
-| T-02 | New high-ICP lead | Email icon → review dialog → Mark sent | Stage `contacted` |
-| T-03 | LinkedIn-first account | InMail → edit copy → Mark sent | Draft in Outreach tab |
-| T-04 | Positive reply (manual stage) | Update stage to `replied` via API/UI future | Ready for T-05 |
-| T-05 | Book demo | Calendar icon → pick AE + slot → Confirm | Booking row + stage `demo_booked` |
-| T-06 | Weekly review | Outreach tab → verify rationale coverage | All drafts have rationale |
-| T-07 | Governance audit | Open `/governance` → cross-check PRD | Checklist signed off |
-| T-08 | Expand geo | Toggle DE/FR/UK etc. on import → Re-score → select | Nearby EU leads optional |
+| T-HS-01 | CRM notes ready | HubSpot panel → Sync (mock or live token) | HubSpot leads with why/opener/contact in pipeline |
+| T-SEQ-01 | High-ICP HubSpot lead | Sequences tab → select lead → Generate | Multi-step draft (LI → wait → FU → email) |
+| T-SEQ-02 | Review touch | Edit body → Approve → send in LI/email client → Mark sent | Step `sent`; lead `contacted` |
+| T-SEQ-03 | No reply after wait | Mark wait done → Approve follow-up → Mark sent → Email step | Sequence progresses without cold call |
+| T-01 | Offline list | Sales Nav CSV import (fallback) → BE+NL → select → Import | `sales_nav_csv` rows |
+| T-01b | Demo without CRM | Demo / sample data → Add demo samples | Labeled demo leads |
+| T-02 | Single-touch email | Email icon → review → Mark sent | Stage `contacted` |
+| T-05 | Book demo | Calendar icon → AE + slot → Confirm | Booking + `demo_booked` |
+| T-07 | Governance audit | Open `/governance` | Checklist signed off |
 
-## Sales Nav export (Floor)
+## HubSpot setup (Floor / ops)
 
-1. LinkedIn Sales Navigator → Lead List (BE/NL lawyer / professional-services search).
-2. Export / download as CSV (Lead List export).
-3. Drop into Sales Generator import panel; keep default geo **BE + NL** unless intentionally expanding.
-4. Review ICP scores + duplicates; import selected only.
-5. Draft outreach per lead — still human send.
+1. Create HubSpot private app with CRM contacts/companies/notes read (and contacts write for stage push).
+2. Put token in `.env.local` as `HUBSPOT_ACCESS_TOKEN`.
+3. Optional: `HUBSPOT_STAGE_MAP` JSON (label → internal stage).
+4. Optional: `HUBSPOT_PROPERTY_MAP` JSON for why/opener/right contact property names.
+5. Sync → generate sequence → approve → mark sent (still human).
 
 ## Agent tasks (future plugin)
 
 | Task ID | Skill (planned) | Notes |
 |---|---|---|
-| A-01 | `sales-lead-run` | Sales Nav CSV + future HubSpot sync |
-| A-02 | `sales-outreach-draft` | Wrap `draftOutreach` + optional LLM |
+| A-01 | `sales-lead-run` | HubSpot sync + Sales Nav CSV fallback |
+| A-02 | `sales-outreach-draft` | Sequence builder + optional LLM |
 | A-03 | `sales-book-demo` | Calendly + AE round-robin |
 
-MVP implements T-01–T-05 and T-08 in the web UI. HubSpot is **out of scope this turn**.
+This slice implements T-HS-01, T-SEQ-01–03, plus prior T-01/T-05. Auto-send remains **out of scope**.

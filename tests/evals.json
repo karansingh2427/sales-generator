@@ -1,6 +1,6 @@
 {
   "product": "sales-generator",
-  "harness": "MVP evals are structural and API-level. Run npm run test:evals and npm run test:import. Invalid cases must return 4xx with plain error strings.",
+  "harness": "Run npm run test:evals, test:import, test:hubspot. Invalid cases must return 4xx with plain error strings. No auto-send.",
   "valid_cases": [
     {
       "id": "V-01",
@@ -61,6 +61,29 @@
         "Duplicate skipped (skippedDuplicates >= 1 or not re-added)",
         "Workspace lead count does not double for same email"
       ]
+    },
+    {
+      "id": "V-07",
+      "scenario": "HubSpot sync in mock mode without token",
+      "request": "POST /api/hubspot { action: sync } with HUBSPOT_ACCESS_TOKEN unset",
+      "expectations": [
+        "Response 200 mode === mock",
+        "upserted leads include CRM whyGood/opener",
+        "source === hubspot",
+        "strong social presence leads flagged (skippedStrongPresence >= 1 or stage disqualified)"
+      ]
+    },
+    {
+      "id": "V-08",
+      "scenario": "Generate multi-channel sequence then approve and mark sent",
+      "request": "POST /api/sequences generate → approve_step → mark_sent",
+      "expectations": [
+        "Sequence steps include linkedin_connect, wait, linkedin_followup, email",
+        "Opportunity angles non-empty",
+        "mark_sent without approve returns 400",
+        "After approve+mark_sent step status sent and lead stage contacted",
+        "App does not transmit LinkedIn/email itself"
+      ]
     }
   ],
   "invalid_cases": [
@@ -99,6 +122,18 @@
       "scenario": "Import commit without selected rows (no silent blast)",
       "request": "POST /api/leads { action: import_commit, rows: [] }",
       "expectations": ["Response 400", "error mentions rows / human-in-the-loop"]
+    },
+    {
+      "id": "I-07",
+      "scenario": "Sequence mark_sent before approve (no silent send)",
+      "request": "POST /api/sequences { action: mark_sent, sequenceId, stepId } on draft step",
+      "expectations": ["Response 400", "error mentions approve / human-in-the-loop"]
+    },
+    {
+      "id": "I-08",
+      "scenario": "Generate sequence for disqualified / strong-presence lead",
+      "request": "POST /api/sequences { action: generate, leadId: disqualified }",
+      "expectations": ["Response 422", "error mentions disqualified"]
     }
   ]
 }

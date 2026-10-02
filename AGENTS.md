@@ -1,7 +1,8 @@
 # sales-generator — Agent Map
 
-A **Willow BDR operating prototype**: a Next.js app plus governance corpus that imports lawyer ICP leads
-from LinkedIn Sales Navigator (CSV), drafts AI-assisted outreach, and books AE demos — so cold calling stays minimal.
+A **Willow BDR operating prototype**: Next.js app plus governance corpus that syncs HubSpot CRM notes
+(why-good, opener, right contact), drafts multi-channel LinkedIn + email sequences with human approve,
+and keeps Sales Nav CSV as fallback — so cold calling stays minimal.
 
 **Geography locked:** Belgium & the Netherlands first (most Willow clients).
 
@@ -9,25 +10,22 @@ from LinkedIn Sales Navigator (CSV), drafts AI-assisted outreach, and books AE d
 
 ## Start here
 
-- **[ARCHITECTURE.md](ARCHITECTURE.md)** — product domains × architectural layers (summary table).
-- **[docs/PRD.md](docs/PRD.md)** — requirements and scope for Floor Hoefkens (BE/NL ICP, Sales Nav P0).
-- **Runtime contracts** — [docs/RULES.md](docs/RULES.md) (conduct), [docs/TASKS.md](docs/TASKS.md) (operator flows), [docs/GOVERNANCE.md](docs/GOVERNANCE.md) (data + consent). Do not duplicate them in skills; link.
-
-## Design & product
-
-- [docs/PRD.md](docs/PRD.md) — product scope and non-goals (HubSpot out this turn).
+- **[ARCHITECTURE.md](ARCHITECTURE.md)** — product domains × architectural layers.
+- **[docs/PRD.md](docs/PRD.md)** — Floor requirements (HubSpot hero, sequences, draft→approve).
+- **Runtime contracts** — [docs/RULES.md](docs/RULES.md), [docs/TASKS.md](docs/TASKS.md), [docs/GOVERNANCE.md](docs/GOVERNANCE.md).
 
 ## Quality · governance · interface
 
-- [docs/QUALITY_SCORE.md](docs/QUALITY_SCORE.md) — qualitative grades per domain × layer.
-- [docs/GOVERNANCE.md](docs/GOVERNANCE.md) — security, PII, Sales Nav CSV vs demo samples.
-- [tests/evals.json](tests/evals.json) — valid / invalid behavioral test cases.
+- [docs/QUALITY_SCORE.md](docs/QUALITY_SCORE.md)
+- [tests/evals.json](tests/evals.json) — valid / invalid cases (HubSpot + sequences included).
 
 ## Working here
 
-- **Single source of truth:** Sales Nav parse/map/dedupe/score in `src/lib/sales-nav-import.ts` + `src/lib/geo.ts`; outreach validation in `src/lib/outreach-engine.ts`; booking validation in `src/app/api/bookings/route.ts`; workspace persistence in `src/lib/db.ts`.
-- **Live leads:** CSV import; **Demo / sample data** is the labeled fallback only.
-- Before PR: `npm run lint`, `npm run build`, `npm run test:evals`, `npm run test:import`.
+- **HubSpot:** `src/lib/hubspot.ts`, `src/lib/hubspot-config.ts`, `src/app/api/hubspot/route.ts`
+- **Sequences:** `src/lib/sequence-engine.ts`, `src/app/api/sequences/route.ts`, `src/components/sequence-builder-panel.tsx`
+- **ICP:** `src/lib/icp.ts` (decision makers, verticals, social presence)
+- **Fallback CSV:** `src/lib/sales-nav-import.ts`
+- Before ship: `npm run lint`, `npm run build`, `npm run test:evals`, `npm run test:import`, `npm run test:hubspot`.
 
 <!-- BEGIN:nextjs-agent-rules -->
 

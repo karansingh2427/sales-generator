@@ -29,11 +29,19 @@ if (!rules.includes("Belgium") && !rules.includes("BE + NL")) {
   console.error("RULES.md must mention Belgium / BE+NL geography");
   ok = false;
 }
+if (!rules.includes("approve") && !rules.includes("auto-send") && !rules.includes("auto-blast")) {
+  console.error("RULES.md must mention human approve / no auto-send");
+  ok = false;
+}
+if (!rules.includes("HubSpot")) {
+  console.error("RULES.md must mention HubSpot");
+  ok = false;
+}
 
 const ids = [...evals.valid_cases, ...evals.invalid_cases].map((c) => c.id);
-for (const required of ["V-04", "V-05", "I-05", "I-06"]) {
+for (const required of ["V-04", "V-05", "V-07", "V-08", "I-05", "I-06", "I-07", "I-08"]) {
   if (!ids.includes(required)) {
-    console.error(`Missing Sales Nav eval case ${required}`);
+    console.error(`Missing eval case ${required}`);
     ok = false;
   }
 }

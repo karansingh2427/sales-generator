@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
-import type { DemoBooking, Lead, OutreachDraft } from "@/types/sales";
+import type { DemoBooking, Lead, OutreachDraft, OutreachSequence } from "@/types/sales";
 import { PRACTICE_AREAS, WILLOW_PITCH, ICP_GEOGRAPHY } from "@/lib/willow-context";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -34,8 +34,10 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Sparkles, PhoneOff, CalendarPlus, Mail } from "lucide-react";
+import { Sparkles, PhoneOff, CalendarPlus, Mail, ListOrdered } from "lucide-react";
 import { SalesNavImportPanel } from "@/components/sales-nav-import-panel";
+import { HubSpotSyncPanel, type HubSpotStatus } from "@/components/hubspot-sync-panel";
+import { SequenceBuilderPanel } from "@/components/sequence-builder-panel";
 
 const STAGE_LABEL: Record<Lead["stage"], string> = {
   new: "New",
@@ -58,6 +60,8 @@ type WorkbenchProps = {
   initialLeads: Lead[];
   initialOutreach: OutreachDraft[];
   initialBookings: DemoBooking[];
+  initialSequences: OutreachSequence[];
+  hubspotStatus: HubSpotStatus;
   aes: string[];
 };
 
@@ -65,11 +69,14 @@ export function LeadsWorkbench({
   initialLeads,
   initialOutreach,
   initialBookings,
+  initialSequences,
+  hubspotStatus,
   aes,
 }: WorkbenchProps) {
   const [leads, setLeads] = useState<Lead[]>(initialLeads);
   const [outreach, setOutreach] = useState<OutreachDraft[]>(initialOutreach);
   const [bookings, setBookings] = useState<DemoBooking[]>(initialBookings);
+  const [sequences, setSequences] = useState<OutreachSequence[]>(initialSequences);
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState<Lead | null>(null);
   const [draft, setDraft] = useState<OutreachDraft | null>(null);
@@ -83,19 +90,23 @@ export function LeadsWorkbench({
   });
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
+  const [sequenceFocusLeadId, setSequenceFocusLeadId] = useState<string | null>(null);
+  const [tab, setTab] = useState("leads");
 
   const refresh = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const [l, o, b] = await Promise.all([
+      const [l, o, b, s] = await Promise.all([
         fetch("/api/leads").then((r) => r.json()),
         fetch("/api/outreach").then((r) => r.json()),
         fetch("/api/bookings").then((r) => r.json()),
+        fetch("/api/sequences").then((r) => r.json()),
       ]);
       setLeads(l.leads ?? []);
       setOutreach(o.outreach ?? []);
       setBookings(b.bookings ?? []);
+      setSequences(s.sequences ?? []);
     } catch {
       setError("Could not load workspace. Retry in a moment.");
     } finally {
@@ -261,14 +272,27 @@ export function LeadsWorkbench({
         </p>
       )}
 
-      <Tabs defaultValue="leads">
+      <Tabs value={tab} onValueChange={setTab}>
         <TabsList>
           <TabsTrigger value="leads">Leads</TabsTrigger>
+          <TabsTrigger value="sequences">Sequences</TabsTrigger>
           <TabsTrigger value="outreach">Outreach</TabsTrigger>
           <TabsTrigger value="bookings">Demo calendar</TabsTrigger>
         </TabsList>
 
         <TabsContent value="leads" className="space-y-4">
+          <HubSpotSyncPanel
+            initialStatus={hubspotStatus}
+            onSynced={() => {
+              void refresh();
+            }}
+            onError={(msg) => setError(msg || null)}
+            onStatus={(msg) => {
+              setError(null);
+              setStatus(msg);
+            }}
+          />
+
           <SalesNavImportPanel
             onImported={(n) => {
               void refresh().then(() => {
@@ -285,10 +309,10 @@ export function LeadsWorkbench({
           <Card>
             <CardHeader className="flex flex-row flex-wrap items-end justify-between gap-4">
               <div>
-                <CardTitle>Law firm ICP pipeline</CardTitle>
+                <CardTitle>Expertise B2B pipeline</CardTitle>
                 <CardDescription>
-                  Live path: Sales Nav CSV above. Geo default {ICP_GEOGRAPHY.defaultFilterLabel}. Demo
-                  samples below are labeled fallback only.
+                  Hero: HubSpot sync (agent notes). Fallback: Sales Nav CSV. Geo default{" "}
+                  {ICP_GEOGRAPHY.defaultFilterLabel}. Demo samples are labeled fallback only.
                 </CardDescription>
               </div>
               <div className="flex flex-wrap items-end gap-2 rounded-md border border-dashed border-muted-foreground/40 bg-muted/30 p-3">
@@ -364,17 +388,36 @@ export function LeadsWorkbench({
                         </TableCell>
                         <TableCell>
                           <Badge variant="outline" className="text-[10px]">
-                            {lead.source === "sales_nav_csv"
-                              ? "Sales Nav"
-                              : lead.source === "demo_sample" || lead.source === "mock_apollo"
-                                ? "Demo"
-                                : lead.source}
+                            {lead.source === "hubspot"
+                              ? "HubSpot"
+                              : lead.source === "sales_nav_csv"
+                                ? "Sales Nav"
+                                : lead.source === "demo_sample" || lead.source === "mock_apollo"
+                                  ? "Demo"
+                                  : lead.source}
                           </Badge>
+                          {lead.socialPresence && lead.socialPresence !== "unknown" && (
+                            <div className="mt-1 text-[10px] text-muted-foreground">
+                              Social: {lead.socialPresence}
+                            </div>
+                          )}
                         </TableCell>
                         <TableCell>
                           <Badge variant={stageVariant(lead.stage)}>{STAGE_LABEL[lead.stage]}</Badge>
                         </TableCell>
                         <TableCell className="text-right space-x-1">
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            disabled={lead.stage === "disqualified"}
+                            title="Build LinkedIn + email sequence"
+                            onClick={() => {
+                              setSequenceFocusLeadId(lead.id);
+                              setTab("sequences");
+                            }}
+                          >
+                            <ListOrdered className="h-3.5 w-3.5" />
+                          </Button>
                           <Button
                             size="sm"
                             variant="outline"
@@ -408,12 +451,27 @@ export function LeadsWorkbench({
           </Card>
         </TabsContent>
 
+        <TabsContent value="sequences" className="space-y-4">
+          <SequenceBuilderPanel
+            leads={leads}
+            initialSequences={sequences}
+            focusLeadId={sequenceFocusLeadId}
+            onChanged={() => void refresh()}
+            onError={(msg) => setError(msg || null)}
+            onStatus={(msg) => {
+              setError(null);
+              setStatus(msg);
+            }}
+          />
+        </TabsContent>
+
         <TabsContent value="outreach">
           <Card>
             <CardHeader>
               <CardTitle>AI-assisted drafts</CardTitle>
               <CardDescription>
-                Template engine mirrors Claude-for-sales playbooks; set OPENAI_API_KEY for live model later.
+                Single-touch drafts and sequence step mirrors. Prefer the Sequences tab for
+                multi-channel playbooks. Nothing auto-sends.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
