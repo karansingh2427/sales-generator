@@ -1,15 +1,16 @@
 {
   "product": "sales-generator",
-  "harness": "MVP evals are structural and API-level. Run npm run test:evals. Invalid cases must return 4xx with plain error strings.",
+  "harness": "MVP evals are structural and API-level. Run npm run test:evals and npm run test:import. Invalid cases must return 4xx with plain error strings.",
   "valid_cases": [
     {
       "id": "V-01",
-      "scenario": "Generate three corporate law leads",
+      "scenario": "Generate three corporate law demo sample leads (fallback)",
       "request": "POST /api/leads { action: generate, count: 3, practiceArea: Corporate / M&A, minScore: 80 }",
       "expectations": [
         "Response 200 with added.length === 3",
         "Each lead has practiceArea containing Corporate",
-        "Each icpScore >= 80"
+        "Each icpScore >= 80",
+        "source is demo_sample"
       ]
     },
     {
@@ -29,6 +30,36 @@
       "expectations": [
         "Response 200 with booking.meetingLink",
         "Lead stage demo_booked"
+      ]
+    },
+    {
+      "id": "V-04",
+      "scenario": "Preview Sales Nav CSV with default BE+NL geo filter",
+      "request": "POST /api/leads { action: import_preview, csvText: <fixture>, geoFilter: [BE, NL], minScore: 70 }",
+      "expectations": [
+        "Response 200 with preview.rows length matching fixture",
+        "preview.geoFilter includes BE and NL",
+        "BE/NL lawyer rows score higher than US-only rows",
+        "Column mapping auto-detects First Name / Company / LinkedIn URL aliases"
+      ]
+    },
+    {
+      "id": "V-05",
+      "scenario": "Commit selected Sales Nav rows after human review",
+      "request": "POST /api/leads { action: import_commit, rows: [one BE lawyer] }",
+      "expectations": [
+        "Response 200 with added.length >= 1",
+        "added[0].source === sales_nav_csv",
+        "Lead persisted in workspace.json"
+      ]
+    },
+    {
+      "id": "V-06",
+      "scenario": "Deduplicate import by email or LinkedIn URL",
+      "request": "POST import_commit with email matching existing workspace lead",
+      "expectations": [
+        "Duplicate skipped (skippedDuplicates >= 1 or not re-added)",
+        "Workspace lead count does not double for same email"
       ]
     }
   ],
@@ -56,6 +87,18 @@
       "scenario": "Booking duration out of range",
       "request": "POST /api/bookings { leadId: lead_1, aeName: Sarah Chen, scheduledAt: future ISO, durationMinutes: 5 }",
       "expectations": ["Response 400", "error mentions duration"]
+    },
+    {
+      "id": "I-05",
+      "scenario": "Import preview without csvText",
+      "request": "POST /api/leads { action: import_preview }",
+      "expectations": ["Response 400", "error mentions csvText"]
+    },
+    {
+      "id": "I-06",
+      "scenario": "Import commit without selected rows (no silent blast)",
+      "request": "POST /api/leads { action: import_commit, rows: [] }",
+      "expectations": ["Response 400", "error mentions rows / human-in-the-loop"]
     }
   ]
 }

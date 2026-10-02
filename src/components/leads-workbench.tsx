@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo, useState } from "react";
 import type { DemoBooking, Lead, OutreachDraft } from "@/types/sales";
-import { PRACTICE_AREAS, WILLOW_PITCH } from "@/lib/willow-context";
+import { PRACTICE_AREAS, WILLOW_PITCH, ICP_GEOGRAPHY } from "@/lib/willow-context";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -35,6 +35,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sparkles, PhoneOff, CalendarPlus, Mail } from "lucide-react";
+import { SalesNavImportPanel } from "@/components/sales-nav-import-panel";
 
 const STAGE_LABEL: Record<Lead["stage"], string> = {
   new: "New",
@@ -112,7 +113,7 @@ export function LeadsWorkbench({
     };
   }, [leads, outreach]);
 
-  async function generateLeads() {
+  async function generateDemoLeads() {
     setError(null);
     const res = await fetch("/api/leads", {
       method: "POST",
@@ -125,12 +126,14 @@ export function LeadsWorkbench({
       }),
     });
     if (!res.ok) {
-      setError("Lead generation failed.");
+      setError("Demo sample generation failed.");
       return;
     }
     const data = await res.json();
     await refresh();
-    setStatus(`Added ${data.added?.length ?? 0} new leads at the top of the table.`);
+    setStatus(
+      `Added ${data.added?.length ?? 0} Demo / sample leads (BE/NL-biased). Use Sales Nav CSV for live prospects.`,
+    );
   }
 
   async function draftForLead(lead: Lead, channel: "email" | "linkedin_dm") {
@@ -266,13 +269,32 @@ export function LeadsWorkbench({
         </TabsList>
 
         <TabsContent value="leads" className="space-y-4">
+          <SalesNavImportPanel
+            onImported={(n) => {
+              void refresh().then(() => {
+                if (n === 0) setStatus("No new leads added (all duplicates or empty selection).");
+              });
+            }}
+            onError={(msg) => setError(msg || null)}
+            onStatus={(msg) => {
+              setError(null);
+              setStatus(msg);
+            }}
+          />
+
           <Card>
             <CardHeader className="flex flex-row flex-wrap items-end justify-between gap-4">
               <div>
-                <CardTitle>Law firm ICP</CardTitle>
-                <CardDescription>Mock Apollo-style pull — no API key required.</CardDescription>
+                <CardTitle>Law firm ICP pipeline</CardTitle>
+                <CardDescription>
+                  Live path: Sales Nav CSV above. Geo default {ICP_GEOGRAPHY.defaultFilterLabel}. Demo
+                  samples below are labeled fallback only.
+                </CardDescription>
               </div>
-              <div className="flex flex-wrap items-end gap-2">
+              <div className="flex flex-wrap items-end gap-2 rounded-md border border-dashed border-muted-foreground/40 bg-muted/30 p-3">
+                <div className="w-full text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+                  Demo / sample data
+                </div>
                 <div className="space-y-1">
                   <Label className="text-xs">Practice</Label>
                   <Select
@@ -303,9 +325,9 @@ export function LeadsWorkbench({
                     onChange={(e) => setGenCount(Number(e.target.value))}
                   />
                 </div>
-                <Button onClick={() => void generateLeads()}>
+                <Button variant="secondary" onClick={() => void generateDemoLeads()}>
                   <Sparkles className="mr-2 h-4 w-4" />
-                  Generate leads
+                  Add demo samples
                 </Button>
               </div>
             </CardHeader>
@@ -318,6 +340,7 @@ export function LeadsWorkbench({
                       <TableHead>Contact</TableHead>
                       <TableHead>Practice</TableHead>
                       <TableHead>ICP</TableHead>
+                      <TableHead>Source</TableHead>
                       <TableHead>Stage</TableHead>
                       <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
@@ -337,6 +360,15 @@ export function LeadsWorkbench({
                         <TableCell>
                           <Badge variant={lead.icpScore >= 85 ? "default" : "secondary"}>
                             {lead.icpScore}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className="text-[10px]">
+                            {lead.source === "sales_nav_csv"
+                              ? "Sales Nav"
+                              : lead.source === "demo_sample" || lead.source === "mock_apollo"
+                                ? "Demo"
+                                : lead.source}
                           </Badge>
                         </TableCell>
                         <TableCell>

@@ -10,8 +10,16 @@ export function scoreLeadRationale(lead: Lead): string {
   if (lead.icpScore >= 85) reasons.push("Strong ICP fit (firm size + legal vertical).");
   if (lead.practiceArea.includes("Corporate") || lead.practiceArea.includes("Litigation"))
     reasons.push("Practice area aligns with Willow's legal case studies.");
-  if (lead.location.includes("NL") || lead.location.includes("BE") || lead.location.includes("UK"))
-    reasons.push("Benelux/UK — core Willow market.");
+  if (
+    lead.geoCode === "BE" ||
+    lead.geoCode === "NL" ||
+    /\b(BE|NL|Belgium|Netherlands|Brussels|Amsterdam|Antwerp|Ghent|Rotterdam)\b/i.test(
+      lead.location,
+    )
+  )
+    reasons.push("Belgium/Netherlands — core Willow market.");
+  else if (/\b(LU|UK|DE|FR|IE|CH)\b/i.test(lead.location))
+    reasons.push("Nearby EU — secondary to BE/NL book.");
   if (lead.notes?.toLowerCase().includes("linkedin"))
     reasons.push("LinkedIn activity gap — good hook for consistency story.");
   if (reasons.length === 0) reasons.push("Meets baseline lawyer ICP; personalize from firm site.");
