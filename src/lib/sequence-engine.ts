@@ -5,49 +5,46 @@ import type {
   SequenceStep,
   SequenceStepKind,
 } from "@/types/sales";
-import { describeAngles, inferOpportunityAngles, type OpportunityAngle } from "@/lib/icp";
-import { WILLOW_PITCH } from "@/lib/willow-context";
+import { inferOpportunityAngles } from "@/lib/icp";
+import { buildStoryArc, type StoryArc } from "@/lib/story-arc";
 
 function firstName(full: string): string {
   return full.split(/\s+/)[0] ?? full;
 }
 
-function primaryAngleLine(angles: OpportunityAngle[], lead: Lead): string {
-  const fromCrm = lead.crm?.opener?.trim();
-  if (fromCrm) return fromCrm;
-  const described = describeAngles(angles);
-  return described[0] ?? "visibility without burning expert time";
-}
-
-function whyBlock(lead: Lead, angles: OpportunityAngle[]): string {
-  const parts: string[] = [];
+function whyBlock(lead: Lead, arc: StoryArc): string {
+  const parts: string[] = [`Story: ${arc.angle}`];
   if (lead.crm?.whyGood) parts.push(lead.crm.whyGood);
-  parts.push(...describeAngles(angles));
+  parts.push(arc.insight);
   if (lead.crm?.rightContact) parts.push(`Right contact: ${lead.crm.rightContact}`);
   return parts.join(" · ");
 }
 
 type EmailTouch = 1 | 2 | 3;
 
+/**
+ * Senior sales voice: calm, specific, peer-to-peer.
+ * One story thread across Email 1–3. Soft CTA — never a demo/feature dump in E1.
+ */
 function draftEmail(
   lead: Lead,
-  angles: OpportunityAngle[],
+  arc: StoryArc,
   bdrName: string,
   touch: EmailTouch,
 ): { subject: string; body: string; rationale: string } {
   const name = firstName(lead.contactName);
-  const hook = primaryAngleLine(angles, lead);
-  const angleBits = describeAngles(angles).slice(0, 2).join("; ") || "visibility / consistency";
-  const rationale = whyBlock(lead, angles);
+  const rationale = whyBlock(lead, arc);
 
   if (touch === 2) {
     return {
-      subject: `Re: ${lead.firmName}`,
+      subject: `Re: ${arc.subjectHint}`,
       body: `Hi ${name},
 
-Quick follow-up on my note about ${lead.firmName} — still seeing room around ${angleBits}.
+Circling back briefly on ${lead.firmName} — still thinking about ${arc.insight.replace(/\.$/, "")}.
 
-Happy to show how Willow helps in a short call with Ludwig if useful. If not a priority, no worries.
+${arc.tension}
+
+If useful to compare notes, I’m happy to. If not a priority, no worries at all.
 
 Best,
 ${bdrName}`,
@@ -60,7 +57,7 @@ ${bdrName}`,
       subject: `Last note — ${lead.firmName}`,
       body: `Hi ${name},
 
-Last note from me. If improving how ${lead.firmName} shows expertise online is on the radar, I can set up 30 minutes with Ludwig.
+Last note from me on this. If the ${arc.angle === "open_vacancies" ? "hiring / visibility" : arc.angle.replace(/_/g, " ")} angle for ${lead.firmName} is on your radar, I’m glad to continue the conversation — or introduce Ludwig for a short chat.
 
 If timing is off, just say so and I’ll close the loop.
 
@@ -70,26 +67,27 @@ ${bdrName}`,
     };
   }
 
-  // Email 1 — personalized opener from HubSpot note (never invent scrape facts)
-  const subject = `${lead.firmName} — ${hook.split(/[.!?]/)[0]?.slice(0, 60) || "quick thought"}`;
+  // Email 1 — insight → one tension → soft Willow bridge (same story) → short CTA
   const body = `Hi ${name},
 
-${hook}
+${arc.insight}
 
-${lead.crm?.whyGood ? `${lead.crm.whyGood}\n\n` : ""}For expertise firms like yours, Willow helps with ${angleBits} without pulling decision makers into content production. ${WILLOW_PITCH.valueProps[0]}.
+${arc.tension}
 
-Open to a short intro with Ludwig?
+${arc.willowBridge}
+
+Curious whether this is on your radar — open to a short chat if useful.
 
 Best,
-${bdrName}
-BDR · Willow`;
-  return { subject, body, rationale };
+${bdrName}`;
+
+  return { subject: arc.subjectHint, body, rationale };
 }
 
 /**
- * Floor end vision (Dutch pilot): max 3 Gmail emails.
+ * Floor Dutch pilot: max 3 Gmail emails.
  * Email 1 now → wait ~1 week → Email 2 → wait ~1 week → Email 3.
- * Stop early on clear no or interest (handled in skills, not this builder).
+ * Same story arc on every touch. Stop early on clear no or interest (skills).
  */
 const DEFAULT_PLAYBOOK: {
   kind: SequenceStepKind;
@@ -97,11 +95,11 @@ const DEFAULT_PLAYBOOK: {
   waitDays: number;
   touch?: EmailTouch;
 }[] = [
-  { kind: "email", label: "Email 1 — opener from HubSpot note", waitDays: 0, touch: 1 },
+  { kind: "email", label: "Email 1 — HubSpot insight → one story", waitDays: 0, touch: 1 },
   { kind: "wait", label: "Wait for reply (~1 week)", waitDays: 7 },
-  { kind: "email", label: "Email 2 — follow-up", waitDays: 0, touch: 2 },
+  { kind: "email", label: "Email 2 — same story, light escalate", waitDays: 0, touch: 2 },
   { kind: "wait", label: "Wait for reply (~1 week)", waitDays: 7 },
-  { kind: "email", label: "Email 3 — last note", waitDays: 0, touch: 3 },
+  { kind: "email", label: "Email 3 — same story, last note", waitDays: 0, touch: 3 },
 ];
 
 function channelFor(kind: SequenceStepKind): OutreachChannel | undefined {
@@ -141,6 +139,7 @@ export function buildSequenceForLead(
   options: BuildSequenceOptions = {},
 ): Omit<OutreachSequence, "id" | "createdAt" | "updatedAt"> {
   const angles = inferOpportunityAngles(lead);
+  const arc = buildStoryArc(lead);
   const guidance = options.feedbackGuidance;
   const neverPitch = options.neverPitchTopics;
   let emailTouch = 1 as EmailTouch;
@@ -155,7 +154,7 @@ export function buildSequenceForLead(
         waitDays: p.waitDays,
         status: "pending" as const,
         rationale: withFeedbackRationale(
-          `Pause ~${p.waitDays} days (~1 week). Cap 3 emails. Stop early on clear no or interest → Slack Floor.`,
+          `Pause ~${p.waitDays} days (~1 week). Same story on next email. Cap 3. Stop on clear no or interest → Slack Floor.`,
           guidance,
         ),
       };
@@ -163,7 +162,7 @@ export function buildSequenceForLead(
     if (p.kind === "email") {
       const touch = (p.touch ?? emailTouch) as EmailTouch;
       emailTouch = Math.min(3, (touch + 1) as EmailTouch) as EmailTouch;
-      const d = draftEmail(lead, angles, bdrName, touch);
+      const d = draftEmail(lead, arc, bdrName, touch);
       return {
         id,
         kind: p.kind,
@@ -187,7 +186,7 @@ export function buildSequenceForLead(
         `(Not used in Dutch pilot — Gmail only.) Contact ${firstName(lead.contactName)} at ${lead.firmName}.`,
         neverPitch,
       ),
-      rationale: withFeedbackRationale(whyBlock(lead, angles), guidance),
+      rationale: withFeedbackRationale(whyBlock(lead, arc), guidance),
       status: "draft" as const,
     };
   });
@@ -197,7 +196,7 @@ export function buildSequenceForLead(
     name: `Gmail cold sequence (max 3) · ${lead.firmName}`,
     status: "draft",
     steps,
-    opportunityAngles: angles,
+    opportunityAngles: angles.length ? [arc.angle, ...angles.filter((a) => a !== arc.angle)] : [arc.angle],
   };
 }
 

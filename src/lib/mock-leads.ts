@@ -20,7 +20,7 @@ const BASE: Omit<Lead, "id" | "createdAt">[] = [
     notes: "Active on LinkedIn; last post 8 weeks ago. Demo sample — not live HubSpot.",
     crm: {
       whyGood: "Litigation-adjacent corporate firm; inconsistent posting cadence.",
-      opener: "Consistency gap vs peer NL firms — quarterly calendar angle.",
+      opener: "Consistency gap vs peer NL firms — LinkedIn has gone quiet.",
       rightContact: "Sophie Van der Berg (Managing Partner)",
     },
   },

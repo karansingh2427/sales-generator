@@ -1,5 +1,4 @@
 import type { Lead, OutreachChannel, OutreachDraft } from "@/types/sales";
-import { WILLOW_PITCH } from "@/lib/willow-context";
 import { describeAngles, inferOpportunityAngles } from "@/lib/icp";
 
 function firstName(full: string): string {
@@ -68,18 +67,15 @@ Willow drafts posts in your firm's voice (EU/GDPR). Worth a 30-min live demo? We
     };
   }
 
-  const subject = `${lead.firmName} — LinkedIn consistency without expert time?`;
+  const subject = `${lead.firmName} — a quick thought`;
   const body = `Hi ${name},
 
-${opener || `I noticed ${lead.firmName}'s ${lead.practiceArea.toLowerCase()} work — and that keeping LinkedIn consistent usually falls on marketing (or partners) without a system.`}
+${opener || `I noticed ${lead.firmName}'s ${lead.practiceArea.toLowerCase()} work — and that how you show up online may not match the expertise you deliver.`}
 
-Willow helps professional-services and expertise B2B firms post steadily in their own voice: quarterly calendars, drafts from a business profile, and a coach. ${WILLOW_PITCH.valueProps[0]}
-
-${WILLOW_PITCH.demoCta} Reply with a time that works, or book via the AE calendar link we send after you confirm interest.
+Worth a short chat if useful — happy to compare notes.
 
 Best,
-${bdrName}
-BDR · Willow · willow.co`;
+${bdrName}`;
 
   return {
     leadId: lead.id,

@@ -21,4 +21,10 @@ Governance: feedback never bypasses draft → approve → mark sent.
 - text: Skip company Acme Legal forever
 ```
 
-_No active committed feedback by default — Floor’s live memory stays local._
+## fb_story_arc_playbook
+- category: `messaging_tone` · target: —
+- source: skill · 2026-10-06T00:00:00.000Z
+- instruction: `{"kind":"tone","note":"senior_story_arc"}`
+- text: Emails should look like a 20–30 year sales pro. One story only — HubSpot insight → one tension → soft Willow on the same thread → short CTA. Never vacancy opener then random content calendar. Match Floor’s past HubSpot sent emails for tone/length. Emails 2–3 continue the same story.
+
+_Runtime entries also live in `.data/feedback.json` (gitignored)._

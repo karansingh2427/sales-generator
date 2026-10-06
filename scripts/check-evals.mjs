@@ -81,6 +81,15 @@ if (!rules.includes("feedback") && !rules.includes("Feedback")) {
   ok = false;
 }
 
+if (!rules.includes("story") && !rules.includes("Story")) {
+  console.error("RULES.md must mention story arc");
+  ok = false;
+}
+if (!rules.includes("content calendar") && !rules.includes("calendar")) {
+  console.error("RULES.md must forbid random content-calendar pivot");
+  ok = false;
+}
+
 const ids = [...evals.valid_cases, ...evals.invalid_cases].map((c) => c.id);
 for (const required of [
   "V-04",
@@ -90,6 +99,7 @@ for (const required of [
   "V-09",
   "V-10",
   "V-11",
+  "V-12",
   "I-05",
   "I-06",
   "I-07",

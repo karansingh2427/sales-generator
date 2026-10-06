@@ -7,11 +7,14 @@ These rules govern human and agent operators. Violations are **invalid** scenari
 1. **No outreach to disqualified leads** — including **strong social presence** (Floor disqualifier).
 2. **Dutch pilot channel** — **Gmail email sequences only**. No LinkedIn API send. No Lemlist (Willow does not have it). Web-app types may still include LinkedIn kinds for legacy; default playbook is email day 0 + follow-ups.
 3. **Every draft includes rationale** — CRM why-good / opener / opportunity angles (`scoreLeadRationale` / sequence engine).
-4. **CTA** — offer a 30-minute Willow demo with AE **Ludwig**; do not promise pricing or legal outcomes. When they agree, **Slack Floor** (include conversation) — she books Ludwig’s calendar manually.
-5. **No fabricated case studies** — use only Willow public claims (expertise firms, EU/GDPR, coaching).
-6. **Approve → Gmail send** — draft → Floor **approves** → agent sends via **Gmail** (`sales-gmail-send`) → mark sent. Unattended send without approve is invalid.
-7. **Sequence mark_sent** without prior **approve_step** is invalid for message steps.
-8. Outreach drafts are **editable** (any language Floor prefers); CRM writebacks stay English.
+4. **One story arc** — open with HubSpot-note insight → one tension → soft Willow bridge on the *same* story → short CTA. Never pivot (e.g. vacancy → random content calendar). Emails 2–3 continue the same thread.
+5. **Senior voice** — write as a sales pro with 20–30 years experience; calm, peer-to-peer; never AI-ish or feature dump. Once per batch, learn tone from Floor’s past HubSpot sent emails + feedback playbook.
+6. **CTA** — Email 1 = curious / open to chat (soft). Ludwig intro ok by Email 3. When they agree, **Slack Floor** (include conversation) — she books Ludwig’s calendar manually. Do not promise pricing or legal outcomes.
+7. **No fabricated case studies** — use only Willow public claims (expertise firms, EU/GDPR, coaching) and only when they continue the same story.
+8. **Approve → Gmail send** — draft → Floor **approves** → agent sends via **Gmail** (`sales-gmail-send`) → mark sent. Unattended send without approve is invalid.
+9. **Sequence mark_sent** without prior **approve_step** is invalid for message steps.
+10. Outreach drafts are **editable** (any language Floor prefers); CRM writebacks stay English.
+11. **Floor UX** — `START-HERE-FLOOR.md` stays tiny; one paste prompt; do not overwhelm her with jargon or extra docs.
 
 ## HubSpot rules
 

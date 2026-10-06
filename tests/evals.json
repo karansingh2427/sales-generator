@@ -115,6 +115,19 @@
         "Entry active=false with disabledAt set",
         "applyFeedbackToLeads no longer skips that company"
       ]
+    },
+    {
+      "id": "V-12",
+      "scenario": "Vacancy HubSpot note drafts one coherent hiring-brand story (no content-calendar pivot)",
+      "request": "POST /api/sequences generate for lead with open-vacancies CRM note",
+      "expectations": [
+        "Email 1 opens from vacancy/quiet LinkedIn insight",
+        "One tension about hiring visibility / trust — same story",
+        "Soft Willow bridge continues hiring/visibility thread",
+        "Body must NOT mention content calendar / quarterly calendar as a random pivot",
+        "Emails 2–3 continue same story; Email 1 CTA is soft (curious/chat), not feature dump",
+        "Senior peer-to-peer tone (not junior AI pitch)"
+      ]
     }
   ],
   "invalid_cases": [

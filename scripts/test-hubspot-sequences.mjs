@@ -71,10 +71,21 @@ assert.ok(!seq.steps.some((s) => s.kind.startsWith("linkedin")), "Dutch pilot is
 assert.ok(seq.steps.every((s) => s.kind === "wait" || (s.body && s.body.length > 20)));
 assert.ok(seq.opportunityAngles.length > 0);
 assert.ok(
-  emailSteps.some((s) => s.body && /Ludwig|intro|demo|call/i.test(s.body)),
-  "sequence CTA mentions Ludwig / intro",
+  emailSteps.some((s) => s.body && /chat|curious|radar|Ludwig|intro/i.test(s.body)),
+  "sequence has soft CTA / Ludwig by later touch",
 );
 assert.match(seq.name, /Gmail/i);
+
+// Story arc: vacancy note must NOT pivot to content calendar
+const amelie = sync.upserted.find((l) => l.contactName.includes("Amélie") || l.firmName.includes("BrightHire"));
+assert.ok(amelie, "BrightHire / Amélie mock lead present");
+const vacSeq = buildSequenceForLead(amelie!, "Floor Hoefkens");
+const vacE1 = vacSeq.steps.find((s) => s.kind === "email");
+assert.ok(vacE1?.body);
+assert.ok(!/content calendar|quarterly calendar/i.test(vacE1.body), "no random content-calendar pivot on vacancy story");
+assert.ok(/hiring|vacanc|candidate|LinkedIn|visibility|trust/i.test(vacE1.body), "vacancy story stays on hiring/visibility");
+const vacBodies = vacSeq.steps.filter((s) => s.kind === "email").map((s) => s.body ?? "").join("\\n");
+assert.ok(/hiring|vacanc|visibility|LinkedIn/i.test(vacBodies), "emails 2–3 continue same story thread");
 
 const bad = validateSequenceAction({ action: "mark_sent" });
 assert.equal(bad.ok, false);

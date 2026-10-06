@@ -121,7 +121,7 @@ export function mockHubSpotPayload(): {
           sg_why_good:
             "Accountancy decision maker; LinkedIn posts only 2× in 90 days — consistency gap.",
           sg_opener:
-            "Open with their Q3 tax calendar content vs empty firm page — vacancies posted, no storytelling.",
+            "Vacancies posted online, but the firm LinkedIn page is quiet — little employer-brand story for candidates.",
           sg_right_contact: "Els Peeters (Managing Partner)",
           sg_social_presence: "weak",
           sg_vertical: "accountancy",

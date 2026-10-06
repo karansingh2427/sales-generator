@@ -8,10 +8,17 @@ Prototype for **Floor Hoefkens** (BDR @ [Willow](https://willow.co/)): **HubSpot
 
 ## For Floor
 
-- **Start here (zip):** [START-HERE-FLOOR.md](./START-HERE-FLOOR.md)
+- **Start here (zip):** [START-HERE-FLOOR.md](./START-HERE-FLOOR.md) — open in Cowork → paste one prompt → review → send
 - **Live pilot (mock HubSpot UI):** https://sales-generator-delta.vercel.app
 - **5-minute test guide:** [docs/floor-test-guide.md](./docs/floor-test-guide.md)
 - **Demo video:** [media/floor-sales-generator-demo.mp4](./media/floor-sales-generator-demo.mp4)
+
+### Floor first-run (short)
+
+1. Unzip → open folder in Cowork (HubSpot + Gmail connected).
+2. Paste the **one prompt** in `START-HERE-FLOOR.md` (senior voice + HubSpot tone + one story).
+3. `approve 1-20` → `Send approved emails via Gmail.`
+4. Interest → Slack you → you book Ludwig.
 
 ## Quick start
 
@@ -36,14 +43,6 @@ See **[docs/skills.md](./docs/skills.md)** for first-run steps.
 | `sales-demo-book` | [`skills/sales-demo-book/SKILL.md`](./skills/sales-demo-book/SKILL.md) |
 | `sales-feedback-learn` | [`skills/sales-feedback-learn/SKILL.md`](./skills/sales-feedback-learn/SKILL.md) |
 | `sales-lead-run` | [`skills/sales-lead-run/SKILL.md`](./skills/sales-lead-run/SKILL.md) |
-
-### Floor first-run (short)
-
-1. Cowork with **HubSpot + Gmail + Slack** (same Google for Gmail/Calendar if possible).
-2. Batch Dutch HubSpot tasks → personalize Gmail sequences from notes (max 3) → approve queue.
-3. Approve → **Send approved emails via Gmail.**
-4. Interest → Slack Floor with **conversation** → she books **Ludwig** → Demo Booked → Completed / Rescheduled / Cancelled.
-5. “Remember how I write: …” / skip rules → next batch.
 
 ## Feedback learning
 
