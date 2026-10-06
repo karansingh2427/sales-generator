@@ -1,6 +1,6 @@
 ---
 name: sales-lead-run
-description: Orchestrate Floor’s Dutch cold-email pass — pull Dutch HubSpot daily tasks, transform company notes into Gmail sequences (max 3, ~1 week gaps, no re-scrape), approve queue, send via Gmail after approve, stop on no/interest with Slack→Ludwig. No Lemlist, no LinkedIn send.
+description: Orchestrate Floor’s Dutch cold-email pass — Dutch HubSpot tasks, Gmail sequences (max 3), prefer HubSpot notes, optional LinkedIn research when notes thin or Floor asks, approve → Gmail send. No Lemlist, no LinkedIn send/API.
 ---
 
 # sales-lead-run
@@ -11,19 +11,19 @@ One operator pass for Floor Hoefkens (Willow BDR). Orchestrates domain skills; d
 
 | | |
 |---|---|
-| **Input** | Dutch HubSpot **daily tasks** + company notes (opener/situation already there) |
-| **Transform** | HubSpot notes = **background**; agent personalizes the **full** email sequence from that note only — **never re-scrape** LinkedIn/website |
+| **Input** | Dutch HubSpot **daily tasks** + company notes (preferred background) |
+| **Transform** | Personalize the **full** Gmail sequence from notes; **LinkedIn scrape/research OK** when notes thin or Floor asks — don’t force every run |
 | **Sequence** | Email 1 → wait ~1 week if no reply → Email 2 → … **cap 3** |
-| **Stop early** | Clear **no** → close · **Interest** (yes / more info / “what are you talking about?”) → Slack Floor with **full conversation** → she books Ludwig |
+| **Stop early** | Clear **no** → close · **Interest** → Slack Floor with **full conversation** → she books Ludwig |
 | **Tone** | Learn from feedback / “remember how I write” |
 | **Pilot** | Approve-before-send → Gmail send |
-| **Never** | Lemlist · LinkedIn API send · auto-book Calendar |
+| **Never** | Lemlist · LinkedIn **API / send** · auto-book Calendar |
 
 ## Invoke in order
 
 0. **`sales-feedback-learn`** — load active feedback (tone / skips / “how I write”). One-line digest.
-1. **`sales-hubspot-pull`** — Dutch HubSpot **daily tasks** + company notes. Chunk **50**. Skip Belgian unless asked. Do not scrape external sites.
-2. **`sales-sequence-draft`** — transform notes → Gmail drafts (max 3) → **approve queue**.
+1. **`sales-hubspot-pull`** — Dutch HubSpot **daily tasks** + company notes. Chunk **50**. Skip Belgian unless asked.
+2. **`sales-sequence-draft`** — personalize Gmail drafts (max 3) from notes (± optional LinkedIn enrich) → **approve queue**.
 3. **`sales-gmail-send`** — after approve, send due emails via **Gmail** (Cowork). Prerequisite: Gmail connected (same Google as Calendar if possible).
 4. **Watch replies** — clear no → stop sequence · interest → **`sales-demo-book`** (Slack Floor + conversation → she books Ludwig).
 
@@ -35,11 +35,11 @@ One operator pass for Floor Hoefkens (Willow BDR). Orchestrates domain skills; d
 ## Pass contract
 
 ```text
-1. Preflight — HubSpot + Gmail (+ Slack); load feedback; confirm note-only (no scrape); Gmail max 3; approve before send.
+1. Preflight — HubSpot + Gmail (+ Slack); load feedback; Gmail max 3; approve before send; LinkedIn send forbidden.
 2. Pull — Dutch HubSpot daily tasks + company notes (chunk 50).
-3. Draft — sales-sequence-draft: Email 1–3 from notes → approve queue.
+3. Draft — sales-sequence-draft from notes; enrich via LinkedIn only if thin / Floor asks — not every company.
 4. Approve — Floor approve / edit / skip.
-5. Send — sales-gmail-send for approved due steps; mark sent after Gmail confirms.
+5. Send — sales-gmail-send for approved due steps (Gmail only).
 6. Cadence — if no reply ~1 week → next email (still ≤3); stop early on no or interest.
 7. Interest — Slack Floor with full conversation → she books Ludwig (never auto-book).
 8. Learn — “Remember how I write: …” / skip rules → next batch.
@@ -49,19 +49,24 @@ One operator pass for Floor Hoefkens (Willow BDR). Orchestrates domain skills; d
 
 **Batch draft:**
 
-> Batch 50 Dutch HubSpot tasks. Transform company notes into Gmail cold sequences (max 3 emails). Show approve queue. Do not send yet. Do not scrape LinkedIn. Skip Belgian leads.
+> Batch 50 Dutch HubSpot tasks. Transform company notes into Gmail cold sequences (max 3 emails, ~1 week between). Show approve queue. Do not send yet. Skip Belgian leads.
 
 **Approve then send:**
 
 > approve 1-20  
 > Send approved emails via Gmail.
 
+**Optional enrich:**
+
+> Enrich #7 from LinkedIn, then redraft Email 1.
+
 ## What this pass never does
 
-- Re-scrape LinkedIn or company websites.
+- LinkedIn **API / InMail / connect send** (scrape/research is allowed when warranted).
+- Force LinkedIn re-scrape on every company every batch.
 - Draft more than **3** emails per lead.
 - Continue after clear **no** or after interest handoff.
-- Use Lemlist or LinkedIn API send.
+- Use Lemlist.
 - Send before approve (pilot).
 - Auto-book Ludwig / Calendar.
 - Slack demo ping without the **conversation**.

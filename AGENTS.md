@@ -1,9 +1,10 @@
 # sales-generator — Agent Map
 
 A **Willow BDR operating system** for Floor Hoefkens: Cursor/Claude **skills** plus a Next.js workbench
-that pull HubSpot **company notes** as **background** (why-good, opener, right contact), **personalize
-the full Gmail sequence from that note only** (no re-scrape), **approve → send via Gmail**, and when a
-lead wants a demo **Slack Floor** (with the conversation) so she **manually books Ludwig’s calendar** —
+that pull HubSpot **company notes** as **preferred background**, personalize the full Gmail
+sequence (optional LinkedIn **research** when notes are thin or Floor asks — never force every run;
+LinkedIn **send/API** forbidden), **approve → send via Gmail**, and when a lead wants a demo
+**Slack Floor** (with the conversation) so she **manually books Ludwig’s calendar** —
 never auto-book Calendar.
 
 **Geography locked:** **Netherlands first**, Belgium second — **NL + BE only**.

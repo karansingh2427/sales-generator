@@ -1,6 +1,6 @@
 # Sales Generator (Willow BDR)
 
-Prototype for **Floor Hoefkens** (BDR @ [Willow](https://willow.co/)): **HubSpot company notes = background** → agent **personalizes the full Gmail cold sequence** from that note only (**no re-scrape**) → Floor **approves** → agent **sends via Gmail** → on interest, **Slack Floor** (with the conversation) so she **manually books Ludwig’s calendar**. Sales Nav CSV remains a fallback. Cursor/Claude **skills** ship alongside the Next.js UI.
+Prototype for **Floor Hoefkens** (BDR @ [Willow](https://willow.co/)): **HubSpot company notes = preferred background** → agent **personalizes the full Gmail cold sequence** (LinkedIn **scrape/research** OK when notes are thin or she asks — not every run; LinkedIn **send** forbidden) → Floor **approves** → agent **sends via Gmail** → on interest, **Slack Floor** (with the conversation) so she **manually books Ludwig’s calendar**. Sales Nav CSV remains a fallback. Cursor/Claude **skills** ship alongside the Next.js UI.
 
 **Geography:** **Netherlands first**, Belgium second — **NL + BE only**.  
 **Channel (Dutch pilot):** **Gmail only** — max **3** emails, ~1 week between if no reply. **No LinkedIn API send. No Lemlist.**  
@@ -57,7 +57,7 @@ See **[docs/skills.md](./docs/skills.md)** for first-run steps.
 ## Sequences (Dutch pilot)
 
 1. Pull Dutch HubSpot daily tasks + company notes (skill) — notes = background only.
-2. Personalize full Gmail sequence (Email 1 → ~1 week → Email 2 → … **max 3**). No LinkedIn/web scrape.
+2. Personalize full Gmail sequence (Email 1 → ~1 week → Email 2 → … **max 3**). Prefer HubSpot notes; LinkedIn research OK when thin / asked — never LinkedIn send.
 3. Approve → Gmail send via Cowork.
 4. Stop early on clear **no** or **interest** → Slack Floor → she books Ludwig.
 

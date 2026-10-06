@@ -1,13 +1,13 @@
 ---
 name: sales-hubspot-pull
-description: Pull Dutch HubSpot daily tasks and company notes as background for Gmail sequences — NL primary, BE secondary. Never re-scrape LinkedIn/websites. Prefer HubSpot tools in Floor’s Cowork session.
+description: Pull Dutch HubSpot daily tasks and company notes as preferred background for Gmail sequences — NL primary, BE secondary. LinkedIn research OK when notes thin or Floor asks; never force every run. No LinkedIn send. Prefer HubSpot tools in Floor’s Cowork session.
 ---
 
 # sales-hubspot-pull
 
-**One-liner:** HubSpot notes = **background** for personalization — pull them, do not re-scrape.
+**One-liner:** HubSpot notes = **preferred background**. Pull them first. LinkedIn scrape/research is OK when notes are thin or Floor asks — don’t force every run.
 
-Pull today’s **Dutch HubSpot daily tasks** (and NL+BE companies when present) and surface the **company notes** the internal lead-gen agent already wrote (opener / situation: vacancies, weak posting, visibility, etc.). Pass notes to `sales-sequence-draft` so it can personalize the full Gmail sequence from that note only. **Never re-scrape LinkedIn or company websites.**
+Pull today’s **Dutch HubSpot daily tasks** (and NL+BE companies when present) and surface the **company notes** the internal lead-gen agent already wrote (opener / situation: vacancies, weak posting, visibility, etc.). Pass notes to `sales-sequence-draft` for Gmail personalization.
 
 ## Geography (hard rule)
 
@@ -33,7 +33,7 @@ Batch pull contract
 - Source: Dutch HubSpot daily tasks (primary) → NL companies + notes
 - Size: tens–hundreds; present in reviewable chunks (default 50)
 - Next: sales-sequence-draft (Gmail max 3 from notes) → approve queue
-- Never: re-scrape LinkedIn/websites, LinkedIn API send, Lemlist, other countries, rebuild lead-gen
+- Never: LinkedIn API send, Lemlist, other countries, rebuild lead-gen, force LinkedIn scrape on every company every batch
 ```
 
 ## Prefer live HubSpot via session tools

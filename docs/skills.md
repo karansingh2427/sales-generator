@@ -2,8 +2,8 @@
 
 | Skill | Path | Job |
 |---|---|---|
-| `sales-hubspot-pull` | [`skills/sales-hubspot-pull/SKILL.md`](../skills/sales-hubspot-pull/SKILL.md) | Dutch HubSpot daily tasks + company notes (no scrape) |
-| `sales-sequence-draft` | [`skills/sales-sequence-draft/SKILL.md`](../skills/sales-sequence-draft/SKILL.md) | HubSpot notes = background → personalize full Gmail sequence (max 3, no re-scrape) → approve queue |
+| `sales-hubspot-pull` | [`skills/sales-hubspot-pull/SKILL.md`](../skills/sales-hubspot-pull/SKILL.md) | Dutch HubSpot daily tasks + company notes (preferred background) |
+| `sales-sequence-draft` | [`skills/sales-sequence-draft/SKILL.md`](../skills/sales-sequence-draft/SKILL.md) | Prefer notes → personalize Gmail (max 3); LinkedIn research OK if thin/asked; no LinkedIn send |
 | `sales-gmail-send` | [`skills/sales-gmail-send/SKILL.md`](../skills/sales-gmail-send/SKILL.md) | After approve — send via Gmail; stop on no/interest |
 | `sales-demo-book` | [`skills/sales-demo-book/SKILL.md`](../skills/sales-demo-book/SKILL.md) | Slack Floor + conversation → she books Ludwig |
 | `sales-feedback-learn` | [`skills/sales-feedback-learn/SKILL.md`](../skills/sales-feedback-learn/SKILL.md) | Tone / ICP memory (“remember how I write”) |
@@ -20,4 +20,4 @@
 
 ### Do not
 
-- Re-scrape LinkedIn/websites · LinkedIn API · Lemlist · send before approve · auto-book Calendar · Slack without conversation · countries outside NL+BE.
+- LinkedIn **API / send** · Lemlist · send before approve · auto-book Calendar · Slack without conversation · countries outside NL+BE · force LinkedIn scrape on every company every batch.

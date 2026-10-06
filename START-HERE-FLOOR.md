@@ -8,19 +8,21 @@ Connect **Gmail** in Claude Cowork (Google connector). Prefer the **same Google 
 
 ## What this does (your end vision)
 
-| Input | Your Dutch HubSpot **daily tasks** + company notes (**background** — opener / situation already there) |
-| Output | Agent personalizes the **full** cold **Gmail** sequence from that note only (no re-scrape): Email 1 → wait ~1 week if no reply → Email 2 → **max 3 emails** |
+| Input | Your Dutch HubSpot **daily tasks** + company notes (**preferred background**) |
+| Output | Agent personalizes the **full** cold **Gmail** sequence: Email 1 → wait ~1 week if no reply → Email 2 → **max 3 emails** |
+| Research | Prefer HubSpot notes when present. **LinkedIn scrape/research is OK** when notes are thin or you ask — not forced every run |
+| Send | **Gmail only** — no LinkedIn send / API outreach |
 | Stop early | Clear **no** → stop · Interest → Claude **Slacks you** with the **full conversation** → **you book Ludwig** |
 | Tone | Claude learns from your feedback (“remember how I write”) |
 | Pilot | You still **approve** before Claude sends via Gmail |
-| Not used | Lemlist · LinkedIn send · re-scraping LinkedIn/websites |
+| Not used | Lemlist · LinkedIn **send** |
 
 ## 1) Batch of 50 — draft
 
 1. **Unzip** `sales-generator-for-floor.zip` → open the folder in **Claude Cowork**.
 2. Paste:
 
-> Batch 50 Dutch HubSpot tasks. Transform company notes into Gmail cold sequences (max 3 emails, ~1 week between). Show approve queue. Do not send yet. Do not scrape LinkedIn. Skip Belgian leads.
+> Batch 50 Dutch HubSpot tasks. Transform company notes into Gmail cold sequences (max 3 emails, ~1 week between). Show approve queue. Do not send yet. Skip Belgian leads.
 
 3. Review → `approve 1-20` / `edit #7` / `skip #12` / `approve-all pending`.
 4. Then:
@@ -28,6 +30,8 @@ Connect **Gmail** in Claude Cowork (Google connector). Prefer the **same Google 
 > Send approved emails via Gmail.
 
 Next chunk: `Draft the next 50 Dutch tasks into the approve queue — do not send yet.`
+
+Optional if a note is thin: `Enrich #7 from LinkedIn, then redraft Email 1.`
 
 ## 2) Teach your tone
 
