@@ -1,11 +1,11 @@
 ---
 name: sales-gmail-send
-description: Gmail self-test; after Floor approves, send Email 1 and auto-schedule Email 2 (+7d) and Email 3 (+14d) if no reply. Max 3. Stop on reply → Slack Floor. No LinkedIn/Lemlist.
+description: Gmail self-test; send approved E1 and auto-schedule E2/E3; log every successful send as a HubSpot email engagement. Stop on reply → Slack Floor.
 ---
 
 # sales-gmail-send
 
-Send **approved** cold-sequence emails through **Gmail**. Auto-schedule follow-ups — **do not rely on Floor remembering**.
+Send **approved** cold-sequence emails through **Gmail**. Auto-schedule follow-ups. **Log every successful send in HubSpot.**
 
 ## Step 0 — Gmail self-test (before any Dutch batch)
 
@@ -14,60 +14,69 @@ Send **approved** cold-sequence emails through **Gmail**. Auto-schedule follow-u
 1. Send **only** to Floor’s own Gmail (connected account).
 2. Subject: `Willow Sales Generator test` · Body: `Gmail send works.`
 3. **Do not** contact leads or draft sequences yet.
-4. Confirm she should check her inbox; then wait for the batch prompt.
+4. Self-test need **not** be logged to HubSpot (it isn’t a lead email).
 
 ## Cadence (hard)
 
 | Touch | When | Action |
 |---|---|---|
-| **Email 1** | On approve + “send” | Send now via Gmail |
-| **Email 2** | **Exactly 7 days** after E1 if **no reply** | Auto-scheduled — not manual |
-| **Email 3** | **Exactly 7 days** after E2 (14 after E1) if still **no reply** | Auto-scheduled — not manual |
+| **Email 1** | On approve + “send” | Send via Gmail → **log HubSpot** → schedule E2/E3 |
+| **Email 2** | **Exactly 7 days** after E1 if **no reply** | Send (or fire schedule) → **log HubSpot** |
+| **Email 3** | **Exactly 7 days** after E2 if still **no reply** | Send → **log HubSpot** |
 | Cap | **Max 3** | Never a 4th |
 
 ### Stop on reply
 
-- Clear **no** → cancel any scheduled E2/E3; close sequence.
-- **Interest** (yes / more info / “what are you talking about?”) → cancel scheduled follow-ups; run `sales-demo-book` (Slack Floor + **full conversation** → she books Ludwig).
+- Clear **no** → cancel scheduled E2/E3; close sequence.
+- **Interest** → cancel scheduled; `sales-demo-book` (Slack Floor + conversation → she books Ludwig).
+
+## HubSpot log (required after every successful lead send)
+
+After **each** successful Gmail send of E1, E2, or E3:
+
+1. Create/log a HubSpot **email engagement** on the **contact** from the Dutch task (associate **company** too when known).
+2. Fields: **subject**, **body or snippet**, **direction = outbound**, **timestamp** (send time), association to contact/company.
+3. Prefer HubSpot tools in Floor’s Cowork session.
+4. Gmail↔HubSpot auto-sync may already exist — **still** log explicitly so nothing is missed.
+5. **Dedup:** before creating, check recent engagements on that contact for the same subject + similar timestamp (± a few minutes). If a matching outbound email already exists, **skip** — do not double-post.
+6. If HubSpot log fails after Gmail succeeded: report the failure; do **not** resend the email. Retry log once if safe.
+
+Self-test emails to Floor herself are exempt.
 
 ## Auto-schedule (required when sending E1)
 
-After sending approved **Email 1**, for each lead **immediately** set follow-ups so Floor does nothing later:
+1. Prefer **Gmail scheduled send** for E2 at **T+7 days** and E3 at **T+14 days**.
+2. Else: Cowork / HubSpot reminder/task dated T+7 / T+14.
+3. One line to Floor: “E1 sent + HubSpot logged; E2/E3 scheduled for \<dates\>.”
+4. Never ask her to remember follow-ups.
 
-1. Prefer **Gmail scheduled send** for Email 2 at **T+7 days** and Email 3 at **T+14 days** (same thread / Re: subject, approved bodies).
-2. If scheduled send isn’t available: create a **Cowork reminder or task** (or HubSpot task) dated T+7 / T+14: “Send approved Email 2/3 to \<lead\> if no reply — cancel if replied.”
-3. Tell Floor in one line: “E1 sent; E2/E3 scheduled for \<dates\> if no reply.”
-4. **Never** ask her to remember to follow up.
+Before scheduled E2/E3 fires: check for reply → cancel if any; else send → **HubSpot log**.
 
-Before a scheduled E2/E3 fires: check inbox/thread for a reply. If any reply → cancel remaining; apply stop rules above.
+## Prerequisites
 
-## Prerequisites (lead sends)
-
-- Gmail connected · steps **approved** · self-test done (or she confirms Gmail works).
+- Gmail + HubSpot connected · steps **approved** · self-test done.
 - Never send pending / skipped / unapproved.
 
 ## Guardrail
 
 ```text
-self-test (own inbox) → approve → send E1 now
-  → schedule E2 @ +7d · E3 @ +14d (Gmail schedule or Cowork/HubSpot reminder)
-  → reply? cancel rest · no → stop · interest → Slack Floor + conversation
+self-test → approve → Gmail send E1 → HubSpot email engagement (dedup)
+  → schedule E2 @ +7d · E3 @ +14d
+  → on fire: send → HubSpot log (dedup)
+  → reply? cancel · no → stop · interest → Slack Floor
   → max 3
 ```
 
-No LinkedIn API. No Lemlist. No send before approve (pilot).
-
 ## Batch send
 
-On `send approved` / `send 1-20` / `send-all approved`:
-
-1. Digest: count + recipients for E1 due now.
+1. Digest recipients for E1 due now.
 2. Send E1 via Gmail.
-3. **Schedule** E2 (+7d) and E3 (+14d) per lead (see Auto-schedule).
-4. Mark E1 sent; report schedule dates + failures.
+3. **HubSpot-log** each success (dedup).
+4. Schedule E2/E3.
+5. Report: sent / HubSpot logged / scheduled / failures.
 
 ## Done when
 
-- E1 sent (or failures listed).
-- E2/E3 scheduled or remindered — Floor need not remember.
+- E1 sent + HubSpot logged (or dedup skip noted).
+- E2/E3 scheduled; when they send, also HubSpot-logged.
 - Cap 3 + stop-on-reply honored.

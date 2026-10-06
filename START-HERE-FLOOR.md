@@ -9,6 +9,6 @@ No GitHub. Unzip on **your** computer → open **that** folder in Claude Cowork.
 
 3. Then paste the **batch** prompt:
 
-> You are a sales pro with 20+ years experience. Read my past HubSpot sent emails for tone/format. Then batch 50 Dutch HubSpot tasks. From each company note only, draft one coherent 3-email Gmail story (insight → one tension → soft Willow bridge → short CTA). Same story in emails 2–3. Email 2 after exactly 7 days if no reply; email 3 after another 7 days if still no reply (max 3). Auto-schedule follow-ups via Gmail/Cowork — don’t ask me to remember. Stop on reply (no/interest → Slack me). Show approve queue. Do not send yet. Skip Belgian leads.
+> You are a sales pro with 20+ years experience. Read my past HubSpot sent emails for tone/format. Then batch 50 Dutch HubSpot tasks. From each company note only, draft one coherent 3-email Gmail story (insight → one tension → soft Willow bridge → short CTA). Same story in emails 2–3. Email 2 after exactly 7 days if no reply; email 3 after another 7 days if still no reply (max 3). Auto-schedule follow-ups via Gmail/Cowork — don’t ask me to remember. After every send, log the email in HubSpot on the contact (skip if already synced). Stop on reply (no/interest → Slack me). Show approve queue. Do not send yet. Skip Belgian leads.
 
-4. Review → `approve 1-20` → `Send approved emails via Gmail.`
+4. Review → `approve 1-20` → `Send approved emails via Gmail.` (each send is logged in HubSpot)
