@@ -1,28 +1,45 @@
 ---
 name: sales-hubspot-pull
-description: Pull Netherlands-first HubSpot companies (NL + BE only) and read company-level agent notes — why-good, opener, right contact. Prefer HubSpot MCP/tools already connected in Floor’s Claude or Cursor session; do not embed a private-app token in the web app. Use when Floor asks to sync CRM, pull leads, read company notes, or prepare a NL/BE prospect list.
+description: Pull Netherlands-first HubSpot companies/tasks in bulk (tens–hundreds) for Floor’s approve queue — NL + BE only, Dutch primary. Read company-level agent notes (why-good, opener, right contact). Prefer HubSpot MCP/tools in Floor’s Claude/Cursor session. Use when Floor asks to sync CRM, pull Dutch tasks, batch leads, or prepare a NL/BE prospect list.
 ---
 
 # sales-hubspot-pull
 
-Pull the next NL+BE companies from HubSpot and surface the **company notes** the internal lead-gen agent already wrote. Sales Generator does **not** rebuild prospecting — it reads why-good / opener / right contact and hands them to sequence drafting.
+Pull the next NL+BE companies (and today’s **Dutch HubSpot tasks** when present) and surface the **company notes** the internal lead-gen agent already wrote. Sales Generator does **not** rebuild prospecting — it reads why-good / opener / right contact and hands them to **batch sequence drafting** (`sales-sequence-draft`).
 
 ## Geography (hard rule)
 
 | Priority | Market | Behavior |
 |---|---|---|
-| 1 · primary | **Netherlands (NL)** | Prefer / score highest |
-| 2 · secondary | **Belgium (BE)** | Include after NL |
+| 1 · primary | **Netherlands (NL)** | Prefer / score highest; **default batch = Dutch tasks** |
+| 2 · secondary | **Belgium (BE)** | Include only if Floor asks; otherwise skip in pilot batches |
 | — | **Everything else** | **Out of scope** — never add to ICP lists, filters, mocks, or digests |
 
-Default filter: `NL + BE`. Sort / present **Netherlands first**.
+Default filter: `NL + BE`. Sort / present **Netherlands first**. Floor’s phase-1 pilot prompt: **Dutch tasks only** (skip Belgian).
+
+## Batch pull (phase 1 — primary path)
+
+Floor works in **bulk**: tens to hundreds of Dutch HubSpot tasks/companies per pass.
+
+1. Prefer HubSpot **tasks** assigned to Floor / due today (or her filter) that point at NL companies; fall back to NL company search if tasks aren’t available.
+2. Cap presentation in chunks Floor can review (e.g. first **50**, then “next 50”) unless she asks for the full set.
+3. Apply feedback skips **before** counting toward the batch.
+4. Output a numbered table ready for `sales-sequence-draft` **batch mode** → items land in an **approve queue** (not auto-send).
+
+```text
+Batch pull contract
+- Source: Dutch HubSpot tasks (primary) → NL companies + notes
+- Size: tens–hundreds; present in reviewable chunks (default 50)
+- Next: sales-sequence-draft batch → approve queue
+- Never: auto-send, other countries, rebuild lead-gen
+```
 
 ## Prefer live HubSpot via session tools
 
 Floor’s HubSpot is already connected to **her Claude**. In Cursor / Claude:
 
 1. Use the **HubSpot MCP / native HubSpot tools** available in **this user session**.
-2. Search **Companies** in the Netherlands first, then Belgium.
+2. Search **Tasks** (Dutch / NL) first when Floor says “today’s tasks” or “batch”; else **Companies** in the Netherlands first, then Belgium if asked.
 3. Read **company notes** (and company properties if notes are empty) for:
    - **why-good** — why this firm fits Willow
    - **opener** — first-line outreach angle
@@ -34,13 +51,13 @@ Web-app fallback (optional): `POST /api/hubspot { action: "sync" }` with mock mo
 ## Steps
 
 0. **Load Floor feedback** from `.data/feedback.json` (or `skills/memory/FEEDBACK.md` / `GET /api/feedback`). Apply skip-company, prefer-title, ICP/geo notes, disqualifier patterns. Confirm in one line what memory is active.
-1. Confirm geo = NL primary, BE secondary; refuse lists that include other countries.
-2. Via HubSpot tools, list companies filtered to the Netherlands and Belgium.
+1. Confirm geo = NL primary, BE secondary; refuse lists that include other countries. For pilot batches, default **NL only** unless she includes BE.
+2. Via HubSpot tools, pull **Dutch tasks in bulk** (or list NL companies). Paginate / chunk (default show **50**).
 3. For each company, pull the latest **company note** (agent handoff). Prefer company-level over contact-only notes.
 4. Skip / flag **strong social presence** (Floor disqualifier) **and** any company named in active skip feedback.
-5. Present a short table: company · country · right contact · opener one-liner · why-good · presence · feedback flags.
-6. Sort Netherlands first, then Belgium; preferred titles (from feedback) and highest ICP / freshest notes first.
-7. Ask Floor which rows to sequence next → hand off to `sales-sequence-draft`.
+5. Present a short table: # · company · country · right contact · opener one-liner · why-good · presence · feedback flags · task due (if any).
+6. Sort Netherlands first; preferred titles (from feedback) and highest ICP / freshest notes first.
+7. Ask Floor: **batch-draft all N** / select rows / next chunk → hand off to `sales-sequence-draft` **batch / approve-queue** mode.
 8. If she steers (“skip that one forever”, “prefer Ops managers”) → invoke `sales-feedback-learn` before the next pull.
 
 ## Company note contract
@@ -67,7 +84,7 @@ CRM language is **English**. Outreach copy language is editable later.
 
 ## Done when
 
-- Floor sees a NL-first company list with note fields filled (or explicitly empty).
+- Floor sees a NL-first (or Dutch-tasks) list with note fields filled (or explicitly empty), sized for batch review.
 - Out-of-scope countries are absent.
 - Strong-presence firms are flagged skip.
-- Next action offered: draft sequences (`sales-sequence-draft`) or book later (`sales-demo-book`).
+- Next action offered: **batch draft into approve queue** (`sales-sequence-draft`) — not send.

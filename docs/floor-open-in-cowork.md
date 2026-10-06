@@ -6,51 +6,32 @@ You do **not** need GitHub, git clone, or a developer account. Goal: unzip once 
 
 ---
 
-## Unzip only (this is the path for you)
+## Unzip only
 
-1. Karandeep sends `sales-generator-for-floor.zip` on WhatsApp.
-2. On your Mac: double-click to unzip → folder appears.
-3. Move it to `Documents/sales-generator` (optional but tidy).
-4. Open **Claude Cowork** or **Claude Code** with that folder as the project (Attach / Open folder, or in Terminal: `cd` into the folder → `claude`).
-5. Open `START-HERE-FLOOR.md` at the top of the folder, or paste:
+1. Get `sales-generator-for-floor.zip` on WhatsApp.
+2. Double-click to unzip → optional: move to `Documents/sales-generator`.
+3. Open the folder in **Claude Cowork** / **Claude Code**.
+4. Open `START-HERE-FLOOR.md`, or paste the prompts below.
 
-> Pull today’s **Dutch** HubSpot tasks. Draft LinkedIn + email sequences to approve — do **not** send. Skip Belgian leads.
+## How to invoke each step
 
-6. To teach it: `Remember this feedback: …`
+| Step | Paste this |
+|---|---|
+| **Batch 50** | `Batch 50 Dutch HubSpot tasks, draft sequences, show approve queue. Do not send. Skip Belgian leads.` |
+| **Approve** | `approve 1-20` / `edit #7` / `skip #12` / `approve-all pending` |
+| **Feedback** | `Remember: skip companies that already post a lot` |
+| **Demo → Slack you** | *(automatic when a lead says yes — includes the conversation)* |
+| **You book Ludwig** | Open Ludwig’s calendar yourself and book — Claude does **not** auto-create events |
+| **Calendar help (optional)** | Only if you want: `Propose 3 times for Ludwig — draft only, don’t create the event.` |
+| **Slack Ludwig (optional)** | `Slack Ludwig with the lead context for this demo.` |
+| **After meeting** | `Mark Demo Completed` / `Rescheduled` / `Cancelled` |
 
-## When a lead wants a demo
+**Hard default on demo interest:** Slack you (with conversation) → **you** book Ludwig → no auto-created calendar events.
 
-1. Claude posts to **Slack** for you: lead/company, the **conversation**, why they’re interested, links.
-2. **You** manually book **Ludwig’s calendar** and verify — Claude must **never** auto-book Calendar.
-3. After it’s booked → HubSpot **Demo Booked**, then later Completed / Rescheduled / Cancelled.
+---
 
 ## Website only (no zip)
 
-Click around: https://sales-generator-delta.vercel.app (mock data — no HubSpot).
+https://sales-generator-delta.vercel.app (mock data — no HubSpot).
 
----
-
-## What “skills” means (plain English)
-
-Inside the folder, `skills/` are instruction packs. When the project is open in Cowork, Claude can follow them to:
-
-- pull HubSpot tasks / company notes  
-- draft LinkedIn + email sequences  
-- **Slack you** when a lead wants a demo (with the conversation) so **you book Ludwig**  
-- save your feedback for next time  
-
-You still **approve** before anything is treated as sent, and you still **book Ludwig** yourself.
-
----
-
-## If Cowork won’t open a local folder
-
-Ask Karandeep or Willow IT which button opens a project folder in your Cowork build.  
-Fallback: use the website for demos — https://sales-generator-delta.vercel.app — and ask Karandeep to run the first real HubSpot pull with you on a screen share.
-
----
-
-## One message you can send Karandeep if stuck
-
-> I unzipped the folder and opened it in Cowork but I don’t see how to attach the project.  
-> Can we do a 10‑min screen share and run: “Pull today’s Dutch HubSpot tasks and draft LinkedIn sequences”?
+Stuck attaching the folder? Ask Karandeep for a 10‑min screen share.

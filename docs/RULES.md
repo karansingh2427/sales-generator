@@ -37,12 +37,15 @@ These rules govern human and agent operators. Violations are **invalid** scenari
 
 ## Booking rules
 
-1. **Primary AE = Ludwig.** Floor books his calendar **manually** after a Slack ping.
+1. **Primary AE = Ludwig.** Floor **books herself** on his calendar after the demo Slack ping.
 2. Duration 15–60 minutes; default 30 (Floor may adjust when she books).
 3. Disqualified leads cannot book.
-4. **Never auto-book** Google Calendar / Calendly / HubSpot meetings / Outlook. Agents must not create calendar events.
-5. Demo handoff Slack must include: lead/company, **conversation** (transcript or clear summary), why interested, links/context.
-6. Only after Floor confirms the Ludwig booking → HubSpot **Demo Booked**; later Completed | Rescheduled | Cancelled.
+4. **Hard default on yes-demo:** Slack Floor (with **conversation**) → Floor books Ludwig → **do not auto-create calendar events**.
+5. Google Calendar propose/draft **only if Floor explicitly asks after** the Slack ping; still no silent create/send.
+6. Demo Slack to Floor must include: lead/company, **conversation**, why interested, links/context.
+7. Optional: Slack Ludwig with lead context when Floor asks.
+8. Only after Floor confirms the Ludwig booking → HubSpot **Demo Booked**; later Completed | Rescheduled | Cancelled.
+9. **Phase 1 batch:** Dutch HubSpot tasks in bulk → approve queue (approve/edit/skip / approve-selected). **No auto-send** (phase 2 later).
 
 ## Skill pack rules
 

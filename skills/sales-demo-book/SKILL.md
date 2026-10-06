@@ -1,50 +1,48 @@
 ---
 name: sales-demo-book
-description: When a lead wants a demo, Slack Floor with lead + conversation + interest, so she manually books Ludwig’s calendar — never auto-book Calendar. After she books, mark HubSpot Demo Booked → Completed | Rescheduled | Cancelled. Netherlands/Belgium leads only.
+description: When a lead wants a demo, Slack Floor with lead + full conversation so she books herself on Ludwig’s calendar — never auto-create calendar events. Optional Calendar propose/draft only if Floor explicitly asks after the Slack ping. Optional Slack to Ludwig with lead context. Then HubSpot Demo Booked → Completed | Rescheduled | Cancelled. NL/BE only.
 ---
 
 # sales-demo-book
 
-When outreach succeeds and the lead wants a demo: **Slack Floor** (with the conversation), she **manually books Ludwig’s calendar** (AE) and verifies. **Never auto-book** Google Calendar / Calendly / HubSpot meetings.
+## Hard default (Karandeep / Floor) — do not regress
+
+**When a lead wants a demo:**
+
+1. Send Floor a **Slack message** that includes the **conversation** (transcript or clear detailed summary), plus lead/company, why interested, links.
+2. Floor **books herself on Ludwig’s calendar** and verifies.
+3. **Do not** auto-create calendar events (Google Calendar / Calendly / HubSpot meetings / Outlook).
+
+Google Calendar propose/draft is **optional and only if Floor explicitly asks** for help **after** the Slack ping. Primary flow = **Slack → manual Ludwig book**.
 
 ## Geography
 
 Only for companies in the **Netherlands** or **Belgium**. Refuse other countries.
 
-## Handoff rule (hard — Karandeep / Floor)
-
-1. **Slack Floor** with: lead/company, **conversation** (transcript or clear chat summary), why they’re interested, links/context.
-2. Floor **manually** books the meeting on **Ludwig’s calendar** and verifies — agents must **never** create calendar events.
-3. After she books, she/Claude can mark HubSpot **Demo Booked** → later **Completed** / **Rescheduled** / **Cancelled**.
-
 ## Booking mechanism
 
-- **Primary AE:** Ludwig (Floor books his calendar by hand).
-- Do **not** invent a shared Calendly / round-robin / auto-schedule flow.
-- Do **not** call Calendar connectors to create events.
-- Default duration expectation: **30 minutes** (Floor may adjust when she books).
+- **Primary AE:** Ludwig — Floor books his calendar by hand.
+- **Never** call Calendar create/send as part of the default yes-demo path.
+- Default duration expectation: **30 minutes** (Floor adjusts when she books).
 
-### Roster (context only — Floor books Ludwig)
+### Roster
 
-| AE | Role |
+| Person | Role |
 |---|---|
-| Ludwig | Primary AE — Floor books his calendar manually after Slack ping |
-| (others) | Only if Floor explicitly names a different AE |
+| Floor | BDR — gets demo Slack; **books Ludwig herself** |
+| Ludwig | AE — calendar owner; optional Slack handoff when Floor asks |
 
-When Floor supplies Ludwig’s calendar URL for her own use, store it in ops notes — agents still never auto-book it.
-
-## Steps — warm lead → Slack Floor
+## Steps — warm lead (default)
 
 1. Confirm lead is BE or NL and not disqualified.
-2. Confirm they asked for / agreed to a demo (or clearly want a meeting).
-3. Post to **Slack** for Floor using the template below (include the **conversation**).
-4. Stop. Wait for Floor to book and confirm.
-5. After Floor confirms the slot is on Ludwig’s calendar, set CRM stage to **Demo Booked** (English).
-6. Record AE = Ludwig, datetime, duration, meeting link in HubSpot note / local workspace if she asks.
+2. Confirm they asked for / agreed to a demo.
+3. **Slack Floor** using Template A (must include the **conversation**).
+4. **Stop.** Do not open Calendar. Do not create events. Wait for Floor.
+5. After Floor confirms the slot is on Ludwig’s calendar → HubSpot **Demo Booked** (English).
+6. If Floor asks, **Slack Ludwig** (Template B) with lead context.
+7. Record AE = Ludwig, datetime, duration, meeting link in HubSpot note if she asks.
 
-## Slack message template
-
-Post to Floor’s Slack channel/DM (use session Slack tools):
+## Template A — Slack Floor (required on yes-demo)
 
 ```text
 🎯 Demo handoff — please book Ludwig
@@ -57,7 +55,7 @@ Preferred timing (if any): <what they said, or “open”>
 
 Conversation (transcript or summary):
 ---
-<paste LinkedIn/email thread summary OR key turns — enough that Floor can brief Ludwig>
+<paste LinkedIn/email thread OR key turns — enough that Floor can book and brief Ludwig>
 ---
 
 Links / context:
@@ -65,12 +63,43 @@ Links / context:
 - Company note opener: <short>
 - Other: <deck, site, mutual, etc.>
 
-Action for Floor: manually book **Ludwig’s calendar**, verify the invite, then tell me when it’s confirmed so I can set HubSpot → Demo Booked.
+Action for Floor: **book yourself on Ludwig’s calendar**, verify the invite, then tell me when it’s confirmed so I can set HubSpot → Demo Booked.
 ```
 
-## Steps — post-demo outcome
+## Optional — Calendar assist (only if Floor asks)
 
-After **Demo Booked**, Floor confirmed only three outcomes:
+**Only after** the Floor Slack ping, and **only if** she explicitly says e.g. “propose times”, “draft the invite”, “help me schedule”:
+
+1. Propose 2–3 slots and/or draft an invite for Ludwig’s calendar.
+2. Show Floor the draft.
+3. **Still do not create/send** unless she explicitly says to create/send that draft.
+4. Prefer she finishes booking herself; assist is help text + draft, not silent booking.
+
+If she never asks → **no Calendar tool use**.
+
+## Template B — Slack Ludwig (optional, when Floor asks)
+
+```text
+📅 Demo handoff — Floor booking you
+
+Lead: <Name> · <Title> @ <Company> (<NL|BE>)
+When: <confirmed slot or “Floor choosing now”>
+HubSpot: <URL>
+
+Why they’re interested:
+- <bullets>
+
+Conversation highlights:
+---
+<short summary>
+---
+
+Floor owns the calendar invite on your calendar.
+```
+
+Draft first unless Floor says “send it to Ludwig”.
+
+## Steps — post-demo outcome
 
 | Outcome | HubSpot / app stage |
 |---|---|
@@ -79,23 +108,21 @@ After **Demo Booked**, Floor confirmed only three outcomes:
 | Cancelled | `demo_cancelled` |
 
 1. Ask which of the three.
-2. Update HubSpot via **session HubSpot MCP/tools** (preferred) or web-app `push_stage`.
-3. Keep writeback language **English**.
-
-Pre–Demo Booked pipeline names are still unknown — do not invent stage labels before Demo Booked.
+2. Update HubSpot via session tools (preferred) or web-app `push_stage`.
+3. Writebacks in **English**.
 
 ## Prefer session tools
 
-Floor’s HubSpot + Slack are connected to her Claude Cowork. Prefer those tools in-session. Do not require embedding private-app tokens or Calendar OAuth in the web app for this skill.
+HubSpot + Slack in Floor’s Cowork session. Calendar only when she explicitly asks after the Slack ping.
 
 ## What this skill never does
 
-- Auto-create calendar events (Google Calendar, Calendly, HubSpot meetings, Outlook).
-- Send the lead a booking link and treat that as “booked” without Floor’s confirmation.
-- Skip the conversation in the Slack ping.
-- Book for AEs other than Ludwig unless Floor explicitly redirects.
+- Auto-create calendar events on the default yes-demo path.
+- Skip the conversation in the Floor Slack ping.
+- Treat “lead wants demo” as permission to open Calendar or send invites.
+- Book for AEs other than Ludwig unless Floor redirects.
 
 ## Done when
 
-- Floor has a Slack ping with lead + **conversation** + interest + links, or
-- Stage is Demo Booked / Completed / Rescheduled / Cancelled as requested, in English, after her manual Ludwig booking.
+- Floor has Slack with lead + **conversation** + interest + links, and she books Ludwig herself, and/or
+- Stage is Demo Booked / Completed / Rescheduled / Cancelled after her manual booking.
