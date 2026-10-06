@@ -147,12 +147,12 @@ export function SequenceBuilderPanel({
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
             <ListOrdered className="h-4 w-4" />
-            Multi-channel sequence drafts
+            Gmail cold sequence (max 3)
           </CardTitle>
           <CardDescription>
-            LinkedIn connect/message → wait a few days → LinkedIn follow-up → email. Uses CRM
-            opener/why-good and opportunity angles. <strong>No auto-send</strong> — draft → approve
-            → mark sent.
+            HubSpot notes = background — personalize Email 1 → wait ~1 week → Email 2 → Email 3.
+            No LinkedIn send, no Lemlist. Pilot: <strong>approve</strong> then send via Gmail
+            (Cowork); Mark sent here is a UI simulator.
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-wrap items-end gap-3">

@@ -12,8 +12,9 @@
 
 ## Consent & automation
 
-- **No auto-send** — Floor must **approve** each sequence step, then **mark sent** after sending outside the app/skill.
-- Floor asked for full automation; product default remains human-in-the-loop until Willow policy + explicit OK.
+- **Approve → Gmail send (pilot)** — Floor must **approve** each email step; then agent sends via **Gmail** (`sales-gmail-send`). No LinkedIn API. No Lemlist.
+- HubSpot notes are **background only**; personalize the full sequence from the note — **no re-scrape**.
+- Unattended send without approve stays out until Willow policy + explicit OK.
 - **No silent HubSpot write storms** — stage push is explicit; sync is operator-triggered.
 - **No silent CSV import** — Sales Nav commit requires human-selected rows.
 - Skills prefer **session HubSpot MCP/tools**; do not require embedding a private-app token in the web app.

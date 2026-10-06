@@ -1,11 +1,13 @@
 ---
 name: sales-hubspot-pull
-description: Pull Netherlands-first HubSpot companies/tasks in bulk (tens–hundreds) for Floor’s approve queue — NL + BE only, Dutch primary. Read company-level agent notes (why-good, opener, right contact). Prefer HubSpot MCP/tools in Floor’s Claude/Cursor session. Use when Floor asks to sync CRM, pull Dutch tasks, batch leads, or prepare a NL/BE prospect list.
+description: Pull Dutch HubSpot daily tasks and company notes as background for Gmail sequences — NL primary, BE secondary. Never re-scrape LinkedIn/websites. Prefer HubSpot tools in Floor’s Cowork session.
 ---
 
 # sales-hubspot-pull
 
-Pull the next NL+BE companies (and today’s **Dutch HubSpot tasks** when present) and surface the **company notes** the internal lead-gen agent already wrote. Sales Generator does **not** rebuild prospecting — it reads why-good / opener / right contact and hands them to **batch sequence drafting** (`sales-sequence-draft`).
+**One-liner:** HubSpot notes = **background** for personalization — pull them, do not re-scrape.
+
+Pull today’s **Dutch HubSpot daily tasks** (and NL+BE companies when present) and surface the **company notes** the internal lead-gen agent already wrote (opener / situation: vacancies, weak posting, visibility, etc.). Pass notes to `sales-sequence-draft` so it can personalize the full Gmail sequence from that note only. **Never re-scrape LinkedIn or company websites.**
 
 ## Geography (hard rule)
 
@@ -28,10 +30,10 @@ Floor works in **bulk**: tens to hundreds of Dutch HubSpot tasks/companies per p
 
 ```text
 Batch pull contract
-- Source: Dutch HubSpot tasks (primary) → NL companies + notes
+- Source: Dutch HubSpot daily tasks (primary) → NL companies + notes
 - Size: tens–hundreds; present in reviewable chunks (default 50)
-- Next: sales-sequence-draft batch → approve queue
-- Never: auto-send, other countries, rebuild lead-gen
+- Next: sales-sequence-draft (Gmail max 3 from notes) → approve queue
+- Never: re-scrape LinkedIn/websites, LinkedIn API send, Lemlist, other countries, rebuild lead-gen
 ```
 
 ## Prefer live HubSpot via session tools

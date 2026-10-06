@@ -64,16 +64,17 @@ const joost = sync.upserted.find((l) => l.contactName.includes("Joost"));
 assert.equal(joost?.geoCode, "NL");
 
 const seq = buildSequenceForLead(els!, "Floor Hoefkens");
-assert.ok(seq.steps.length >= 4);
-assert.ok(seq.steps.some((s) => s.kind === "linkedin_connect"));
-assert.ok(seq.steps.some((s) => s.kind === "wait"));
-assert.ok(seq.steps.some((s) => s.kind === "email"));
+const emailSteps = seq.steps.filter((s) => s.kind === "email");
+assert.equal(emailSteps.length, 3, "Gmail cold sequence caps at 3 emails");
+assert.ok(seq.steps.some((s) => s.kind === "wait" && s.waitDays === 7), "waits ~1 week");
+assert.ok(!seq.steps.some((s) => s.kind.startsWith("linkedin")), "Dutch pilot is Gmail-only");
 assert.ok(seq.steps.every((s) => s.kind === "wait" || (s.body && s.body.length > 20)));
 assert.ok(seq.opportunityAngles.length > 0);
 assert.ok(
-  seq.steps.some((s) => s.body && /AE|calendar link/i.test(s.body)),
-  "sequence CTA mentions AE calendar link",
+  emailSteps.some((s) => s.body && /Ludwig|intro|demo|call/i.test(s.body)),
+  "sequence CTA mentions Ludwig / intro",
 );
+assert.match(seq.name, /Gmail/i);
 
 const bad = validateSequenceAction({ action: "mark_sent" });
 assert.equal(bad.ok, false);

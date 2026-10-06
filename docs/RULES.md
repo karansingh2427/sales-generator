@@ -5,11 +5,11 @@ These rules govern human and agent operators. Violations are **invalid** scenari
 ## Outreach & sequence rules
 
 1. **No outreach to disqualified leads** — including **strong social presence** (Floor disqualifier).
-2. **Channels** — `email`, `linkedin_dm`, or `linkedin_connect` only.
+2. **Dutch pilot channel** — **Gmail email sequences only**. No LinkedIn API send. No Lemlist (Willow does not have it). Web-app types may still include LinkedIn kinds for legacy; default playbook is email day 0 + follow-ups.
 3. **Every draft includes rationale** — CRM why-good / opener / opportunity angles (`scoreLeadRationale` / sequence engine).
 4. **CTA** — offer a 30-minute Willow demo with AE **Ludwig**; do not promise pricing or legal outcomes. When they agree, **Slack Floor** (include conversation) — she books Ludwig’s calendar manually.
 5. **No fabricated case studies** — use only Willow public claims (expertise firms, EU/GDPR, coaching).
-6. **Human send (mandatory this slice)** — draft → Floor **approves** → **mark sent**. MVP never auto-sends LinkedIn or email. Auto-blast is invalid until explicit Willow policy + Floor OK.
+6. **Approve → Gmail send** — draft → Floor **approves** → agent sends via **Gmail** (`sales-gmail-send`) → mark sent. Unattended send without approve is invalid.
 7. **Sequence mark_sent** without prior **approve_step** is invalid for message steps.
 8. Outreach drafts are **editable** (any language Floor prefers); CRM writebacks stay English.
 
@@ -45,18 +45,19 @@ These rules govern human and agent operators. Violations are **invalid** scenari
 6. Demo Slack to Floor must include: lead/company, **conversation**, why interested, links/context.
 7. Optional: Slack Ludwig with lead context when Floor asks.
 8. Only after Floor confirms the Ludwig booking → HubSpot **Demo Booked**; later Completed | Rescheduled | Cancelled.
-9. **Phase 1 batch:** Dutch HubSpot tasks in bulk → approve queue (approve/edit/skip / approve-selected). **No auto-send** (phase 2 later).
+9. **Dutch pilot batch:** Dutch HubSpot tasks in bulk → Gmail email approve queue → approve/edit/skip → **Gmail send** via Cowork. No LinkedIn API. No Lemlist.
 
 ## Skill pack rules
 
 1. Skills live under `skills/*/SKILL.md` and are mapped from [AGENTS.md](../AGENTS.md).
 2. `sales-hubspot-pull` must instruct NL-first pulls and company notes.
-3. `sales-sequence-draft` must require approve before send.
-4. `sales-demo-book` must Slack Floor (with conversation), never auto-book Calendar, and use the three post-demo outcomes after she books Ludwig.
-5. Orchestrator `sales-lead-run` may compose the skills — it must not bypass HITL, geo lock, or the Slack→Ludwig handoff.
-6. `sales-feedback-learn` persists structured feedback; pull/draft/lead-run **must** load active feedback.
-7. Feedback never auto-sends and never bypasses draft → approve → mark sent.
-8. Feedback cannot add countries outside NL+BE.
+3. `sales-sequence-draft` must draft **Gmail** sequences and require approve before send.
+4. `sales-gmail-send` sends only **approved** email steps via Gmail; never LinkedIn API or Lemlist.
+5. `sales-demo-book` must Slack Floor (with conversation), never auto-book Calendar, and use the three post-demo outcomes after she books Ludwig.
+6. Orchestrator `sales-lead-run` may compose the skills — it must not bypass HITL, geo lock, Gmail-only channel, or the Slack→Ludwig handoff.
+7. `sales-feedback-learn` persists structured feedback; pull/draft/lead-run **must** load active feedback.
+8. Feedback never bypasses draft → approve → Gmail send.
+9. Feedback cannot add countries outside NL+BE.
 
 ## Feedback learning rules
 
@@ -71,5 +72,5 @@ These rules govern human and agent operators. Violations are **invalid** scenari
 1. One action at a time; confirm before bulk HubSpot sync interpretation or demo generate (>5 leads).
 2. Present sequence drafts as readable prose before approve/mark sent.
 3. Name failures in plain language.
-4. Prefer **Netherlands-first** language in ICP explanations; mention Netherlands as secondary; never propose other countries.
+4. Prefer **Netherlands-first** language in ICP explanations; mention Belgium as secondary; never propose other countries.
 5. When Floor steers (“skip X”, “prefer title Y”), save via `sales-feedback-learn` and confirm in one line.

@@ -1,18 +1,21 @@
 # sales-generator — Agent Map
 
 A **Willow BDR operating system** for Floor Hoefkens: Cursor/Claude **skills** plus a Next.js workbench
-that pull HubSpot **company notes** (why-good, opener, right contact), draft multi-channel LinkedIn +
-email sequences with human approve, and when a lead wants a demo **Slack Floor** (with the conversation)
-so she **manually books Ludwig’s calendar** — never auto-book Calendar.
+that pull HubSpot **company notes** as **background** (why-good, opener, right contact), **personalize
+the full Gmail sequence from that note only** (no re-scrape), **approve → send via Gmail**, and when a
+lead wants a demo **Slack Floor** (with the conversation) so she **manually books Ludwig’s calendar** —
+never auto-book Calendar.
 
 **Geography locked:** **Netherlands first**, Belgium second — **NL + BE only**.
+
+**Dutch pilot channel:** **Gmail email sequences only**. No LinkedIn API send. No Lemlist (Willow does not have it).
 
 **This file is the entry point for coding agents.** Start here, then follow the pointers.
 
 ## Start here
 
 - **[ARCHITECTURE.md](ARCHITECTURE.md)** — product domains × architectural layers.
-- **[docs/PRD.md](docs/PRD.md)** — Floor requirements (HubSpot hero, sequences, draft→approve).
+- **[docs/PRD.md](docs/PRD.md)** — Floor requirements (HubSpot hero, Gmail sequences, draft→approve→send).
 - **[docs/skills.md](docs/skills.md)** — Floor first-run + skill index.
 - **Runtime contracts** — [docs/RULES.md](docs/RULES.md), [docs/TASKS.md](docs/TASKS.md), [docs/GOVERNANCE.md](docs/GOVERNANCE.md).
 
@@ -23,19 +26,20 @@ Plugin skills live under `skills/` (see [`.cursor-plugin/plugin.json`](.cursor-p
 | Skill | Path | Use when |
 |---|---|---|
 | `sales-hubspot-pull` | [skills/sales-hubspot-pull/SKILL.md](skills/sales-hubspot-pull/SKILL.md) | Bulk Dutch HubSpot tasks / NL-first companies + notes |
-| `sales-sequence-draft` | [skills/sales-sequence-draft/SKILL.md](skills/sales-sequence-draft/SKILL.md) | Batch-draft into approve queue; approve/edit/skip — no auto-send |
+| `sales-sequence-draft` | [skills/sales-sequence-draft/SKILL.md](skills/sales-sequence-draft/SKILL.md) | Batch-draft Gmail sequences into approve queue |
+| `sales-gmail-send` | [skills/sales-gmail-send/SKILL.md](skills/sales-gmail-send/SKILL.md) | After approve — send via Gmail (Cowork connector) |
 | `sales-demo-book` | [skills/sales-demo-book/SKILL.md](skills/sales-demo-book/SKILL.md) | Slack Floor + conversation → she books Ludwig; never auto-create events |
 | `sales-feedback-learn` | [skills/sales-feedback-learn/SKILL.md](skills/sales-feedback-learn/SKILL.md) | “Remember: …” — applied on next Dutch batch pull/drafts |
-| `sales-lead-run` | [skills/sales-lead-run/SKILL.md](skills/sales-lead-run/SKILL.md) | Orchestrate batch pass + demo handoff (loads feedback first) |
+| `sales-lead-run` | [skills/sales-lead-run/SKILL.md](skills/sales-lead-run/SKILL.md) | Orchestrate batch pass + Gmail send + demo handoff |
 
-Pattern mirrored from [agent-data/job-search](https://github.com/agent-data/job-search) (`skills/*/SKILL.md` + this map). Prefer **HubSpot tools in Floor’s Claude/Cursor session** over embedding a private-app token in the web app.
+Pattern mirrored from [agent-data/job-search](https://github.com/agent-data/job-search) (`skills/*/SKILL.md` + this map). Prefer **HubSpot + Gmail + Slack tools in Floor’s Claude Cowork session** over embedding tokens in the web app.
 
-**Feedback memory:** `.data/feedback.json` (runtime) + optional promote copy in [`skills/memory/FEEDBACK.md`](skills/memory/FEEDBACK.md). Next HubSpot pull / sequence draft / lead-run **must** load active feedback. Feedback never bypasses approve-before-send.
+**Feedback memory:** `.data/feedback.json` (runtime) + optional promote copy in [`skills/memory/FEEDBACK.md`](skills/memory/FEEDBACK.md). Next HubSpot pull / sequence draft / lead-run **must** load active feedback. Feedback never bypasses approve-before-Gmail-send.
 
 ## Quality · governance · interface
 
 - [docs/QUALITY_SCORE.md](docs/QUALITY_SCORE.md)
-- [tests/evals.json](tests/evals.json) — valid / invalid cases (HubSpot + sequences + NL-first geo).
+- [tests/evals.json](tests/evals.json) — valid / invalid cases (HubSpot + Gmail sequences + NL-first geo).
 
 ## Working here
 

@@ -1,82 +1,46 @@
 # Floor — quick test guide (Sales Generator)
 
 **App:** https://sales-generator-delta.vercel.app  
-**Who:** Floor Hoefkens (Willow BDR) · **Pilot:** Dutch-first pilot — Netherlands primary, Belgium secondary — NL/BE only  
-**Mode:** Mock HubSpot for this URL (no login / no API token). Live HubSpot stays in your Claude/Cursor session later.
+**Who:** Floor Hoefkens (Willow BDR) · **Pilot:** Dutch-first — Gmail cold sequences from HubSpot notes  
+**Mode:** Mock HubSpot for this URL. Live path = Claude Cowork (HubSpot + Gmail + Slack).
 
 ---
 
 ## What this tool is for
 
-Your lead-gen agent already drops **company notes** in HubSpot (why good / opener / right contact). This app helps you:
+Your lead-gen agent already drops **company notes** in HubSpot. Those notes are **background**. The agent **personalizes the full Gmail sequence** from that note only (no LinkedIn/website re-scrape):
 
-1. Pull those leads (mock sync here)  
-2. Draft **LinkedIn + email** sequences (instead of cold-calling everyone)  
-3. (Live Cowork) When a lead wants a demo → Claude **Slacks you** with the conversation → **you book Ludwig** manually  
-4. Teach the agent with **feedback** so the next run remembers
+1. Pull Dutch HubSpot tasks / leads (mock sync here)  
+2. Draft **Gmail** sequences — max **3** emails, ~1 week between if no reply  
+3. (Live Cowork) **Approve** → Claude sends via **Gmail**  
+4. Interest → Claude **Slacks you** with the conversation → **you book Ludwig**  
+5. Teach tone with **feedback** (“remember how I write”)
 
-Nothing auto-sends. Nothing auto-books Calendar. You always **Approve** before **Mark sent**.
+Pilot: approve before Gmail send. Nothing auto-books Calendar. No Lemlist. No LinkedIn send.
 
 ---
 
-## 5-minute click-through
+## 5-minute click-through (website mock)
 
 ### 1. Open the app
-Go to **https://sales-generator-delta.vercel.app**  
-Confirm it says HubSpot is in **mock** mode.
+https://sales-generator-delta.vercel.app — confirm HubSpot **mock** mode.
 
 ### 2. Sync leads
-- Open the **HubSpot** (or Sync) action  
-- Click **Sync**  
-- You should see NL/BE sample companies with notes (why / opener / right contact)
+- Sync → NL/BE sample companies with notes (why / opener / right contact)
 
 ### 3. Build a sequence
-- Pick a Belgian or Dutch lead  
-- **Build sequence** (or similar)  
-- You get steps like: LinkedIn connect → message → wait → follow-up → email  
-- Edit if you want → **Approve** → **Mark sent** (simulates that you sent it yourself)
+- Pick a Dutch lead → **Build sequence**
+- You should see **Email 1 / wait ~1 week / Email 2 / wait / Email 3** (Gmail, max 3)
+- Edit → **Approve** → **Mark sent** (UI simulator; live Cowork uses real Gmail)
 
 ### 4. Teach the agent
-- Open the **Feedback** tab  
-- Example: *“Skip company Peeters Accountants”* or *“Prefer Partners at law firms”*  
-- Click **Remember**  
-- Sync or build a sequence again — the skip/preference should apply  
-
-Or use the **Teach agent** control on a single lead.
+- Feedback tab: *“Remember how I write: warmer, shorter”* or *“Skip company Peeters Accountants”*
 
 ### 5. Demo handoff (live skills — not this mock URL)
-- On the website, bookings UI is mock-only.
-- In Cowork: lead wants demo → Slack ping with **conversation** → you book **Ludwig** → then set **Demo Booked / Completed / Rescheduled / Cancelled**
+- Interest → Slack you with **conversation** → you book **Ludwig** → Demo Booked / Completed / Rescheduled / Cancelled
 
 ---
 
-## What to tell Karandeep after testing
+## Live Cowork prompts
 
-Please note anything that felt wrong:
-
-- Wrong ICP / titles / countries  
-- Tone of LinkedIn or email drafts  
-- Companies that should always be skipped  
-- Missing fields from your real HubSpot company notes  
-- Whether you’d want **draft-only** forever or true auto-send later  
-
-You can dump that into the **Feedback** tab (best) or WhatsApp Karandeep.
-
----
-
-## Limits of this Vercel pilot
-
-| OK for pilot | Not on this URL yet |
-|---|---|
-| Mock HubSpot + sequences + feedback | Your real HubSpot data |
-| NL/BE sample leads | Sales Nav live API |
-| Approve → mark sent | Auto-send from LinkedIn/email |
-| Ephemeral memory (may reset on sleep) | Durable CRM of record |
-
-**Live HubSpot:** use Cursor/Claude skills in the session where HubSpot is already connected (`sales-hubspot-pull` → `sales-sequence-draft` → `sales-demo-book`, or `sales-lead-run`).
-
----
-
-## One-line ask for you
-
-Open the link → Sync → draft one sequence → leave one piece of Feedback → reply to Karandeep if anything should change before we wire your real HubSpot.
+See [START-HERE-FLOOR.md](../START-HERE-FLOOR.md) and [floor-open-in-cowork.md](./floor-open-in-cowork.md).

@@ -1,6 +1,6 @@
 {
   "product": "sales-generator",
-  "harness": "Run npm run test:evals, test:import, test:hubspot. Invalid cases must return 4xx with plain error strings. No auto-send.",
+  "harness": "Run npm run test:evals, test:import, test:hubspot. Invalid cases must return 4xx with plain error strings. Gmail send only after approve. No LinkedIn API. No Lemlist.",
   "valid_cases": [
     {
       "id": "V-01",
@@ -86,14 +86,14 @@
     },
     {
       "id": "V-08",
-      "scenario": "Generate multi-channel sequence then approve and mark sent",
+      "scenario": "Generate Gmail cold sequence (max 3) then approve and mark sent",
       "request": "POST /api/sequences generate → approve_step → mark_sent",
       "expectations": [
-        "Sequence steps include linkedin_connect, wait, linkedin_followup, email",
-        "Opportunity angles non-empty",
+        "Sequence has exactly 3 email steps and ~1 week waits (no linkedin_* steps)",
+        "Opportunity angles non-empty; drafts personalized from HubSpot note background",
         "mark_sent without approve returns 400",
         "After approve+mark_sent step status sent and lead stage contacted",
-        "App does not transmit LinkedIn/email itself"
+        "Live Cowork send path is Gmail after approve (UI mark_sent is simulator)"
       ]
     },
     {

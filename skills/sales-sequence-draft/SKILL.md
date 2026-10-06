@@ -1,128 +1,130 @@
 ---
 name: sales-sequence-draft
-description: Batch-draft multi-channel LinkedIn + email sequences from HubSpot company notes into an approve queue for Netherlands-first NL+BE leads. Floor approves/edits/skips per item or approve-all selected — never auto-send. Phase 1 = approve queue; phase 2 auto-send is not implemented. Use when Floor asks to draft sequences, batch 50, fill the approve queue, or write LinkedIn/email for prospects.
+description: Batch-draft Gmail cold email sequences (max 3) from Dutch HubSpot company notes only — never re-scrape LinkedIn/websites. Email 1 = note opener; ~1 week → Email 2; cap 3. Approve queue for pilot. Use when Floor asks to draft sequences, batch 50, or write cold emails from HubSpot notes.
 ---
 
 # sales-sequence-draft
 
-Turn one company **or a batch** (tens–hundreds) of NL+BE companies into **LinkedIn → wait → LinkedIn follow-up → email** draft sequences. Reuse HubSpot **company notes**. Floor works an **approve queue** — she approves, edits, or skips per item (or approve-all selected). She still **sends herself** in LinkedIn/email.
+**One-liner:** HubSpot notes = **background**; the agent **personalizes the full email sequence** from that note only (**no re-scrape**).
+
+Transform HubSpot **company notes** into a **Gmail cold email sequence** (max **3** emails). Do **not** re-scrape LinkedIn or the company website.
+
+## End vision (Floor — bake this exactly)
+
+### Input
+
+- **Dutch HubSpot daily tasks** (pilot: skip Belgian unless she includes them).
+- **Company notes** already contain opener / situation (vacancies, weak posting, visibility, consistency, etc.).
+- **Never re-scrape** LinkedIn or websites. If the note is thin, ask Floor or skip — do not invent research.
+
+### Output — automated cold email sequence (Gmail)
+
+1. **Email 1** — personalized opener from the HubSpot note, in Floor’s sales tone (load feedback / “remember how I write”).
+2. If **no reply after ~1 week** → **Email 2** follow-up.
+3. Cap at **3 emails** total (Email 3 = last note).
+4. **Stop early** when the reply is:
+   - clear **no** → close sequence; thank briefly if needed; do not continue; or
+   - **interest** (yes / more info / “what are you talking about?”) → hand off to `sales-demo-book`: **Slack Floor with full conversation** → she books Ludwig manually.
+5. **Learn tone** from past feedback / “remember how I write” (`sales-feedback-learn`).
+
+### Pilot guardrail
+
+**Approve-before-send** still required. After approve → `sales-gmail-send`.  
+**No Lemlist. No LinkedIn send.**
 
 ## Geography
 
-Netherlands first, Belgium second. **NL + BE only.** Refuse sequences for other countries. Pilot batches default to **Dutch** leads.
+Netherlands first, Belgium second. **NL + BE only.** Pilot batches = **Dutch** tasks.
 
-## Phases (do not confuse)
+## Channel (locked)
 
-| Phase | Behavior | Status |
-|---|---|---|
-| **1 — Approve queue (this skill)** | Bulk draft → queue → Floor approves/edits/skips → she sends → mark sent | **Ship / use** |
-| **2 — Auto-send** | Agent sends LinkedIn/email without per-item human send | **Later — do not implement** |
+| Channel | Status |
+|---|---|
+| **Gmail cold email** | Primary |
+| LinkedIn API send | Out of scope |
+| Lemlist | Not used — Willow does not have it |
 
-Never implement or claim phase-2 auto-send. “Approve-all” means approve drafts in the queue — **not** auto-send.
-
-## Guardrail (mandatory)
-
-```text
-batch draft → approve queue → Floor approves/edits/skips (per item or selected)
-  → Floor sends in LinkedIn/email client → mark sent
-```
-
-Never auto-send. Never claim a message was delivered by this skill.
-
-## Batch / approve-queue mode (primary)
-
-When Floor says “batch”, “draft 50”, “today’s Dutch tasks”, or `sales-lead-run` hands off a list:
-
-1. Draft sequences for **each** selected company (reuse notes + feedback).
-2. Put every draft into an **approve queue** (numbered list she can scan).
-3. For each queue item she may: **approve** · **edit** · **skip** · **hold**.
-4. Support **approve-all selected** (or “approve items 1–20”) — still draft-only; she sends outside.
-5. Do **not** mark sent until she confirms she sent that step.
-6. If the batch is large, draft in chunks (e.g. 50) and keep a running queue digest.
-
-### Approve queue digest shape
+## Guardrail
 
 ```text
-# Approve queue — <date> · <n> items (Dutch / NL)
-
-| # | Company | Contact | Status | Next step to send |
-|---|---------|---------|--------|-------------------|
-| 1 | Acme NL  | Jan Partner | pending | LI connect |
-| 2 | Beta BV  | Sam Founder | approved | LI connect (Floor sends) |
-| 3 | …        | …           | skipped | — |
-
-Commands: approve #N | edit #N | skip #N | approve selected: 1,2,5 | approve-all pending | next chunk
+HubSpot note (only) → draft Email 1–3 → approve queue
+  → sales-gmail-send (after approve)
+  → stop on clear no OR interest → Slack Floor + conversation → she books Ludwig
 ```
 
-### Per-item draft (same as single mode)
+## Batch / approve-queue mode
 
-Show full sequence prose under each # so Floor can edit before approve.
+1. For each selected company: read note → draft up to **3** emails (Email 2/3 ready but held until wait + no reply).
+2. Put drafts in a numbered **approve queue**.
+3. Floor: **approve** · **edit** · **skip** · **approve-all selected**.
+4. Then `sales-gmail-send` for approved Email 1 (and later 2/3 when due).
+5. Chunk default **50**.
 
-## Inputs
+### Approve queue digest
 
-- Company + contact from `sales-hubspot-pull` (batch table or pasted notes).
-- Required note fields when available: `whyGood`, `opener`, `rightContact`.
-- Opportunity angles when present: consistency, content quality, content mix, visibility, open vacancies.
-- **Active Floor feedback** (`.data/feedback.json` or `skills/memory/FEEDBACK.md`) — tone, never-pitch topics, sequence notes, ICP memory. Load before drafting.
+```text
+# Approve queue — <date> · <n> · Dutch · Gmail max 3
 
-## Playbook (default)
+| # | Company | Contact | Status | Emails |
+|---|---------|---------|--------|--------|
+| 1 | Acme NL  | Jan | pending  | E1 opener from note |
+| 2 | Beta BV  | Sam | approved | E1 ready → Gmail send |
 
-| Step | Kind | Wait |
+Commands: approve #N | edit #N | skip #N | approve-all pending | send approved | next chunk
+```
+
+## Playbook
+
+| Step | What | Timing |
 |---|---|---|
-| 1 | LinkedIn connection request | 0 |
-| 2 | LinkedIn message / InMail | 0 (same day if connected) |
-| 3 | Wait | ~3 days |
-| 4 | LinkedIn follow-up | 0 |
-| 5 | Email follow-up | ~2 days after prior |
+| Email 1 | Opener from HubSpot note + Floor tone | Day 0 |
+| Wait | No reply | ~1 week |
+| Email 2 | Follow-up | After wait |
+| Wait | No reply | ~1 week |
+| Email 3 | Last note | After wait — **hard cap** |
 
-CTA: offer a 30-minute Willow demo with AE **Ludwig**. When they agree, hand off via `sales-demo-book` (Slack Floor + conversation — she books Ludwig manually). Do not paste fake calendar URLs.
+Never draft a 4th email. Never continue after clear no or interest handoff.
 
 ## Drafting rules
 
-1. Open with the CRM **opener** / why-good — do not invent case studies.
-2. Name the opportunity angle in plain language (consistency, quality, mix, visibility, vacancies).
-3. Keep messages short; LinkedIn connect note ≤ ~280 characters when possible.
-4. CRM writebacks stay **English**; outreach drafts may be NL/FR/EN — ask Floor if language unclear.
-5. Skip if social presence is **strong** or company is in active skip feedback.
-6. Apply **tone** and **never_pitch** feedback (omit forbidden topics).
-7. Show every draft as readable prose; queue status stays **pending** until she approves.
-8. Feedback never auto-sends and never skips the approve step.
-9. Batch size default **50** when she says “a batch” without a number.
+1. **Transform the note only** — opener / situation / why-good / right contact. No LinkedIn/web scrape.
+2. Match Floor’s **tone** from active feedback (“remember how I write”).
+3. Short emails; firm-specific subject from the note angle.
+4. CRM writebacks **English**; outreach NL/FR/EN per Floor.
+5. Skip strong social presence or skip-feedback companies.
+6. Apply never_pitch / tone feedback.
+7. Queue stays **pending** until she approves (pilot).
 
-## Output shape (per lead)
+## Per-lead output shape
 
 ```markdown
-## Sequence — <Firm> · <BE|NL> · <Contact>
+## Sequence — <Firm> · NL · <Contact> · Gmail (max 3)
 
+**From note:** <opener / situation — quoted or paraphrased, not scraped>
 **Rationale:** <whyGood + angles>
-**Right contact:** <rightContact>
 **Queue status:** pending | approved | edited | skipped
 
-### 1. LinkedIn connect
-<draft>
-
-### 2. LinkedIn message
-<draft>
-
-### 3. Wait (~3 days)
-
-### 4. LinkedIn follow-up
-<draft>
-
-### 5. Email
-**Subject:** <subject>
+### Email 1 (day 0)
+**Subject:** …
 <body>
 
-Reply **approve #N** / **edit #N** / **skip #N** (or approve-all selected) before any send.
+### Wait ~1 week (if no reply)
+
+### Email 2
+**Subject:** …
+<body>
+
+### Wait ~1 week (if no reply)
+
+### Email 3 (last)
+**Subject:** …
+<body>
+
+Stop early: clear no → close · interest → Slack Floor (full conversation) → she books Ludwig.
 ```
-
-## Web-app mirror
-
-Same flow exists in the Sales Generator UI (`Sequences` tab / `POST /api/sequences`). Prefer drafting here when Floor is in Claude/Cursor with HubSpot tools; sync stage marks into HubSpot in English when she asks. UI may stay single-lead; **Cowork skills are the batch path**.
 
 ## Done when
 
-- Batch (or single) drafts exist in the **approve queue**.
-- Floor has approved / edited / skipped items (or approve-all selected) before send.
-- Sent steps are marked only after she confirms she sent them outside the agent.
-- Phase-2 auto-send was **not** offered as available.
+- Notes transformed into ≤3 Gmail drafts in the approve queue (no scrape).
+- Floor approved/edited/skipped before any send.
+- Stop rules and tone learning are clear in the digest.

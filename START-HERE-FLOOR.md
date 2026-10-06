@@ -2,53 +2,60 @@
 
 You do **not** need GitHub, git, or a developer laptop setup.
 
-## 1) Batch of 50 (phase 1 — approve queue, no auto-send)
+## Prerequisite
 
-1. **Unzip** `sales-generator-for-floor.zip` → open the folder in **Claude Cowork** / **Claude Code**.
+Connect **Gmail** in Claude Cowork (Google connector). Prefer the **same Google account** as Calendar. Keep **HubSpot** + **Slack** connected.
+
+## What this does (your end vision)
+
+| Input | Your Dutch HubSpot **daily tasks** + company notes (**background** — opener / situation already there) |
+| Output | Agent personalizes the **full** cold **Gmail** sequence from that note only (no re-scrape): Email 1 → wait ~1 week if no reply → Email 2 → **max 3 emails** |
+| Stop early | Clear **no** → stop · Interest → Claude **Slacks you** with the **full conversation** → **you book Ludwig** |
+| Tone | Claude learns from your feedback (“remember how I write”) |
+| Pilot | You still **approve** before Claude sends via Gmail |
+| Not used | Lemlist · LinkedIn send · re-scraping LinkedIn/websites |
+
+## 1) Batch of 50 — draft
+
+1. **Unzip** `sales-generator-for-floor.zip` → open the folder in **Claude Cowork**.
 2. Paste:
 
-> Batch 50 Dutch HubSpot tasks, draft sequences, show approve queue. Do not send. Skip Belgian leads.
+> Batch 50 Dutch HubSpot tasks. Transform company notes into Gmail cold sequences (max 3 emails, ~1 week between). Show approve queue. Do not send yet. Do not scrape LinkedIn. Skip Belgian leads.
 
-3. Review → say `approve 1-20` / `edit #7` / `skip #12` / `approve-all pending`.
-4. **You** send approved LinkedIn/email yourself — Claude never auto-sends.
+3. Review → `approve 1-20` / `edit #7` / `skip #12` / `approve-all pending`.
+4. Then:
 
-Next chunk: `Draft the next 50 Dutch tasks into the approve queue — do not send.`
+> Send approved emails via Gmail.
 
-## 2) Teach the agent (feedback)
+Next chunk: `Draft the next 50 Dutch tasks into the approve queue — do not send yet.`
 
-> Remember: skip companies that already post a lot
+## 2) Teach your tone
 
-Next Dutch batch pull/drafts will apply it. Also: `Remember this feedback: skip company X` / `prefer Partner titles`.
+> Remember how I write: warmer, shorter, less salesy
 
-## 3) Lead wants a demo (hard default)
+Or: `Remember: skip companies that already post a lot` / `prefer Partner titles`.
 
-1. Claude **Slacks you** with lead/company + the **conversation** + why interested + links.
-2. **You book yourself on Ludwig’s calendar** and verify.
+## 3) Lead wants a demo (or asks “what are you talking about?”)
+
+1. Claude **Slacks you** with lead/company + the **full conversation** + why interested + links.
+2. **You book yourself on Ludwig’s calendar**.
 3. Claude must **not** auto-create calendar events.
 
-Only if you want help **after** that Slack: `Propose 3 times for Ludwig — draft only, don’t create the event.`  
-Optional: `Slack Ludwig with the lead context for this demo.`
+Optional after Slack: `Propose 3 times for Ludwig — draft only, don’t create the event.`
 
 ## 4) After the meeting
 
-Tell Claude: **Demo Completed** / **Rescheduled** / **Cancelled** (English in HubSpot).
-
-## Phases
-
-| Phase | What | Status |
-|---|---|---|
-| **1 — Approve queue** | Bulk draft → you approve/edit/skip → you send | **This zip** |
-| **2 — Auto-send** | Claude sends without you | **Later — not built** |
+**Demo Completed** / **Rescheduled** / **Cancelled** (English in HubSpot).
 
 ## Also in this zip
 
-| File | What it is |
+| File | What |
 |---|---|
-| `docs/floor-open-in-cowork.md` | Same setup, more detail |
-| `docs/floor-test-guide.md` | Website click-through (mock HubSpot) |
-| `skills/` | Instruction packs for Cowork |
-| `AGENTS.md` | Skill map (for Claude) |
-| `media/floor-sales-generator-demo.mp4` | Optional demo video |
+| `docs/floor-open-in-cowork.md` | Prompts table |
+| `docs/floor-test-guide.md` | Website click-through (mock) |
+| `skills/` | Cowork instruction packs |
+| `AGENTS.md` | Skill map |
+| `media/floor-sales-generator-demo.mp4` | Optional demo |
 
 **Website only:** https://sales-generator-delta.vercel.app
 
