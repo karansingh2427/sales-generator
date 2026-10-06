@@ -19,6 +19,7 @@ Floor follows `START-HERE-FLOOR.md`. Follow-ups auto-scheduled; **every lead ema
 | **HubSpot** | After **every** successful Gmail send (E1/E2/E3) → email engagement on contact/company (dedup if Gmail sync already logged) |
 | **Stop** | Reply no → close · interest → Slack Floor · **just posted / don’t understand** → gracious reply + HubSpot log + cancel E2/E3 + **no demo** |
 | **Angles** | No stale “quiet LinkedIn / not posting” unless note fresh & specific; prefer vacancy/hiring-brand when they post |
+| **Pilot** | Approve before send |
 
 ## Invoke in order
 
