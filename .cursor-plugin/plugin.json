@@ -1,0 +1,28 @@
+{
+  "name": "sales-generator",
+  "version": "0.3.0",
+  "description": "Willow BDR skill pack for Floor Hoefkens: HubSpot company-note pull (Netherlands first), Gmail email sequence drafts with approve-then-send via Gmail, Slack→Ludwig demo handoff, and feedback learning. No LinkedIn API, no Lemlist.",
+  "author": { "name": "Karandeep Singh" },
+  "homepage": "https://github.com/karansingh2427/sales-generator",
+  "repository": "https://github.com/karansingh2427/sales-generator",
+  "license": "MIT",
+  "keywords": ["sales", "hubspot", "gmail", "bdr", "willow", "netherlands", "belgium", "skills", "feedback"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Sales Generator",
+    "shortDescription": "NL-first HubSpot pull, Gmail sequences, Slack→Ludwig, Floor feedback",
+    "longDescription": "Pull Netherlands-first HubSpot company notes, draft multi-step Gmail email sequences with human approve, send via Gmail after approve, Slack Floor when a lead wants a demo so she books Ludwig manually, and remember Floor’s ICP/company/tone feedback. Geography locked to the Netherlands (primary) and Belgium (secondary) only. No LinkedIn API send. No Lemlist.",
+    "developerName": "Karandeep Singh",
+    "category": "Productivity",
+    "capabilities": ["Interactive", "Read", "Write"],
+    "defaultPrompt": [
+      "Batch 50 Dutch HubSpot tasks, draft Gmail email sequences, show approve queue. Do not send yet. Skip Belgian leads.",
+      "approve 1-20",
+      "Send approved emails via Gmail.",
+      "Remember this feedback: skip company X / prefer Partner titles."
+    ],
+    "websiteURL": "https://github.com/karansingh2427/sales-generator",
+    "brandColor": "#0F766E",
+    "screenshots": []
+  }
+}
