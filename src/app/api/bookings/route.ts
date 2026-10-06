@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { addBooking, findLead, readState } from "@/lib/db";
-import { DEFAULT_AES } from "@/lib/willow-context";
+import { aeNames, calendarUrlForAe, DEFAULT_AES } from "@/lib/willow-context";
 
 function validateBooking(body: unknown):
   | {
@@ -18,7 +18,7 @@ function validateBooking(body: unknown):
   const aeName = b.aeName;
   const scheduledAt = b.scheduledAt;
   if (typeof leadId !== "string" || !leadId) return { ok: false, error: "leadId required" };
-  const allowedAes: string[] = [...DEFAULT_AES];
+  const allowedAes = aeNames();
   if (typeof aeName !== "string" || !allowedAes.includes(aeName)) {
     return { ok: false, error: `aeName must be one of: ${allowedAes.join(", ")}` };
   }
@@ -35,7 +35,13 @@ function validateBooking(body: unknown):
 
 export async function GET() {
   const state = await readState();
-  return NextResponse.json({ bookings: state.bookings, aes: DEFAULT_AES });
+  return NextResponse.json({
+    bookings: state.bookings,
+    aes: aeNames(),
+    aeRoster: DEFAULT_AES,
+    bookingPattern:
+      "Per-AE calendar link (same as Floor’s manual cold-call → AE link flow). Not a shared Calendly.",
+  });
 }
 
 export async function POST(request: Request) {
@@ -49,7 +55,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Cannot book demo for disqualified lead" }, { status: 422 });
   }
 
-  const meetingLink = `https://meet.willow.co/demo/${parsed.leadId.slice(-8)}`;
+  // Per-AE calendar URL — Floor’s confirmed booking pattern (manual AE link).
+  const meetingLink =
+    calendarUrlForAe(parsed.aeName) ??
+    `https://calendar.willow.co/ae/${encodeURIComponent(parsed.aeName.toLowerCase().replace(/\s+/g, "-"))}`;
   const booking = await addBooking({
     leadId: parsed.leadId,
     aeName: parsed.aeName,
@@ -59,5 +68,8 @@ export async function POST(request: Request) {
     notes: parsed.notes,
   });
 
-  return NextResponse.json({ booking });
+  return NextResponse.json({
+    booking,
+    bookingPattern: "Per-AE calendar link (not shared Calendly)",
+  });
 }

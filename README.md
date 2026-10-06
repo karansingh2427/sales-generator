@@ -1,45 +1,122 @@
 # Sales Generator (Willow BDR)
 
-Prototype automation for **Floor Hoefkens** (BDR @ [Willow](https://willow.co/)): lawyer-focused lead generation, AI-assisted outreach drafts, and AE demo booking — designed to minimize cold calling.
+Prototype for **Floor Hoefkens** (BDR @ [Willow](https://willow.co/)): **HubSpot company notes** → **LinkedIn + email sequence drafts** (approve → mark sent) → **per-AE calendar** demo booking. Sales Nav CSV remains a fallback. Cursor/Claude **skills** ship alongside the Next.js UI.
+
+**Geography:** **Netherlands first**, Belgium second — **NL + BE only**. **Governance:** human-in-the-loop — nothing auto-blasts. **CRM language:** English writebacks. **HubSpot path:** prefer Floor’s Claude/Cursor HubSpot MCP/tools; web-app private-app token is optional fallback only.
+
+## For Floor
+
+- **Live pilot (mock HubSpot):** https://sales-generator-delta.vercel.app
+- **5-minute test guide:** [docs/floor-test-guide.md](./docs/floor-test-guide.md)
+- **Demo video:** [media/floor-sales-generator-demo.mp4](./media/floor-sales-generator-demo.mp4)
+- Optional: [docs/vercel-deploy.md](./docs/vercel-deploy.md) · [docs/floor-feedback-learning.md](./docs/floor-feedback-learning.md)
 
 ## Quick start
 
 ```bash
 npm install
 npm run dev
-# or for a stable local demo (avoids flaky HMR hydration):
-npm run build && npm start
+# stable demo:
+npm run build && npm run start:demo   # http://127.0.0.1:4341
 ```
 
-Open [http://127.0.0.1:4317](http://127.0.0.1:4317). Workspace state persists in `.data/workspace.json` (created on first run, gitignored).
+Workspace state: `.data/workspace.json` + `.data/feedback.json` (gitignored).
 
-Optional: set `OPENAI_API_KEY` in `.env.local` for future live model enrichment (MVP uses deterministic templates).
+## Skills (Floor / Claude / Cursor)
+
+See **[docs/skills.md](./docs/skills.md)** for first-run steps.
+
+| Skill | Path |
+|---|---|
+| `sales-hubspot-pull` | [`skills/sales-hubspot-pull/SKILL.md`](./skills/sales-hubspot-pull/SKILL.md) |
+| `sales-sequence-draft` | [`skills/sales-sequence-draft/SKILL.md`](./skills/sales-sequence-draft/SKILL.md) |
+| `sales-demo-book` | [`skills/sales-demo-book/SKILL.md`](./skills/sales-demo-book/SKILL.md) |
+| `sales-feedback-learn` | [`skills/sales-feedback-learn/SKILL.md`](./skills/sales-feedback-learn/SKILL.md) |
+| `sales-lead-run` | [`skills/sales-lead-run/SKILL.md`](./skills/sales-lead-run/SKILL.md) |
+
+Agent map: [AGENTS.md](./AGENTS.md). Plugin manifest: [`.cursor-plugin/plugin.json`](./.cursor-plugin/plugin.json).
+
+### Floor first-run (short)
+
+1. Open this repo in the Claude/Cursor session where **HubSpot is already connected**.
+2. “Pull my Netherlands HubSpot companies and show company notes.”
+3. “Draft LinkedIn + email sequences” → **approve** → send yourself → mark sent.
+4. “Book demo with \<AE\>” → use that AE’s calendar link → after meeting set Completed / Rescheduled / Cancelled.
+5. “Remember this feedback: skip company X / prefer Partner titles” → next pull applies it.
+
+## Feedback learning
+
+| Path | How |
+|---|---|
+| UI | **Feedback** tab — form + disable/delete list; per-lead graduation-cap **Teach agent** |
+| Skill | “Remember this feedback: …” → `sales-feedback-learn` |
+| Storage | `.data/feedback.json` (gitignored); promote to `skills/memory/FEEDBACK.md` for session-only agents |
+| Apply | HubSpot sync, sequence generate, outreach draft, and `sales-lead-run` load **active** feedback |
+| Guardrail | Feedback never auto-sends; draft → approve → mark sent still required |
+
+## HubSpot connector (web app fallback)
+
+| Mode | When | Behavior |
+|---|---|---|
+| **Mock** | `HUBSPOT_ACCESS_TOKEN` unset | Syncs demo contacts/companies + **company-level** notes (why-good, opener, right contact) |
+| **Live** | Token set in `.env.local` | Calls HubSpot CRM API; prefers company notes/props over contact-only |
+
+Prefer session HubSpot tools over storing a token. Token path remains for ops who want the UI live sync.
+
+```bash
+# .env.local (optional fallback)
+HUBSPOT_ACCESS_TOKEN=pat-xxx
+
+HUBSPOT_STAGE_MAP={"demo booked":"demo_booked","demo completed":"demo_completed","demo rescheduled":"demo_rescheduled","demo cancelled":"demo_cancelled"}
+HUBSPOT_PROPERTY_MAP={"whyGood":"sg_why_good","opener":"sg_opener","rightContact":"sg_right_contact","socialPresence":"sg_social_presence","vertical":"sg_vertical"}
+```
+
+**Still needed from Floor/ops:** confirm Claude↔HubSpot scopes, real AE calendar URLs, outreach language(s), pre–Demo Booked stages, auto-send policy.
+
+## Sequences (Floor’s #1 ask)
+
+1. Pull HubSpot company notes (skill or Sync panel) — **NL + BE** filter by default.
+2. **Sequences** tab / `sales-sequence-draft` → Generate (LinkedIn connect/message → wait → follow-up → email).
+3. Edit drafts → **Approve** → send in LinkedIn/email client → **Mark sent**.
+4. App/skill never transmits messages itself.
+
+Opportunity angles: consistency, content quality/mix, visibility, open vacancies — plus company CRM opener/rationale. Strong social presence → disqualified / no sequence.
+
+## Demo booking
+
+Bookings use each AE’s **personal calendar link** — not a single shared Calendly. After Demo Booked, set **Completed / Rescheduled / Cancelled**.
+
+## Sales Nav CSV (fallback)
+
+Import panel defaults geo filter to **NL + BE**. Prefer HubSpot when the internal lead agent already wrote company notes.
 
 ## Scripts
 
 | Command | Purpose |
 |---|---|
-| `npm run dev` | Dev server on port **4317** |
-| `npm run build` | Production build |
-| `npm run lint` | ESLint |
-| `npm run test:evals` | Validate governance test-case structure |
+| `npm run dev` | Dev server **4317** |
+| `npm run start:demo` | Production server **4341** |
+| `npm run test:evals` | Governance eval structure |
+| `npm run test:import` | Sales Nav CSV / NL-first geo unit checks |
+| `npm run test:hubspot` | HubSpot mock + sequence unit checks |
+| `npm run test:feedback` | Feedback persist + apply unit checks |
+| `npm run lint` / `build` | Quality gates |
 
-## Governance (agent structure)
+## API
 
-Mirrors [agent-data/job-search](https://github.com/agent-data/job-search):
+- `GET/POST /api/hubspot` — status / `sync` / `push_stage`
+- `GET/POST /api/sequences` — list / `generate` / `update_step` / `approve_step` / `mark_sent` / `skip_step`
+- `GET/POST /api/feedback` — list / `remember` / `enable` / `disable` / `delete` (`?format=markdown`)
+- `GET/POST /api/leads` — list / Sales Nav import / demo generate / stage
+- `GET/POST /api/outreach` — single-touch drafts
+- `GET/POST /api/bookings` — AE demos (per-AE calendar URLs)
 
-- [AGENTS.md](./AGENTS.md) — entry map
-- [ARCHITECTURE.md](./ARCHITECTURE.md) — domains × layers
-- [docs/PRD.md](./docs/PRD.md) — requirements
-- [docs/RULES.md](./docs/RULES.md) · [docs/TASKS.md](./docs/TASKS.md) · [docs/GOVERNANCE.md](./docs/GOVERNANCE.md)
-- [tests/evals.json](./tests/evals.json) — valid/invalid cases
+## Governance
 
-## API (local)
-
-- `GET/POST /api/leads` — list / generate / update stage
-- `GET/POST /api/outreach` — list / create draft
-- `GET/POST /api/bookings` — list / schedule demo
+- [AGENTS.md](./AGENTS.md) · [ARCHITECTURE.md](./ARCHITECTURE.md)
+- [docs/PRD.md](docs/PRD.md) · [RULES](docs/RULES.md) · [TASKS](docs/TASKS.md) · [GOVERNANCE](docs/GOVERNANCE.md) · [skills](docs/skills.md)
+- [tests/evals.json](./tests/evals.json)
 
 ## Stack
 
-Next.js 16 · TypeScript · Tailwind · shadcn/ui
+Next.js 16 · TypeScript · Tailwind · shadcn/ui · Cursor skills (`skills/`)

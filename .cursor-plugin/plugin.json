@@ -1,0 +1,28 @@
+{
+  "name": "sales-generator",
+  "version": "0.2.0",
+  "description": "Willow BDR skill pack for Floor Hoefkens: HubSpot company-note pull (Netherlands first), LinkedIn+email sequence drafts with human approve, per-AE demo booking, and feedback learning for next runs.",
+  "author": { "name": "Karandeep Singh" },
+  "homepage": "https://github.com/karansingh2427/sales-generator",
+  "repository": "https://github.com/karansingh2427/sales-generator",
+  "license": "MIT",
+  "keywords": ["sales", "hubspot", "bdr", "willow", "linkedin", "belgium", "netherlands", "skills", "feedback"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Sales Generator",
+    "shortDescription": "NL-first HubSpot pull, LI+email drafts, AE booking, Floor feedback learning",
+    "longDescription": "Pull Netherlands-first HubSpot company notes, draft multi-channel LinkedIn and email sequences with human approve before send, book demos on each AE’s calendar link, and remember Floor’s ICP/company/tone feedback for later runs. Geography locked to the Netherlands (primary) and Belgium (secondary) only.",
+    "developerName": "Karandeep Singh",
+    "category": "Productivity",
+    "capabilities": ["Interactive", "Read", "Write"],
+    "defaultPrompt": [
+      "Pull my Netherlands HubSpot companies and show company notes.",
+      "Draft a LinkedIn + email sequence for this lead.",
+      "Remember this feedback: skip company X / prefer Partner titles.",
+      "Book a demo on the AE calendar link."
+    ],
+    "websiteURL": "https://github.com/karansingh2427/sales-generator",
+    "brandColor": "#0F766E",
+    "screenshots": []
+  }
+}
