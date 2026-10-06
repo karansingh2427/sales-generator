@@ -2,7 +2,8 @@
 
 A **Willow BDR operating system** for Floor Hoefkens: Cursor/Claude **skills** plus a Next.js workbench
 that pull HubSpot **company notes** (why-good, opener, right contact), draft multi-channel LinkedIn +
-email sequences with human approve, and book demos on **per-AE calendar links**.
+email sequences with human approve, and when a lead wants a demo **Slack Floor** (with the conversation)
+so she **manually books Ludwig’s calendar** — never auto-book Calendar.
 
 **Geography locked:** **Netherlands first**, Belgium second — **NL + BE only**.
 
@@ -21,11 +22,11 @@ Plugin skills live under `skills/` (see [`.cursor-plugin/plugin.json`](.cursor-p
 
 | Skill | Path | Use when |
 |---|---|---|
-| `sales-hubspot-pull` | [skills/sales-hubspot-pull/SKILL.md](skills/sales-hubspot-pull/SKILL.md) | Pull NL-first companies + company notes via HubSpot MCP/session tools |
-| `sales-sequence-draft` | [skills/sales-sequence-draft/SKILL.md](skills/sales-sequence-draft/SKILL.md) | LI + email drafts; approve before send |
-| `sales-demo-book` | [skills/sales-demo-book/SKILL.md](skills/sales-demo-book/SKILL.md) | Per-AE calendar links; Demo Booked → Completed \| Rescheduled \| Cancelled |
-| `sales-feedback-learn` | [skills/sales-feedback-learn/SKILL.md](skills/sales-feedback-learn/SKILL.md) | “Remember this feedback: …” — persist ICP/company/tone/geo memory |
-| `sales-lead-run` | [skills/sales-lead-run/SKILL.md](skills/sales-lead-run/SKILL.md) | Orchestrate one full BDR pass (loads feedback first) |
+| `sales-hubspot-pull` | [skills/sales-hubspot-pull/SKILL.md](skills/sales-hubspot-pull/SKILL.md) | Bulk Dutch HubSpot tasks / NL-first companies + notes |
+| `sales-sequence-draft` | [skills/sales-sequence-draft/SKILL.md](skills/sales-sequence-draft/SKILL.md) | Batch-draft into approve queue; approve/edit/skip — no auto-send |
+| `sales-demo-book` | [skills/sales-demo-book/SKILL.md](skills/sales-demo-book/SKILL.md) | Slack Floor + conversation → she books Ludwig; never auto-create events |
+| `sales-feedback-learn` | [skills/sales-feedback-learn/SKILL.md](skills/sales-feedback-learn/SKILL.md) | “Remember: …” — applied on next Dutch batch pull/drafts |
+| `sales-lead-run` | [skills/sales-lead-run/SKILL.md](skills/sales-lead-run/SKILL.md) | Orchestrate batch pass + demo handoff (loads feedback first) |
 
 Pattern mirrored from [agent-data/job-search](https://github.com/agent-data/job-search) (`skills/*/SKILL.md` + this map). Prefer **HubSpot tools in Floor’s Claude/Cursor session** over embedding a private-app token in the web app.
 
