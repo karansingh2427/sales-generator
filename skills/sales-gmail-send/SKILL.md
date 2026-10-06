@@ -27,8 +27,13 @@ Send **approved** cold-sequence emails through **Gmail**. Auto-schedule follow-u
 
 ### Stop on reply
 
-- Clear **no** → cancel scheduled E2/E3; close sequence.
-- **Interest** → cancel scheduled; `sales-demo-book` (Slack Floor + conversation → she books Ludwig).
+| Reply class | Action |
+|---|---|
+| Clear **no** | Cancel E2/E3 · close · HubSpot-log the reply thread if useful |
+| **Interest** | Cancel E2/E3 · `sales-demo-book` (Slack Floor + conversation) |
+| **Stale-opener / just posted / “don’t understand your point”** (e.g. “we posted Friday”, “nothing happening isn’t true”) | **Gracious short reply only** · HubSpot-log outbound reply · **cancel E2/E3** · **do not** push demo · **do not** keep sequence · close |
+
+For the stale-opener class: draft 2–3 calm sentences for Floor (or send if she asks). Acknowledge their post, thank them, leave the door open lightly — no Willow pitch, no Ludwig, no “but still…”.
 
 ## HubSpot log (required after every successful lead send)
 

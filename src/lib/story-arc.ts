@@ -27,11 +27,11 @@ export type StoryArc = {
 
 const TENSION: Record<OpportunityAngle, (firm: string) => string> = {
   open_vacancies: (firm) =>
-    `When ${firm} is hiring, candidates and clients often check LinkedIn first — a quiet page undercuts trust in the firm they’re joining or buying from.`,
+    `When ${firm} is hiring, candidates and clients often check LinkedIn first — the employer brand story around open roles matters as much as the vacancy post itself.`,
   visibility: (firm) =>
     `If ${firm}’s expertise barely shows online, the buyers you want may never see why you’re the safer choice.`,
   consistency: (firm) =>
-    `Sporadic posting makes ${firm} look quieter than peers — even when the work is strong.`,
+    `When posting has gone quiet for a sustained stretch, ${firm} can look quieter than peers — even when the work is strong.`,
   content_quality: (firm) =>
     `Generic or thin posts don’t sound like ${firm} — decision makers notice when the voice doesn’t match the expertise.`,
   content_mix: (firm) =>
@@ -72,12 +72,24 @@ function insightFromNote(lead: Lead, angle: OpportunityAngle): string {
   const opener = lead.crm?.opener?.trim();
   if (opener) {
     // Strip product-pitch / calendar pivots that sometimes leak into CRM openers.
-    const cleaned = opener
+    // Also soften stale "not posting" claims when vacancy/hiring is the real angle.
+    let cleaned = opener
       .replace(/\bwillow\b[^.?!]*/gi, "")
       .replace(/\b(quarterly\s+)?content\s+calendar(s)?\b/gi, "")
       .replace(/\s{2,}/g, " ")
       .replace(/\s*[—–-]\s*$/g, "")
       .trim();
+    if (
+      angle === "open_vacancies" &&
+      /\b(quiet|not posting|nothing happening|inactive|no posts?)\b/i.test(cleaned)
+    ) {
+      // Prefer hiring-brand framing over a stale "quiet LinkedIn" claim.
+      cleaned = cleaned
+        .replace(/\b(quiet|inactive)\b[^.?!]*/gi, "open roles online")
+        .replace(/\b(not posting|nothing happening|no posts?)\b[^.?!]*/gi, "hiring visibility")
+        .replace(/\s{2,}/g, " ")
+        .trim();
+    }
     if (cleaned.length > 12) return cleaned;
   }
   const why = lead.crm?.whyGood?.trim();

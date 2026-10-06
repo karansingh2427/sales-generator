@@ -27,4 +27,10 @@ Governance: feedback never bypasses draft → approve → mark sent.
 - instruction: `{"kind":"tone","note":"senior_story_arc"}`
 - text: Emails should look like a 20–30 year sales pro. One story only — HubSpot insight → one tension → soft Willow on the same thread → short CTA. Never vacancy opener then random content calendar. Match Floor’s past HubSpot sent emails for tone/length. Emails 2–3 continue the same story.
 
+## fb_soften_not_posting_recent
+- category: `messaging_tone` · target: —
+- source: skill · 2026-10-06T00:00:00.000Z
+- instruction: `{"kind":"soften_not_posting_if_recent_posts"}`
+- text: Skip or soften not-posting / quiet-LinkedIn angles when the company posted recently. Only use “quiet LinkedIn / not posting / nothing happening” when the HubSpot note is fresh and specific. Prefer vacancy / hiring-brand angles when recent posts exist. If a prospect replies that they just posted or don’t understand the point: gracious short reply, log HubSpot, cancel E2/E3, do not push demo.
+
 _Runtime entries also live in `.data/feedback.json` (gitignored)._

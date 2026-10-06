@@ -12,6 +12,7 @@ Capture Floor’s steering in structured memory. Later **`sales-hubspot-pull` (i
 - “Remember this feedback: …”
 - “Teach the agent: skip company X”
 - “Remember: skip companies that already post a lot”
+- “Remember: Skip or soften not-posting angles when company posted recently”
 - “Prefer Partner titles going forward”
 - “Never pitch pricing / never pitch Z”
 - “Show my learned feedback” / “Disable that feedback”
@@ -42,8 +43,9 @@ Confirm in **one line**: what was saved + that the **next Dutch batch pull/draft
 When **any** of these run, load active feedback first:
 
 1. `sales-hubspot-pull` — on **bulk Dutch tasks** and company lists: skip listed companies; skip/flag **strong social / already post a lot**; prefer preferred titles; apply ICP/geo notes.
-2. `sales-sequence-draft` — inject tone / never-pitch / sequence notes into **approve-queue** drafts; still **approve before send** (no auto-send).
-3. `sales-lead-run` — preflight: load memory → show digest of active rules → then batch pull/draft/book.
+2. `sales-sequence-draft` — inject tone / never-pitch / sequence notes into **approve-queue** drafts; **skip or soften not-posting / quiet-LinkedIn angles** when feedback or recent posts say so; still **approve before send** (no auto-send).
+3. `sales-gmail-send` — on reply class “just posted / don’t understand”: gracious short reply, HubSpot log, cancel E2/E3, no demo.
+4. `sales-lead-run` — preflight: load memory → show digest of active rules → then batch pull/draft/book.
 
 ## List / disable / delete
 
@@ -69,6 +71,10 @@ User: Remember this feedback: skip company Acme Legal forever
 User: Remember: skip companies that already post a lot
 → category=disqualifier, instruction=skip_strong_social / already_post_a_lot, save.
 → Next Dutch batch pull flags/skips strong presence before drafting.
+
+User: Remember: Skip or soften not-posting angles when company posted recently
+→ category=messaging_tone / sequence_quality, instruction=soften_not_posting_if_recent_posts, save.
+→ Next drafts: no “quiet LinkedIn / nothing happening” unless note is fresh & specific; prefer vacancy/hiring-brand.
 
 User: Prefer Ops manager titles for larger firms
 → category=title_preference, instruction=prefer_title([Ops manager]), save.
