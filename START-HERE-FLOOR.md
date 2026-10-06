@@ -1,12 +1,14 @@
-# Floor — start here
+# Floor — start here (your computer only)
 
-1. Unzip this folder → open it in **Claude Cowork**.
-2. HubSpot + Gmail connected (Slack too if you use demo handoffs).
-3. Paste this **once**:
+No GitHub. Unzip on **your** computer → open **that** folder in Claude Cowork.
 
-> You are a sales pro with 20+ years experience. Read my past HubSpot sent emails for tone/format. Then batch 50 Dutch HubSpot tasks. From each company note only, draft one coherent 3-email Gmail story (insight → one tension → soft Willow bridge → short CTA). Same story in emails 2–3. Show approve queue. Do not send yet. Skip Belgian leads.
+1. Unzip `sales-generator-for-floor.zip` on your Mac → open **that folder** in **Claude Cowork** (HubSpot + Gmail connected).
+2. **Step 0 — Gmail self-test** (check your inbox):
 
-4. Review → say `approve 1-20` (or `edit #7` / `skip #12`).
-5. When ready → `Send approved emails via Gmail.`
+> Send me one short test email via Gmail to my own inbox with subject “Willow Sales Generator test” and body “Gmail send works.” Don’t contact any leads yet.
 
-That’s it. Next chunk: `Draft the next 50 — do not send yet.`
+3. Then paste the **batch** prompt:
+
+> You are a sales pro with 20+ years experience. Read my past HubSpot sent emails for tone/format. Then batch 50 Dutch HubSpot tasks. From each company note only, draft one coherent 3-email Gmail story (insight → one tension → soft Willow bridge → short CTA). Same story in emails 2–3. Email 2 after exactly 7 days if no reply; email 3 after another 7 days if still no reply (max 3). Auto-schedule follow-ups via Gmail/Cowork — don’t ask me to remember. Stop on reply (no/interest → Slack me). Show approve queue. Do not send yet. Skip Belgian leads.
+
+4. Review → `approve 1-20` → `Send approved emails via Gmail.`

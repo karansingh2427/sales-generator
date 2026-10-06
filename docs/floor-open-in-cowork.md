@@ -1,12 +1,5 @@
-# Floor — open in Claude Cowork
+# Floor — open in Claude Cowork (your computer)
 
-1. Unzip `sales-generator-for-floor.zip` → open the folder in Cowork.
-2. Open `START-HERE-FLOOR.md` and paste the prompt there.
+No GitHub. Unzip on **your** Mac → open **that** folder in Cowork (HubSpot + Gmail).
 
-## The one prompt
-
-> You are a sales pro with 20+ years experience. Read my past HubSpot sent emails for tone/format. Then batch 50 Dutch HubSpot tasks. From each company note only, draft one coherent 3-email Gmail story (insight → one tension → soft Willow bridge → short CTA). Same story in emails 2–3. Show approve queue. Do not send yet. Skip Belgian leads.
-
-Then: `approve 1-20` → `Send approved emails via Gmail.`
-
-Need HubSpot + Gmail connected. Interest → Claude Slacks you → you book Ludwig.
+Follow `START-HERE-FLOOR.md`: **Step 0** Gmail self-test → batch prompt (E2 after 7 days if no reply; E3 after another 7; auto-schedule) → `approve` → `Send approved emails via Gmail.`

@@ -96,10 +96,10 @@ const DEFAULT_PLAYBOOK: {
   touch?: EmailTouch;
 }[] = [
   { kind: "email", label: "Email 1 — HubSpot insight → one story", waitDays: 0, touch: 1 },
-  { kind: "wait", label: "Wait for reply (~1 week)", waitDays: 7 },
-  { kind: "email", label: "Email 2 — same story, light escalate", waitDays: 0, touch: 2 },
-  { kind: "wait", label: "Wait for reply (~1 week)", waitDays: 7 },
-  { kind: "email", label: "Email 3 — same story, last note", waitDays: 0, touch: 3 },
+  { kind: "wait", label: "Wait exactly 7 days (if no reply) → Email 2 auto-scheduled", waitDays: 7 },
+  { kind: "email", label: "Email 2 — same story (+7d if no reply)", waitDays: 0, touch: 2 },
+  { kind: "wait", label: "Wait exactly 7 days (if no reply) → Email 3 auto-scheduled", waitDays: 7 },
+  { kind: "email", label: "Email 3 — same story (+14d if no reply)", waitDays: 0, touch: 3 },
 ];
 
 function channelFor(kind: SequenceStepKind): OutreachChannel | undefined {
@@ -154,7 +154,7 @@ export function buildSequenceForLead(
         waitDays: p.waitDays,
         status: "pending" as const,
         rationale: withFeedbackRationale(
-          `Pause ~${p.waitDays} days (~1 week). Same story on next email. Cap 3. Stop on clear no or interest → Slack Floor.`,
+          `Pause exactly ${p.waitDays} days. Auto-schedule next email (Gmail schedule or Cowork reminder). Cap 3. Cancel on reply → stop or Slack Floor.`,
           guidance,
         ),
       };
