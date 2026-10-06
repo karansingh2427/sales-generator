@@ -1,21 +1,22 @@
 ---
 name: sales-feedback-learn
-description: Persist Floor’s feedback on ICP, companies, tone, disqualifiers, geo, or sequence quality so the next Dutch batch HubSpot pull and approve-queue drafts apply it. Use when Floor says remember this feedback, teach the agent, skip companies that already post a lot, prefer this title, never pitch X, or lists learned feedback to disable/delete.
+description: Persist Floor’s feedback on ICP, companies, tone, disqualifiers, geo, or sequence quality so the next Dutch batch HubSpot pull and approve-queue drafts apply it. Use when Floor says remember this feedback, teach the agent, skip companies that already post a lot / post frequently, prefer this title, never pitch X, or lists learned feedback to disable/delete.
 ---
 
 # sales-feedback-learn
 
-Capture Floor’s steering in structured memory. Later **`sales-hubspot-pull` (including Dutch batch pulls)**, **`sales-sequence-draft` (approve queue)**, and **`sales-lead-run`** **must** load active feedback before acting.
+Capture Floor’s steering in structured memory. Later **`sales-hubspot-pull`**, **`sales-sequence-draft`**, and **`sales-lead-run`** **must** load active feedback before acting.
 
 ## Invoke phrases
 
 - “Remember this feedback: …”
 - “Teach the agent: skip company X”
-- “Remember: skip companies that already post a lot”
-- “Remember: Skip or soften not-posting angles when company posted recently”
+- “Remember: skip companies that already post a lot” / “skip frequent posters”
 - “Prefer Partner titles going forward”
 - “Never pitch pricing / never pitch Z”
 - “Show my learned feedback” / “Disable that feedback”
+
+**Do not** save “skip not-posting angles when company posted recently” — Floor retracted that. One post ≠ consistent posting.
 
 ## Persist (required)
 
@@ -38,14 +39,16 @@ Write one entry with:
 
 Confirm in **one line**: what was saved + that the **next Dutch batch pull/draft** will apply it.
 
+If Floor accidentally re-states the retracted rule (“skip not-posting when they posted recently”), **disable** any such entry and confirm: consistency angle stays; phrasing = “haven’t been posting consistently”; skip only **frequent** posters.
+
 ## Applying feedback (for sibling skills)
 
 When **any** of these run, load active feedback first:
 
-1. `sales-hubspot-pull` — on **bulk Dutch tasks** and company lists: skip listed companies; skip/flag **strong social / already post a lot**; prefer preferred titles; apply ICP/geo notes.
-2. `sales-sequence-draft` — inject tone / never-pitch / sequence notes into **approve-queue** drafts; **skip or soften not-posting / quiet-LinkedIn angles** when feedback or recent posts say so; still **approve before send** (no auto-send).
-3. `sales-gmail-send` — on reply class “just posted / don’t understand”: gracious short reply, HubSpot log, cancel E2/E3, no demo.
-4. `sales-lead-run` — preflight: load memory → show digest of active rules → then batch pull/draft/book.
+1. `sales-hubspot-pull` — skip listed companies; skip/flag **strong social / frequent posters**; prefer preferred titles; apply ICP/geo notes.
+2. `sales-sequence-draft` — inject tone / never-pitch; use consistency phrasing **“haven’t been posting consistently”** (never single-post date callouts); still **approve before send**.
+3. `sales-gmail-send` — on confused / don’t-understand replies: gracious short reply, HubSpot log, cancel E2/E3, no demo.
+4. `sales-lead-run` — preflight: load memory → digest → batch pull/draft.
 
 ## List / disable / delete
 
@@ -59,8 +62,9 @@ When **any** of these run, load active feedback first:
 - Feedback **never** auto-sends LinkedIn or email.
 - Feedback does **not** bypass draft → approve queue → mark sent.
 - Feedback does **not** allow silent calendar auto-book.
-- Geo hard rule still wins: **Netherlands first**, Belgium second, **NL+BE only** — feedback cannot add other countries.
+- Geo hard rule still wins: **Netherlands first**, Belgium second, **NL+BE only**.
 - CRM writebacks stay English.
+- **Do not** live-check LinkedIn every run because of feedback.
 
 ## Examples
 
@@ -68,17 +72,17 @@ When **any** of these run, load active feedback first:
 User: Remember this feedback: skip company Acme Legal forever
 → category=company, instruction=skip_company(Acme Legal), save, confirm.
 
-User: Remember: skip companies that already post a lot
-→ category=disqualifier, instruction=skip_strong_social / already_post_a_lot, save.
+User: Remember: skip companies that already post a lot / post frequently
+→ category=disqualifier, instruction=skip_strong_social / frequent_posters, save.
 → Next Dutch batch pull flags/skips strong presence before drafting.
-
-User: Remember: Skip or soften not-posting angles when company posted recently
-→ category=messaging_tone / sequence_quality, instruction=soften_not_posting_if_recent_posts, save.
-→ Next drafts: no “quiet LinkedIn / nothing happening” unless note is fresh & specific; prefer vacancy/hiring-brand.
 
 User: Prefer Ops manager titles for larger firms
 → category=title_preference, instruction=prefer_title([Ops manager]), save.
 
 User: Never pitch pricing on LinkedIn
 → category=messaging_tone, instruction=never_pitch(pricing), save.
+
+User: Remember: Skip or soften not-posting angles when company posted recently
+→ Do NOT save as active. Disable any prior soften_not_posting_if_recent_posts entry.
+→ Confirm: one post ≠ consistent; keep “haven’t been posting consistently”; skip only frequent posters.
 ```

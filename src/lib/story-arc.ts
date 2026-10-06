@@ -31,7 +31,7 @@ const TENSION: Record<OpportunityAngle, (firm: string) => string> = {
   visibility: (firm) =>
     `If ${firm}’s expertise barely shows online, the buyers you want may never see why you’re the safer choice.`,
   consistency: (firm) =>
-    `When posting has gone quiet for a sustained stretch, ${firm} can look quieter than peers — even when the work is strong.`,
+    `When ${firm} hasn’t been posting consistently, the firm can look quieter than peers online — even when the work is strong.`,
   content_quality: (firm) =>
     `Generic or thin posts don’t sound like ${firm} — decision makers notice when the voice doesn’t match the expertise.`,
   content_mix: (firm) =>
@@ -71,29 +71,23 @@ export function pickPrimaryAngle(angles: OpportunityAngle[]): OpportunityAngle {
 function insightFromNote(lead: Lead, angle: OpportunityAngle): string {
   const opener = lead.crm?.opener?.trim();
   if (opener) {
-    // Strip product-pitch / calendar pivots that sometimes leak into CRM openers.
-    // Also soften stale "not posting" claims when vacancy/hiring is the real angle.
+    // Strip product-pitch / calendar pivots. Prefer consistency phrasing
+    // ("haven't been posting consistently") over pointing at a single post date.
     let cleaned = opener
       .replace(/\bwillow\b[^.?!]*/gi, "")
       .replace(/\b(quarterly\s+)?content\s+calendar(s)?\b/gi, "")
+      .replace(/\bi saw (your|the) post (yesterday|friday|today|this week)\b/gi, "I see you haven’t been posting consistently")
+      .replace(/\bnothing happening on linkedin\b/gi, "you haven’t been posting consistently")
       .replace(/\s{2,}/g, " ")
       .replace(/\s*[—–-]\s*$/g, "")
       .trim();
-    if (
-      angle === "open_vacancies" &&
-      /\b(quiet|not posting|nothing happening|inactive|no posts?)\b/i.test(cleaned)
-    ) {
-      // Prefer hiring-brand framing over a stale "quiet LinkedIn" claim.
-      cleaned = cleaned
-        .replace(/\b(quiet|inactive)\b[^.?!]*/gi, "open roles online")
-        .replace(/\b(not posting|nothing happening|no posts?)\b[^.?!]*/gi, "hiring visibility")
-        .replace(/\s{2,}/g, " ")
-        .trim();
-    }
     if (cleaned.length > 12) return cleaned;
   }
   const why = lead.crm?.whyGood?.trim();
   if (why) return why;
+  if (angle === "consistency") {
+    return "I see you haven’t been posting consistently on LinkedIn";
+  }
   return describeAngles([angle])[0] ?? "room to show expertise more clearly online";
 }
 

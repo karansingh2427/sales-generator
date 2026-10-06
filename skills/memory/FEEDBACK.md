@@ -1,6 +1,6 @@
 # Floor learned feedback
 
-_Active: 0 · Seed file — runtime entries live in `.data/feedback.json` (gitignored)._
+_Active seeds below · runtime entries also live in `.data/feedback.json` (gitignored)._
 
 Load and apply these on every HubSpot pull / sequence draft / lead-run.
 Governance: feedback never bypasses draft → approve → mark sent.
@@ -27,10 +27,14 @@ Governance: feedback never bypasses draft → approve → mark sent.
 - instruction: `{"kind":"tone","note":"senior_story_arc"}`
 - text: Emails should look like a 20–30 year sales pro. One story only — HubSpot insight → one tension → soft Willow on the same thread → short CTA. Never vacancy opener then random content calendar. Match Floor’s past HubSpot sent emails for tone/length. Emails 2–3 continue the same story.
 
-## fb_soften_not_posting_recent
+## fb_consistency_phrasing
 - category: `messaging_tone` · target: —
 - source: skill · 2026-10-06T00:00:00.000Z
-- instruction: `{"kind":"soften_not_posting_if_recent_posts"}`
-- text: Skip or soften not-posting / quiet-LinkedIn angles when the company posted recently. Only use “quiet LinkedIn / not posting / nothing happening” when the HubSpot note is fresh and specific. Prefer vacancy / hiring-brand angles when recent posts exist. If a prospect replies that they just posted or don’t understand the point: gracious short reply, log HubSpot, cancel E2/E3, do not push demo.
+- instruction: `{"kind":"consistency_phrasing"}`
+- text: Consistency angle = “I see you haven’t been posting consistently” — never “I saw your post yesterday/Friday”. One recent post does NOT invalidate inconsistent-posting. Skip / don’t follow up if they post frequently (strong presence = bad lead). Do NOT live-check LinkedIn vs notes every run — trust HubSpot notes. (Supersedes any earlier “skip not-posting when company posted recently” guidance.)
+
+## ~~fb_soften_not_posting_recent~~ (retracted)
+- active: **false** · retracted 2026-10-06
+- text: ~~Skip or soften not-posting angles when company posted recently~~ — Floor corrected: one post ≠ consistent; keep consistency angle with correct phrasing.
 
 _Runtime entries also live in `.data/feedback.json` (gitignored)._
