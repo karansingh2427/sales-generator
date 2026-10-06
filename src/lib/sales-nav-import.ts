@@ -232,10 +232,10 @@ export function scoreLawyerIcp(input: {
   if (bonus > 0) {
     score += bonus;
     const tier = geoTier(input.geoCode);
-    if (tier === "primary") reasons.push("Belgium — primary Willow ICP market.");
-    else if (tier === "secondary") reasons.push("Netherlands — secondary Willow ICP market.");
+    if (tier === "primary") reasons.push("Netherlands — primary Willow ICP market.");
+    else if (tier === "secondary") reasons.push("Belgium — secondary Willow ICP market.");
   } else {
-    reasons.push("Out of scope — BE + NL only.");
+    reasons.push("Out of scope — NL + BE only.");
   }
 
   if (/\b(10|11|12|1[3-9]|[2-9]\d|[1-9]\d{2,})\b/.test(input.firmSize) ||

@@ -13,16 +13,16 @@ export function scoreLeadRationale(lead: Lead): string {
   if (lead.vertical && lead.vertical !== "other")
     reasons.push(`Vertical: ${lead.vertical}.`);
   if (
-    lead.geoCode === "BE" ||
-    /\b(BE|Belgium|Brussels|Antwerp|Ghent|Gent|Leuven)\b/i.test(lead.location)
-  )
-    reasons.push("Belgium — primary ICP market.");
-  else if (
     lead.geoCode === "NL" ||
     /\b(NL|Netherlands|Amsterdam|Rotterdam|Utrecht|Eindhoven)\b/i.test(lead.location)
   )
-    reasons.push("Netherlands — secondary ICP market.");
-  else reasons.push("Out of scope — BE + NL only.");
+    reasons.push("Netherlands — primary ICP market.");
+  else if (
+    lead.geoCode === "BE" ||
+    /\b(BE|Belgium|Brussels|Antwerp|Ghent|Gent|Leuven)\b/i.test(lead.location)
+  )
+    reasons.push("Belgium — secondary ICP market.");
+  else reasons.push("Out of scope — NL + BE only.");
   const angles = inferOpportunityAngles(lead);
   reasons.push(...describeAngles(angles));
   if (lead.crm?.rightContact) reasons.push(`Right contact: ${lead.crm.rightContact}.`);

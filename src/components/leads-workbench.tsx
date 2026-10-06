@@ -162,7 +162,7 @@ export function LeadsWorkbench({
     const data = await res.json();
     await refresh();
     setStatus(
-      `Added ${data.added?.length ?? 0} Demo / sample leads (BE/NL-biased). Use Sales Nav CSV for live prospects.`,
+      `Added ${data.added?.length ?? 0} Demo / sample leads (NL/BE-biased). Use Sales Nav CSV for live prospects.`,
     );
   }
 

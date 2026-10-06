@@ -79,6 +79,38 @@ export function mockHubSpotPayload(): {
   return {
     companies: [
       {
+        id: "co_102",
+        properties: {
+          name: "Nova Legal Partners",
+          city: "Amsterdam",
+          country: "Netherlands",
+          industry: "Legal Services",
+          numberofemployees: "42",
+          sg_why_good: "Litigation partner; firm voice thin on LinkedIn vs competitors.",
+          sg_opener: "Ask about partner time vs content quality — Willow drafts in firm voice.",
+          sg_right_contact: "Joost van Dijk (Partner)",
+          sg_social_presence: "inconsistent",
+          sg_vertical: "legal",
+        },
+        associations: { notes: ["nt_302"] },
+      },
+      {
+        id: "co_104",
+        properties: {
+          name: "CloudNest IT",
+          city: "Utrecht",
+          country: "Netherlands",
+          industry: "Information Technology",
+          numberofemployees: "55",
+          sg_why_good: "IT founder; content mix is pure product promo — no expertise posts.",
+          sg_opener: "Content mix angle: buyers want founder POV, not feature dumps.",
+          sg_right_contact: "Mark de Vries (Founder)",
+          sg_social_presence: "inconsistent",
+          sg_vertical: "it",
+        },
+        associations: { notes: ["nt_304"] },
+      },
+      {
         id: "co_101",
         properties: {
           name: "Peeters Accountants",
@@ -97,22 +129,6 @@ export function mockHubSpotPayload(): {
         associations: { notes: ["nt_301"] },
       },
       {
-        id: "co_102",
-        properties: {
-          name: "Nova Legal Partners",
-          city: "Amsterdam",
-          country: "Netherlands",
-          industry: "Legal Services",
-          numberofemployees: "42",
-          sg_why_good: "Litigation partner; firm voice thin on LinkedIn vs competitors.",
-          sg_opener: "Ask about partner time vs content quality — Willow drafts in firm voice.",
-          sg_right_contact: "Joost van Dijk (Partner)",
-          sg_social_presence: "inconsistent",
-          sg_vertical: "legal",
-        },
-        associations: { notes: ["nt_302"] },
-      },
-      {
         id: "co_103",
         properties: {
           name: "BrightHire Executive Search",
@@ -128,22 +144,6 @@ export function mockHubSpotPayload(): {
           sg_vertical: "hr_recruitment",
         },
         associations: { notes: ["nt_303"] },
-      },
-      {
-        id: "co_104",
-        properties: {
-          name: "CloudNest IT",
-          city: "Utrecht",
-          country: "Netherlands",
-          industry: "Information Technology",
-          numberofemployees: "55",
-          sg_why_good: "IT founder; content mix is pure product promo — no expertise posts.",
-          sg_opener: "Content mix angle: buyers want founder POV, not feature dumps.",
-          sg_right_contact: "Mark de Vries (Founder)",
-          sg_social_presence: "inconsistent",
-          sg_vertical: "it",
-        },
-        associations: { notes: ["nt_304"] },
       },
       {
         id: "co_105",
@@ -164,20 +164,6 @@ export function mockHubSpotPayload(): {
     ],
     contacts: [
       {
-        id: "ct_201",
-        properties: {
-          firstname: "Els",
-          lastname: "Peeters",
-          jobtitle: "Managing Partner",
-          email: "els.peeters@peeters-accountants.example",
-          hs_linkedin_url: "https://www.linkedin.com/in/example-els-peeters",
-          city: "Antwerp",
-          country: "Belgium",
-          lifecyclestage: "marketingqualifiedlead",
-        },
-        associations: { companies: ["co_101"] },
-      },
-      {
         id: "ct_202",
         properties: {
           firstname: "Joost",
@@ -192,19 +178,6 @@ export function mockHubSpotPayload(): {
         associations: { companies: ["co_102"] },
       },
       {
-        id: "ct_203",
-        properties: {
-          firstname: "Amélie",
-          lastname: "Dubois",
-          jobtitle: "Founder",
-          email: "amelie@brighthire.be",
-          city: "Brussels",
-          country: "Belgium",
-          lifecyclestage: "lead",
-        },
-        associations: { companies: ["co_103"] },
-      },
-      {
         id: "ct_204",
         properties: {
           firstname: "Mark",
@@ -216,6 +189,33 @@ export function mockHubSpotPayload(): {
           lifecyclestage: "opportunity",
         },
         associations: { companies: ["co_104"] },
+      },
+      {
+        id: "ct_201",
+        properties: {
+          firstname: "Els",
+          lastname: "Peeters",
+          jobtitle: "Managing Partner",
+          email: "els.peeters@peeters-accountants.example",
+          hs_linkedin_url: "https://www.linkedin.com/in/example-els-peeters",
+          city: "Antwerp",
+          country: "Belgium",
+          lifecyclestage: "marketingqualifiedlead",
+        },
+        associations: { companies: ["co_101"] },
+      },
+      {
+        id: "ct_203",
+        properties: {
+          firstname: "Amélie",
+          lastname: "Dubois",
+          jobtitle: "Founder",
+          email: "amelie@brighthire.be",
+          city: "Brussels",
+          country: "Belgium",
+          lifecyclestage: "lead",
+        },
+        associations: { companies: ["co_103"] },
       },
       {
         id: "ct_205",
@@ -373,7 +373,7 @@ function contactToLead(
     title,
     email: p.email ?? `${contact.id}@hubspot.example`,
     linkedInUrl: p.hs_linkedin_url || p.linkedin_url || undefined,
-    location: location || "Belgium",
+    location: location || "Netherlands",
     practiceArea,
     firmSize,
     icpScore: scored.score,

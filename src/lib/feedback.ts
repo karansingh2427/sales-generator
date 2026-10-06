@@ -373,7 +373,7 @@ export function applyFeedbackToLeads(
     kept.push(lead);
   }
 
-  // Belgium-first already elsewhere; here: preferred titles float up within kept.
+  // Netherlands-first already elsewhere; here: preferred titles float up within kept.
   if (preferredBoostIds.length) {
     const boost = new Set(preferredBoostIds);
     kept.sort((a, b) => Number(boost.has(b.id)) - Number(boost.has(a.id)));

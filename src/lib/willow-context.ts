@@ -11,12 +11,12 @@ export const WILLOW_PITCH = {
     "Book a 30-minute live demo on the AE’s calendar link (we draft posts for their firm on the call).",
 } as const;
 
-/** Belgium first, Netherlands second — BE + NL only (hard product rule). */
+/** Netherlands first, Belgium second — NL + BE only (hard product rule). */
 export const ICP_GEOGRAPHY = {
-  primaryMarkets: "Belgium (primary) · Netherlands (secondary)",
-  defaultFilterLabel: "BE + NL",
+  primaryMarkets: "Netherlands (primary) · Belgium (secondary)",
+  defaultFilterLabel: "NL + BE",
   description:
-    "ICP geography is locked to Belgium first and the Netherlands second. HubSpot pulls and Sales Nav imports default to BE + NL; every other country is out of scope.",
+    "ICP geography is locked to the Dutch (Netherlands) market first and Belgium second. HubSpot pulls and Sales Nav imports default to NL + BE; every other country is out of scope.",
 } as const;
 
 /**

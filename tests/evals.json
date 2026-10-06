@@ -35,12 +35,12 @@
     },
     {
       "id": "V-04",
-      "scenario": "Preview Sales Nav CSV with default BE+NL geo filter",
+      "scenario": "Preview Sales Nav CSV with default NL+BE geo filter",
       "request": "POST /api/leads { action: import_preview, csvText: <fixture>, geoFilter: [BE, NL], minScore: 70 }",
       "expectations": [
         "Response 200 with preview.rows length matching fixture",
-        "preview.geoFilter is BE + NL (Belgium primary)",
-        "BE and NL lawyer rows pass filter; non-BE/NL rows filtered out",
+        "preview.geoFilter is NL + BE (Belgium primary)",
+        "BE and NL lawyer rows pass filter; non-NL/BE rows filtered out",
         "Column mapping auto-detects First Name / Company / LinkedIn URL aliases"
       ]
     },

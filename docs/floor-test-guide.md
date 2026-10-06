@@ -1,7 +1,7 @@
 # Floor — quick test guide (Sales Generator)
 
 **App:** https://sales-generator-delta.vercel.app  
-**Who:** Floor Hoefkens (Willow BDR) · **Pilot:** Belgium first, Netherlands second — BE/NL only  
+**Who:** Floor Hoefkens (Willow BDR) · **Pilot:** Dutch-first pilot — Netherlands primary, Belgium secondary — NL/BE only  
 **Mode:** Mock HubSpot for this URL (no login / no API token). Live HubSpot stays in your Claude/Cursor session later.
 
 ---
@@ -28,7 +28,7 @@ Confirm it says HubSpot is in **mock** mode.
 ### 2. Sync leads
 - Open the **HubSpot** (or Sync) action  
 - Click **Sync**  
-- You should see BE/NL sample companies with notes (why / opener / right contact)
+- You should see NL/BE sample companies with notes (why / opener / right contact)
 
 ### 3. Build a sequence
 - Pick a Belgian or Dutch lead  
@@ -69,7 +69,7 @@ You can dump that into the **Feedback** tab (best) or WhatsApp Karandeep.
 | OK for pilot | Not on this URL yet |
 |---|---|
 | Mock HubSpot + sequences + feedback | Your real HubSpot data |
-| BE/NL sample leads | Sales Nav live API |
+| NL/BE sample leads | Sales Nav live API |
 | Approve → mark sent | Auto-send from LinkedIn/email |
 | Ephemeral memory (may reset on sleep) | Durable CRM of record |
 

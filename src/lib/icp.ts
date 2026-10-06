@@ -131,7 +131,7 @@ export function describeAngles(angles: OpportunityAngle[]): string[] {
 
 /**
  * Floor ICP: decision makers in expertise B2B verticals,
- * Belgium-first then Netherlands only, skip strong social presence.
+ * Netherlands-first then Belgium only, skip strong social presence.
  */
 export function scoreExpertiseIcp(input: {
   title: string;
@@ -172,15 +172,15 @@ export function scoreExpertiseIcp(input: {
     reasons.push("Title may not be decision maker (Partner / Founder / Ops manager preferred)");
   }
 
-  if (geoCode === "BE") {
+  if (geoCode === "NL") {
     score += 16;
-    reasons.push("Belgium — primary ICP market");
-  } else if (geoCode === "NL") {
+    reasons.push("Netherlands — primary ICP market");
+  } else if (geoCode === "BE") {
     score += 12;
-    reasons.push("Netherlands — secondary ICP market");
+    reasons.push("Belgium — secondary ICP market");
   } else {
     score -= 20;
-    reasons.push("Out of scope — BE + NL only");
+    reasons.push("Out of scope — NL + BE only");
   }
 
   const presence = input.socialPresence ?? "unknown";

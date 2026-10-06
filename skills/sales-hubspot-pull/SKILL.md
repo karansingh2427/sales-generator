@@ -1,28 +1,28 @@
 ---
 name: sales-hubspot-pull
-description: Pull Belgium-first HubSpot companies (BE + NL only) and read company-level agent notes — why-good, opener, right contact. Prefer HubSpot MCP/tools already connected in Floor’s Claude or Cursor session; do not embed a private-app token in the web app. Use when Floor asks to sync CRM, pull leads, read company notes, or prepare a BE/NL prospect list.
+description: Pull Netherlands-first HubSpot companies (NL + BE only) and read company-level agent notes — why-good, opener, right contact. Prefer HubSpot MCP/tools already connected in Floor’s Claude or Cursor session; do not embed a private-app token in the web app. Use when Floor asks to sync CRM, pull leads, read company notes, or prepare a NL/BE prospect list.
 ---
 
 # sales-hubspot-pull
 
-Pull the next BE+NL companies from HubSpot and surface the **company notes** the internal lead-gen agent already wrote. Sales Generator does **not** rebuild prospecting — it reads why-good / opener / right contact and hands them to sequence drafting.
+Pull the next NL+BE companies from HubSpot and surface the **company notes** the internal lead-gen agent already wrote. Sales Generator does **not** rebuild prospecting — it reads why-good / opener / right contact and hands them to sequence drafting.
 
 ## Geography (hard rule)
 
 | Priority | Market | Behavior |
 |---|---|---|
-| 1 · primary | **Belgium (BE)** | Prefer / score highest |
-| 2 · secondary | **Netherlands (NL)** | Include after BE |
+| 1 · primary | **Netherlands (NL)** | Prefer / score highest |
+| 2 · secondary | **Belgium (BE)** | Include after NL |
 | — | **Everything else** | **Out of scope** — never add to ICP lists, filters, mocks, or digests |
 
-Default filter: `BE + NL`. Sort / present **Belgium first**.
+Default filter: `NL + BE`. Sort / present **Netherlands first**.
 
 ## Prefer live HubSpot via session tools
 
 Floor’s HubSpot is already connected to **her Claude**. In Cursor / Claude:
 
 1. Use the **HubSpot MCP / native HubSpot tools** available in **this user session**.
-2. Search **Companies** in Belgium first, then Netherlands.
+2. Search **Companies** in the Netherlands first, then Belgium.
 3. Read **company notes** (and company properties if notes are empty) for:
    - **why-good** — why this firm fits Willow
    - **opener** — first-line outreach angle
@@ -34,12 +34,12 @@ Web-app fallback (optional): `POST /api/hubspot { action: "sync" }` with mock mo
 ## Steps
 
 0. **Load Floor feedback** from `.data/feedback.json` (or `skills/memory/FEEDBACK.md` / `GET /api/feedback`). Apply skip-company, prefer-title, ICP/geo notes, disqualifier patterns. Confirm in one line what memory is active.
-1. Confirm geo = BE primary, NL secondary; refuse lists that include other countries.
-2. Via HubSpot tools, list companies filtered to Belgium and the Netherlands.
+1. Confirm geo = NL primary, BE secondary; refuse lists that include other countries.
+2. Via HubSpot tools, list companies filtered to the Netherlands and Belgium.
 3. For each company, pull the latest **company note** (agent handoff). Prefer company-level over contact-only notes.
 4. Skip / flag **strong social presence** (Floor disqualifier) **and** any company named in active skip feedback.
 5. Present a short table: company · country · right contact · opener one-liner · why-good · presence · feedback flags.
-6. Sort Belgium first, then Netherlands; preferred titles (from feedback) and highest ICP / freshest notes first.
+6. Sort Netherlands first, then Belgium; preferred titles (from feedback) and highest ICP / freshest notes first.
 7. Ask Floor which rows to sequence next → hand off to `sales-sequence-draft`.
 8. If she steers (“skip that one forever”, “prefer Ops managers”) → invoke `sales-feedback-learn` before the next pull.
 
@@ -67,7 +67,7 @@ CRM language is **English**. Outreach copy language is editable later.
 
 ## Done when
 
-- Floor sees a BE-first company list with note fields filled (or explicitly empty).
+- Floor sees a NL-first company list with note fields filled (or explicitly empty).
 - Out-of-scope countries are absent.
 - Strong-presence firms are flagged skip.
 - Next action offered: draft sequences (`sales-sequence-draft`) or book later (`sales-demo-book`).

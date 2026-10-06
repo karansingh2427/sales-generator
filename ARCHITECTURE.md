@@ -2,7 +2,7 @@
 
 Sales Generator is a **BDR workflow OS** for Willow: sync HubSpot **company** agent notes, draft multi-channel
 LinkedIn + email sequences (human approve), fall back to Sales Nav CSV, book demos on **per-AE calendar links** — with governance
-docs and a **skill pack** mirroring [agent-data/job-search](https://github.com/agent-data/job-search). **Belgium first**, NL second, BE+NL only.
+docs and a **skill pack** mirroring [agent-data/job-search](https://github.com/agent-data/job-search). **Netherlands first**, Belgium second, NL+BE only.
 
 ## OS model
 
@@ -21,7 +21,7 @@ docs and a **skill pack** mirroring [agent-data/job-search](https://github.com/a
 |---|---|---|
 | `crm-ingest` | HubSpot sync + company notes + stage/property maps | strong |
 | `sequence-drafting` | Multi-step LI + email drafts, approve/mark sent | strong |
-| `lead-discovery` | Sales Nav CSV fallback + BE-first ICP | adequate |
+| `lead-discovery` | Sales Nav CSV fallback + NL-first ICP | adequate |
 | `outreach-drafting` | Single-touch templates + CRM rationale | adequate |
 | `demo-scheduling` | AE roster + per-AE calendar links | adequate |
 | `pipeline-state` | Stage machine incl. post-demo outcomes | strong |
@@ -45,7 +45,7 @@ docs and a **skill pack** mirroring [agent-data/job-search](https://github.com/a
         ↓
 sales-feedback-learn / .data/feedback.json  (load active memory)
         ↓
-sales-hubspot-pull / /api/hubspot (BE first · apply skips)
+sales-hubspot-pull / /api/hubspot (NL first · apply skips)
         ↓
 sales-sequence-draft / /api/sequences  (tone/never-pitch · approve → mark sent)
         ↓

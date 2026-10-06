@@ -1,15 +1,15 @@
 ---
 name: sales-sequence-draft
-description: Draft multi-channel LinkedIn + email outreach sequences from HubSpot company notes for Belgium-first BE+NL leads. Human must approve every step before send — never auto-blast. Use when Floor asks to write LinkedIn connect/message, follow-ups, email drafts, or a full sequence for a prospect.
+description: Draft multi-channel LinkedIn + email outreach sequences from HubSpot company notes for Netherlands-first NL+BE leads. Human must approve every step before send — never auto-blast. Use when Floor asks to write LinkedIn connect/message, follow-ups, email drafts, or a full sequence for a prospect.
 ---
 
 # sales-sequence-draft
 
-Turn one (or a few) BE+NL companies into a **LinkedIn → wait → LinkedIn follow-up → email** draft sequence. Reuse the HubSpot **company note** (why-good, opener, right contact). Floor **approves** every message before she sends it outside the agent.
+Turn one (or a few) NL+BE companies into a **LinkedIn → wait → LinkedIn follow-up → email** draft sequence. Reuse the HubSpot **company note** (why-good, opener, right contact). Floor **approves** every message before she sends it outside the agent.
 
 ## Geography
 
-Belgium first, Netherlands second. **BE + NL only.** Refuse sequences for other countries.
+Netherlands first, Belgium second. **NL + BE only.** Refuse sequences for other countries.
 
 ## Guardrail (mandatory)
 

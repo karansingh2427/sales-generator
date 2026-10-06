@@ -2,7 +2,7 @@
 
 Prototype for **Floor Hoefkens** (BDR @ [Willow](https://willow.co/)): **HubSpot company notes** → **LinkedIn + email sequence drafts** (approve → mark sent) → **per-AE calendar** demo booking. Sales Nav CSV remains a fallback. Cursor/Claude **skills** ship alongside the Next.js UI.
 
-**Geography:** **Belgium first**, Netherlands second — **BE + NL only**. **Governance:** human-in-the-loop — nothing auto-blasts. **CRM language:** English writebacks. **HubSpot path:** prefer Floor’s Claude/Cursor HubSpot MCP/tools; web-app private-app token is optional fallback only.
+**Geography:** **Netherlands first**, Belgium second — **NL + BE only**. **Governance:** human-in-the-loop — nothing auto-blasts. **CRM language:** English writebacks. **HubSpot path:** prefer Floor’s Claude/Cursor HubSpot MCP/tools; web-app private-app token is optional fallback only.
 
 ## For Floor
 
@@ -39,7 +39,7 @@ Agent map: [AGENTS.md](./AGENTS.md). Plugin manifest: [`.cursor-plugin/plugin.js
 ### Floor first-run (short)
 
 1. Open this repo in the Claude/Cursor session where **HubSpot is already connected**.
-2. “Pull my Belgium HubSpot companies and show company notes.”
+2. “Pull my Netherlands HubSpot companies and show company notes.”
 3. “Draft LinkedIn + email sequences” → **approve** → send yourself → mark sent.
 4. “Book demo with \<AE\>” → use that AE’s calendar link → after meeting set Completed / Rescheduled / Cancelled.
 5. “Remember this feedback: skip company X / prefer Partner titles” → next pull applies it.
@@ -75,7 +75,7 @@ HUBSPOT_PROPERTY_MAP={"whyGood":"sg_why_good","opener":"sg_opener","rightContact
 
 ## Sequences (Floor’s #1 ask)
 
-1. Pull HubSpot company notes (skill or Sync panel) — **BE + NL** filter by default.
+1. Pull HubSpot company notes (skill or Sync panel) — **NL + BE** filter by default.
 2. **Sequences** tab / `sales-sequence-draft` → Generate (LinkedIn connect/message → wait → follow-up → email).
 3. Edit drafts → **Approve** → send in LinkedIn/email client → **Mark sent**.
 4. App/skill never transmits messages itself.
@@ -88,7 +88,7 @@ Bookings use each AE’s **personal calendar link** — not a single shared Cale
 
 ## Sales Nav CSV (fallback)
 
-Import panel defaults geo filter to **BE + NL**. Prefer HubSpot when the internal lead agent already wrote company notes.
+Import panel defaults geo filter to **NL + BE**. Prefer HubSpot when the internal lead agent already wrote company notes.
 
 ## Scripts
 
@@ -97,7 +97,7 @@ Import panel defaults geo filter to **BE + NL**. Prefer HubSpot when the interna
 | `npm run dev` | Dev server **4317** |
 | `npm run start:demo` | Production server **4341** |
 | `npm run test:evals` | Governance eval structure |
-| `npm run test:import` | Sales Nav CSV / BE-first geo unit checks |
+| `npm run test:import` | Sales Nav CSV / NL-first geo unit checks |
 | `npm run test:hubspot` | HubSpot mock + sequence unit checks |
 | `npm run test:feedback` | Feedback persist + apply unit checks |
 | `npm run lint` / `build` | Quality gates |

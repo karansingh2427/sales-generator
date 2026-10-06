@@ -1,6 +1,6 @@
 ---
 name: sales-lead-run
-description: Orchestrate one Floor BDR pass — pull BE-first HubSpot company notes, draft LinkedIn+email sequences for approval, and prepare AE calendar booking. Use when Floor says run leads, do a sales pass, work my HubSpot list, or start outreach for Belgium/Netherlands today.
+description: Orchestrate one Floor BDR pass — pull NL-first HubSpot company notes, draft LinkedIn+email sequences for approval, and prepare AE calendar booking. Use when Floor says run leads, do a sales pass, work my HubSpot list, or start outreach for Netherlands/Belgium today.
 ---
 
 # sales-lead-run
@@ -10,15 +10,15 @@ One operator pass for Floor Hoefkens (Willow BDR). This skill **orchestrates** t
 ## Invoke in order
 
 0. **`sales-feedback-learn`** — **load active feedback first** (`.data/feedback.json` or `skills/memory/FEEDBACK.md`). Show a one-line digest of skip/prefer/tone rules. If Floor gives new feedback mid-pass, save it via the skill before continuing.
-1. **`sales-hubspot-pull`** — Belgium-first companies + company notes (why / opener / right contact); **apply** skip-company / prefer-title / ICP notes from memory.
+1. **`sales-hubspot-pull`** — Netherlands-first companies + company notes (why / opener / right contact); **apply** skip-company / prefer-title / ICP notes from memory.
 2. **`sales-sequence-draft`** — multi-channel drafts using tone / never-pitch / sequence notes; **approve before send**.
 3. **`sales-demo-book`** — when a prospect is ready; per-AE calendar link + post-demo stages.
 
 ## Geography (hard rule — do not regress)
 
-- **Belgium first**, Netherlands second.
-- **BE + NL only** — no other countries in the pull, drafts, filters, or digests.
-- Supersedes any older NL-first pilot defaults in the web app.
+- **Netherlands first**, Belgium second.
+- **NL + BE only** — no other countries in the pull, drafts, filters, or digests.
+- Supersedes any older Belgium-first defaults in the web app.
 - Feedback cannot override the geo lock.
 
 ## HubSpot path
@@ -30,11 +30,11 @@ Prefer **HubSpot MCP/tools in Floor’s Claude or Cursor session**. Do not block
 ```text
 1. Preflight
    - Confirm HubSpot tools visible in session (or mock web-app fallback labeled as demo).
-   - Geo lock: BE primary, NL secondary.
+   - Geo lock: NL primary, BE secondary.
    - Load active Floor feedback; list skip companies / prefer titles / tone rules.
 2. Pull
    - Run sales-hubspot-pull with feedback applied (skip listed companies).
-   - Present BE-first table; Floor selects who to sequence.
+   - Present NL-first table; Floor selects who to sequence.
 3. Draft
    - Run sales-sequence-draft per selected company (inject tone / never-pitch).
    - Stop for approve on every message step.
@@ -51,7 +51,7 @@ Prefer **HubSpot MCP/tools in Floor’s Claude or Cursor session**. Do not block
 ## What this pass never does
 
 - Auto-send LinkedIn or email.
-- Prospect outside BE/NL.
+- Prospect outside NL/BE.
 - Rebuild the internal lead-gen agent (notes already exist on the company).
 - Write non-English into HubSpot.
 - Let feedback bypass approve-before-send.

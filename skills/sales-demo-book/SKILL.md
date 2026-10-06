@@ -1,6 +1,6 @@
 ---
 name: sales-demo-book
-description: Book Willow demos on per-AE calendar links and set post-demo HubSpot stages — Demo Booked → Completed | Rescheduled | Cancelled. Belgium/Netherlands leads only. Use when Floor has a meeting to schedule, needs an AE link, or must update demo outcome in HubSpot.
+description: Book Willow demos on per-AE calendar links and set post-demo HubSpot stages — Demo Booked → Completed | Rescheduled | Cancelled. Netherlands/Belgium leads only. Use when Floor has a meeting to schedule, needs an AE link, or must update demo outcome in HubSpot.
 ---
 
 # sales-demo-book
@@ -9,7 +9,7 @@ Floor books demos the same way she does after cold calls: paste the **AE’s per
 
 ## Geography
 
-Only for companies in **Belgium** or the **Netherlands**. Refuse other countries.
+Only for companies in the **Netherlands** or **Belgium**. Refuse other countries.
 
 ## Booking mechanism
 

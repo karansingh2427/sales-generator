@@ -1,19 +1,19 @@
-/** Geography defaults for Willow BDR — Belgium first, Netherlands second. BE + NL only. */
+/** Geography defaults for Willow BDR — Netherlands first, Belgium second. NL + BE only. */
 
 export type GeoCode = "BE" | "NL" | "OTHER";
 
 export type GeoTier = "primary" | "secondary" | "out_of_scope";
 
 /**
- * Default import / HubSpot filter: Belgium + Netherlands.
- * Belgium is primary (higher ICP bonus); Netherlands is secondary.
+ * Default import / HubSpot filter: Netherlands + Belgium.
+ * Netherlands is primary (higher ICP bonus); Belgium is secondary.
  * No other countries are in scope.
  */
-export const DEFAULT_GEO_FILTER: GeoCode[] = ["BE", "NL"];
+export const DEFAULT_GEO_FILTER: GeoCode[] = ["NL", "BE"];
 
 /** Markets Floor covers — hard lock. */
-export const PRIMARY_GEO: GeoCode = "BE";
-export const AVAILABLE_GEO: GeoCode[] = ["BE", "NL"];
+export const PRIMARY_GEO: GeoCode = "NL";
+export const AVAILABLE_GEO: GeoCode[] = ["NL", "BE"];
 
 /** @deprecated Use PRIMARY_GEO — kept so older call sites compile during rename. */
 export const PILOT_GEO: GeoCode = PRIMARY_GEO;
@@ -56,8 +56,8 @@ const CITY_HINTS: Record<string, GeoCode> = {
 };
 
 const COUNTRY_PATTERNS: { re: RegExp; code: GeoCode }[] = [
-  { re: /\b(belgium|belgi[eë]|belgique)\b/i, code: "BE" },
   { re: /\b(netherlands|nederland|holland)\b/i, code: "NL" },
+  { re: /\b(belgium|belgi[eë]|belgique)\b/i, code: "BE" },
 ];
 
 export function detectGeoCode(...parts: (string | undefined | null)[]): GeoCode {
@@ -69,7 +69,7 @@ export function detectGeoCode(...parts: (string | undefined | null)[]): GeoCode 
     if (lower.includes(city)) return code;
   }
 
-  // Prefer trailing ", XX" country tokens — only BE/NL count
+  // Prefer trailing ", XX" country tokens — only NL/BE count
   const trailing = hay.match(/,\s*([A-Za-z]{2})\s*$/);
   if (trailing) {
     const cc = trailing[1].toUpperCase();
@@ -82,19 +82,19 @@ export function detectGeoCode(...parts: (string | undefined | null)[]): GeoCode 
   }
 
   // Domain TLDs in company/email when location blank
-  if (/\.be\b/i.test(hay)) return "BE";
   if (/\.nl\b/i.test(hay)) return "NL";
+  if (/\.be\b/i.test(hay)) return "BE";
 
   return "OTHER";
 }
 
 export function geoTier(code: GeoCode): GeoTier {
-  if (code === "BE") return "primary";
-  if (code === "NL") return "secondary";
+  if (code === "NL") return "primary";
+  if (code === "BE") return "secondary";
   return "out_of_scope";
 }
 
-/** ICP score bonus: Belgium primary, Netherlands secondary; all else zero. */
+/** ICP score bonus: Netherlands primary, Belgium secondary; all else zero. */
 export function geoScoreBonus(code: GeoCode): number {
   switch (geoTier(code)) {
     case "primary":

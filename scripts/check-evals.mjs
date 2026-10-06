@@ -30,11 +30,11 @@ if (!rules.includes("Netherlands") && !rules.includes("NL")) {
   ok = false;
 }
 if (!rules.includes("Belgium") && !rules.includes("BE")) {
-  console.error("RULES.md must mention Belgium as primary market");
+  console.error("RULES.md must mention Belgium as secondary market");
   ok = false;
 }
-if (!rules.includes("BE + NL") && !rules.includes("BE+NL") && !rules.includes("Belgium first")) {
-  console.error("RULES.md must lock geography to Belgium first / BE+NL only");
+if (!rules.includes("NL + BE") && !rules.includes("NL+BE") && !rules.includes("Netherlands first")) {
+  console.error("RULES.md must lock geography to Netherlands first / NL+BE only");
   ok = false;
 }
 if (!rules.includes("company") && !rules.includes("Company")) {
@@ -68,8 +68,8 @@ for (const rel of skillDirs) {
   }
 }
 const agents = fs.readFileSync(path.join(root, "AGENTS.md"), "utf8");
-if (!agents.includes("sales-hubspot-pull") || !agents.includes("Belgium first")) {
-  console.error("AGENTS.md must map skills and Belgium-first geo");
+if (!agents.includes("sales-hubspot-pull") || !agents.includes("Netherlands first")) {
+  console.error("AGENTS.md must map skills and Netherlands-first geo");
   ok = false;
 }
 if (!agents.includes("sales-feedback-learn") || !agents.includes("feedback")) {

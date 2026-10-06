@@ -28,12 +28,12 @@ These rules govern human and agent operators. Violations are **invalid** scenari
 ## Lead generation & Sales Nav import rules
 
 1. **Fallback path:** LinkedIn Sales Navigator CSV → preview → human select → commit.
-2. **Default ICP geography:** **Belgium (BE) primary**, **Netherlands (NL) secondary**. Default filter = `BE + NL`. **No other countries** in ICP, filters, mocks, or skills.
+2. **Default ICP geography:** **Netherlands (NL) primary**, **Belgium (BE) secondary**. Default filter = `NL + BE`. **No other countries** in ICP, filters, mocks, or skills.
 3. ICP: decision makers (Partner / Founder / Ops manager); verticals accountancy, legal, IT, HR/recruitment/exec search, coaching, expertise B2B.
 4. `minScore` floor 70 unless PRD exception documented.
 5. **Deduplicate** on email and/or LinkedIn URL (and HubSpot contact id on sync).
 6. **No silent import blast** — `import_commit` only accepts explicitly selected rows.
-7. Demo / sample data must be labeled (`source: demo_sample`) and BE/NL only.
+7. Demo / sample data must be labeled (`source: demo_sample`) and NL/BE only.
 
 ## Booking rules
 
@@ -45,13 +45,13 @@ These rules govern human and agent operators. Violations are **invalid** scenari
 ## Skill pack rules
 
 1. Skills live under `skills/*/SKILL.md` and are mapped from [AGENTS.md](../AGENTS.md).
-2. `sales-hubspot-pull` must instruct BE-first pulls and company notes.
+2. `sales-hubspot-pull` must instruct NL-first pulls and company notes.
 3. `sales-sequence-draft` must require approve before send.
 4. `sales-demo-book` must use per-AE links and the three post-demo outcomes.
 5. Orchestrator `sales-lead-run` may compose the skills — it must not bypass HITL or geo lock.
 6. `sales-feedback-learn` persists structured feedback; pull/draft/lead-run **must** load active feedback.
 7. Feedback never auto-sends and never bypasses draft → approve → mark sent.
-8. Feedback cannot add countries outside BE+NL.
+8. Feedback cannot add countries outside NL+BE.
 
 ## Feedback learning rules
 
@@ -66,5 +66,5 @@ These rules govern human and agent operators. Violations are **invalid** scenari
 1. One action at a time; confirm before bulk HubSpot sync interpretation or demo generate (>5 leads).
 2. Present sequence drafts as readable prose before approve/mark sent.
 3. Name failures in plain language.
-4. Prefer **Belgium-first** language in ICP explanations; mention Netherlands as secondary; never propose other countries.
+4. Prefer **Netherlands-first** language in ICP explanations; mention Netherlands as secondary; never propose other countries.
 5. When Floor steers (“skip X”, “prefer title Y”), save via `sales-feedback-learn` and confirm in one line.

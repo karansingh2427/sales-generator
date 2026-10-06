@@ -23,7 +23,7 @@ Local `.data/` is read-only on Vercel. Runtime writes go to `/tmp/sales-generato
 
 1. Open **https://sales-generator-delta.vercel.app**
 2. Confirm header shows **mock** HubSpot (no live token required).
-3. **Leads** — seed BE/NL sample list (Belgium-first scoring).
+3. **Leads** — seed NL/BE sample list (Netherlands-first scoring).
 4. **HubSpot** tab → **Sync** — pulls mock company notes (why / opener / right contact); Peeters & peers appear.
 5. Pick a lead → **Build sequence** — LinkedIn connect → wait → follow-up → email drafts (approve → mark sent; no auto-blast).
 6. **Feedback** tab → Remember e.g. “Skip company Peeters Accountants” → Sync again / draft sequence and confirm skip applies.

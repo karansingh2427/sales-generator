@@ -4,7 +4,7 @@ A **Willow BDR operating system** for Floor Hoefkens: Cursor/Claude **skills** p
 that pull HubSpot **company notes** (why-good, opener, right contact), draft multi-channel LinkedIn +
 email sequences with human approve, and book demos on **per-AE calendar links**.
 
-**Geography locked:** **Belgium first**, Netherlands second — **BE + NL only**.
+**Geography locked:** **Netherlands first**, Belgium second — **NL + BE only**.
 
 **This file is the entry point for coding agents.** Start here, then follow the pointers.
 
@@ -21,7 +21,7 @@ Plugin skills live under `skills/` (see [`.cursor-plugin/plugin.json`](.cursor-p
 
 | Skill | Path | Use when |
 |---|---|---|
-| `sales-hubspot-pull` | [skills/sales-hubspot-pull/SKILL.md](skills/sales-hubspot-pull/SKILL.md) | Pull BE-first companies + company notes via HubSpot MCP/session tools |
+| `sales-hubspot-pull` | [skills/sales-hubspot-pull/SKILL.md](skills/sales-hubspot-pull/SKILL.md) | Pull NL-first companies + company notes via HubSpot MCP/session tools |
 | `sales-sequence-draft` | [skills/sales-sequence-draft/SKILL.md](skills/sales-sequence-draft/SKILL.md) | LI + email drafts; approve before send |
 | `sales-demo-book` | [skills/sales-demo-book/SKILL.md](skills/sales-demo-book/SKILL.md) | Per-AE calendar links; Demo Booked → Completed \| Rescheduled \| Cancelled |
 | `sales-feedback-learn` | [skills/sales-feedback-learn/SKILL.md](skills/sales-feedback-learn/SKILL.md) | “Remember this feedback: …” — persist ICP/company/tone/geo memory |
@@ -34,14 +34,14 @@ Pattern mirrored from [agent-data/job-search](https://github.com/agent-data/job-
 ## Quality · governance · interface
 
 - [docs/QUALITY_SCORE.md](docs/QUALITY_SCORE.md)
-- [tests/evals.json](tests/evals.json) — valid / invalid cases (HubSpot + sequences + BE-first geo).
+- [tests/evals.json](tests/evals.json) — valid / invalid cases (HubSpot + sequences + NL-first geo).
 
 ## Working here
 
 - **HubSpot:** `src/lib/hubspot.ts`, `src/lib/hubspot-config.ts`, `src/app/api/hubspot/route.ts`
 - **Sequences:** `src/lib/sequence-engine.ts`, `src/app/api/sequences/route.ts`, `src/components/sequence-builder-panel.tsx`
 - **Feedback learning:** `src/lib/feedback.ts`, `src/app/api/feedback/route.ts`, `src/components/feedback-panel.tsx`, `skills/sales-feedback-learn/`
-- **ICP / geo:** `src/lib/icp.ts`, `src/lib/geo.ts` (BE primary, NL secondary, no other countries)
+- **ICP / geo:** `src/lib/icp.ts`, `src/lib/geo.ts` (NL primary, BE secondary, no other countries)
 - **Fallback CSV:** `src/lib/sales-nav-import.ts`
 - Before ship: `npm run lint`, `npm run build`, `npm run test:evals`, `npm run test:import`, `npm run test:hubspot`, `npm run test:feedback`.
 
