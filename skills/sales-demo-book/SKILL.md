@@ -1,39 +1,72 @@
 ---
 name: sales-demo-book
-description: Book Willow demos on per-AE calendar links and set post-demo HubSpot stages — Demo Booked → Completed | Rescheduled | Cancelled. Netherlands/Belgium leads only. Use when Floor has a meeting to schedule, needs an AE link, or must update demo outcome in HubSpot.
+description: When a lead wants a demo, Slack Floor with lead + conversation + interest, so she manually books Ludwig’s calendar — never auto-book Calendar. After she books, mark HubSpot Demo Booked → Completed | Rescheduled | Cancelled. Netherlands/Belgium leads only.
 ---
 
 # sales-demo-book
 
-Floor books demos the same way she does after cold calls: paste the **AE’s personal calendar link**. This skill helps pick the AE, hand Floor the link, and write HubSpot stages in **English**.
+When outreach succeeds and the lead wants a demo: **Slack Floor** (with the conversation), she **manually books Ludwig’s calendar** (AE) and verifies. **Never auto-book** Google Calendar / Calendly / HubSpot meetings.
 
 ## Geography
 
 Only for companies in the **Netherlands** or **Belgium**. Refuse other countries.
 
+## Handoff rule (hard — Karandeep / Floor)
+
+1. **Slack Floor** with: lead/company, **conversation** (transcript or clear chat summary), why they’re interested, links/context.
+2. Floor **manually** books the meeting on **Ludwig’s calendar** and verifies — agents must **never** create calendar events.
+3. After she books, she/Claude can mark HubSpot **Demo Booked** → later **Completed** / **Rescheduled** / **Cancelled**.
+
 ## Booking mechanism
 
-- Use **per-AE calendar URLs** from the roster (placeholders until Floor pastes real links).
-- Do **not** invent a shared Calendly / round-robin unless ops changes the rule.
-- Default duration: **30 minutes** (allowed 15–60).
+- **Primary AE:** Ludwig (Floor books his calendar by hand).
+- Do **not** invent a shared Calendly / round-robin / auto-schedule flow.
+- Do **not** call Calendar connectors to create events.
+- Default duration expectation: **30 minutes** (Floor may adjust when she books).
 
-### Roster (placeholders — replace with Floor’s real URLs)
+### Roster (context only — Floor books Ludwig)
 
-| AE | Calendar URL |
+| AE | Role |
 |---|---|
-| Sarah Chen | `https://calendar.willow.co/ae/sarah-chen` |
-| Marcus Webb | `https://calendar.willow.co/ae/marcus-webb` |
-| Elena Kostova | `https://calendar.willow.co/ae/elena-kostova` |
+| Ludwig | Primary AE — Floor books his calendar manually after Slack ping |
+| (others) | Only if Floor explicitly names a different AE |
 
-When Floor supplies real links, update `src/lib/willow-context.ts` (`DEFAULT_AES`) and this table.
+When Floor supplies Ludwig’s calendar URL for her own use, store it in ops notes — agents still never auto-book it.
 
-## Steps — book
+## Steps — warm lead → Slack Floor
 
 1. Confirm lead is BE or NL and not disqualified.
-2. Ask which AE owns the demo (or pick from roster).
-3. Give Floor that AE’s **calendar link** to send/book.
-4. After the slot is confirmed, set CRM stage to **Demo Booked** (English).
-5. Record AE name, datetime, duration, meeting link in the local workspace / HubSpot note if she asks.
+2. Confirm they asked for / agreed to a demo (or clearly want a meeting).
+3. Post to **Slack** for Floor using the template below (include the **conversation**).
+4. Stop. Wait for Floor to book and confirm.
+5. After Floor confirms the slot is on Ludwig’s calendar, set CRM stage to **Demo Booked** (English).
+6. Record AE = Ludwig, datetime, duration, meeting link in HubSpot note / local workspace if she asks.
+
+## Slack message template
+
+Post to Floor’s Slack channel/DM (use session Slack tools):
+
+```text
+🎯 Demo handoff — please book Ludwig
+
+Lead: <Name> · <Title>
+Company: <Company> (<NL|BE>)
+HubSpot: <company or contact URL if available>
+Why interested: <1–3 bullets from the chat>
+Preferred timing (if any): <what they said, or “open”>
+
+Conversation (transcript or summary):
+---
+<paste LinkedIn/email thread summary OR key turns — enough that Floor can brief Ludwig>
+---
+
+Links / context:
+- Sequence / thread: <URLs>
+- Company note opener: <short>
+- Other: <deck, site, mutual, etc.>
+
+Action for Floor: manually book **Ludwig’s calendar**, verify the invite, then tell me when it’s confirmed so I can set HubSpot → Demo Booked.
+```
 
 ## Steps — post-demo outcome
 
@@ -51,11 +84,18 @@ After **Demo Booked**, Floor confirmed only three outcomes:
 
 Pre–Demo Booked pipeline names are still unknown — do not invent stage labels before Demo Booked.
 
-## Prefer session HubSpot tools
+## Prefer session tools
 
-Floor’s HubSpot is connected to her Claude. Prefer updating deal/contact stage through those tools in-session. Do not require embedding a private-app token in the web app for this skill to work.
+Floor’s HubSpot + Slack are connected to her Claude Cowork. Prefer those tools in-session. Do not require embedding private-app tokens or Calendar OAuth in the web app for this skill.
+
+## What this skill never does
+
+- Auto-create calendar events (Google Calendar, Calendly, HubSpot meetings, Outlook).
+- Send the lead a booking link and treat that as “booked” without Floor’s confirmation.
+- Skip the conversation in the Slack ping.
+- Book for AEs other than Ludwig unless Floor explicitly redirects.
 
 ## Done when
 
-- Floor has the correct AE calendar link, or
-- Stage is Demo Booked / Completed / Rescheduled / Cancelled as requested, in English.
+- Floor has a Slack ping with lead + **conversation** + interest + links, or
+- Stage is Demo Booked / Completed / Rescheduled / Cancelled as requested, in English, after her manual Ludwig booking.

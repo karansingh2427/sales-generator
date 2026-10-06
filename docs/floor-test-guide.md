@@ -12,10 +12,10 @@ Your lead-gen agent already drops **company notes** in HubSpot (why good / opene
 
 1. Pull those leads (mock sync here)  
 2. Draft **LinkedIn + email** sequences (instead of cold-calling everyone)  
-3. Book demos via **AE calendar links**  
+3. (Live Cowork) When a lead wants a demo → Claude **Slacks you** with the conversation → **you book Ludwig** manually  
 4. Teach the agent with **feedback** so the next run remembers
 
-Nothing auto-sends. You always **Approve** before **Mark sent**.
+Nothing auto-sends. Nothing auto-books Calendar. You always **Approve** before **Mark sent**.
 
 ---
 
@@ -44,9 +44,9 @@ Confirm it says HubSpot is in **mock** mode.
 
 Or use the **Teach agent** control on a single lead.
 
-### 5. Demo outcome (optional)
-- Book using a **per-AE calendar link** field  
-- After the meeting: set **Demo Completed / Rescheduled / Cancelled**
+### 5. Demo handoff (live skills — not this mock URL)
+- On the website, bookings UI is mock-only.
+- In Cowork: lead wants demo → Slack ping with **conversation** → you book **Ludwig** → then set **Demo Booked / Completed / Rescheduled / Cancelled**
 
 ---
 

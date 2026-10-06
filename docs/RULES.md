@@ -7,7 +7,7 @@ These rules govern human and agent operators. Violations are **invalid** scenari
 1. **No outreach to disqualified leads** — including **strong social presence** (Floor disqualifier).
 2. **Channels** — `email`, `linkedin_dm`, or `linkedin_connect` only.
 3. **Every draft includes rationale** — CRM why-good / opener / opportunity angles (`scoreLeadRationale` / sequence engine).
-4. **CTA** — offer 30-minute Willow demo booked on the **AE’s calendar link** (per-AE, not a shared Calendly); do not promise pricing or legal outcomes.
+4. **CTA** — offer a 30-minute Willow demo with AE **Ludwig**; do not promise pricing or legal outcomes. When they agree, **Slack Floor** (include conversation) — she books Ludwig’s calendar manually.
 5. **No fabricated case studies** — use only Willow public claims (expertise firms, EU/GDPR, coaching).
 6. **Human send (mandatory this slice)** — draft → Floor **approves** → **mark sent**. MVP never auto-sends LinkedIn or email. Auto-blast is invalid until explicit Willow policy + Floor OK.
 7. **Sequence mark_sent** without prior **approve_step** is invalid for message steps.
@@ -37,18 +37,20 @@ These rules govern human and agent operators. Violations are **invalid** scenari
 
 ## Booking rules
 
-1. AE must be from configured roster (`DEFAULT_AES` with per-AE `calendarUrl`).
-2. Duration 15–60 minutes; default 30.
+1. **Primary AE = Ludwig.** Floor books his calendar **manually** after a Slack ping.
+2. Duration 15–60 minutes; default 30 (Floor may adjust when she books).
 3. Disqualified leads cannot book.
-4. Meeting link = **that AE’s calendar URL** (Floor’s manual booking pattern).
+4. **Never auto-book** Google Calendar / Calendly / HubSpot meetings / Outlook. Agents must not create calendar events.
+5. Demo handoff Slack must include: lead/company, **conversation** (transcript or clear summary), why interested, links/context.
+6. Only after Floor confirms the Ludwig booking → HubSpot **Demo Booked**; later Completed | Rescheduled | Cancelled.
 
 ## Skill pack rules
 
 1. Skills live under `skills/*/SKILL.md` and are mapped from [AGENTS.md](../AGENTS.md).
 2. `sales-hubspot-pull` must instruct NL-first pulls and company notes.
 3. `sales-sequence-draft` must require approve before send.
-4. `sales-demo-book` must use per-AE links and the three post-demo outcomes.
-5. Orchestrator `sales-lead-run` may compose the skills — it must not bypass HITL or geo lock.
+4. `sales-demo-book` must Slack Floor (with conversation), never auto-book Calendar, and use the three post-demo outcomes after she books Ludwig.
+5. Orchestrator `sales-lead-run` may compose the skills — it must not bypass HITL, geo lock, or the Slack→Ludwig handoff.
 6. `sales-feedback-learn` persists structured feedback; pull/draft/lead-run **must** load active feedback.
 7. Feedback never auto-sends and never bypasses draft → approve → mark sent.
 8. Feedback cannot add countries outside NL+BE.

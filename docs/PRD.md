@@ -5,7 +5,7 @@
 
 ## Problem
 
-Lead gen is already handled by an internal agent that writes **HubSpot company notes**. Floor’s remaining pain is **0% LinkedIn outreach** — she cold-calls everyone. She needs CRM-aware **LinkedIn + email sequence drafts** that replace cold-call discovery and book demos on **per-AE calendar links**, with human approve before send — reachable from both the web UI and Cursor/Claude **skills**.
+Lead gen is already handled by an internal agent that writes **HubSpot company notes**. Floor’s remaining pain is **0% LinkedIn outreach** — she cold-calls everyone. She needs CRM-aware **LinkedIn + email sequence drafts** that replace cold-call discovery, then **Slack her** (with the conversation) so she **manually books Ludwig’s calendar** — never auto-book — with human approve before send; reachable from both the web UI and Cursor/Claude **skills**.
 
 ## Goals
 
@@ -35,7 +35,7 @@ Supersedes earlier Belgium-first defaults (Karandeep preference 2026-10-06).
 - Live Sales Nav API.
 - Auto-dialer or call recording / NL→EN call transcription (her existing path).
 - Multi-tenant auth.
-- Shared Calendly round-robin (booking = **per-AE calendar links**).
+- Auto-booking Calendar / Calendly / HubSpot meetings (Floor books **Ludwig** manually after Slack).
 - Embedding HubSpot private-app tokens as the primary skill path.
 
 ## User stories
@@ -55,7 +55,8 @@ Supersedes earlier Belgium-first defaults (Karandeep preference 2026-10-06).
 | RF-FB-03 | As Floor, I see learned feedback and can disable/delete | Feedback tab list; disable keeps history |
 | RF-FB-04 | As Floor, feedback never auto-sends | Approve-before-send still required |
 | RF-01 | As Floor, I still import Sales Nav CSV (fallback) | Preview defaults to **NL + BE**; human select-before-commit |
-| RF-04 | As Floor, I book an AE demo | Valid AE + datetime; **per-AE calendar link**; stage → demo_booked |
+| RF-04 | As Floor, I get a Slack demo handoff then book Ludwig | Slack includes conversation; Floor books Ludwig manually; stage → demo_booked after confirm |
+| RF-04b | As Floor, agents never auto-book Calendar | No Calendar create-event; template instructs manual Ludwig book |
 | RF-05 | As Floor, I set post-demo outcome | Completed / Rescheduled / Cancelled from bookings UI / skill |
 | RF-06 | As Karandeep, I audit AI governance | PRD, RULES, TASKS, evals, skills updated |
 
@@ -64,16 +65,15 @@ Supersedes earlier Belgium-first defaults (Karandeep preference 2026-10-06).
 - ≥80% of touches via LinkedIn/email **before** calls (baseline ~0% LinkedIn).
 - Sequences reuse **company** CRM agent notes rather than re-prospecting.
 - Lists stay **NL-first / NL+BE only**.
-- Booking lands on **per-AE calendar links**.
+- Demo handoff = Slack Floor (with conversation) → she books Ludwig; never auto-book.
 - Zero silent sends; every step approved by Floor.
 - Zero PII committed to git.
-- Skills usable in Floor’s HubSpot-connected Claude/Cursor session.
+- Skills usable in Floor’s HubSpot + Slack-connected Claude/Cursor session.
 
 ## Still needs from Floor / ops
 
-- Confirm Claude↔HubSpot connection scopes (notes + stages).
+- Confirm Claude↔HubSpot + Slack connection scopes (notes + stages + Slack post).
 - Pipeline name + stages **before** Demo Booked.
-- Real AE calendar link copies (placeholders in roster today).
 - Property names if structured company props differ from defaults.
 - Explicit OK to flip from draft-approve to auto-send (Willow policy).
 - LinkedIn/email outreach language(s) (CRM is EN; calls are NL).

@@ -1,8 +1,8 @@
 # Sales Generator (Willow BDR)
 
-Prototype for **Floor Hoefkens** (BDR @ [Willow](https://willow.co/)): **HubSpot company notes** → **LinkedIn + email sequence drafts** (approve → mark sent) → **per-AE calendar** demo booking. Sales Nav CSV remains a fallback. Cursor/Claude **skills** ship alongside the Next.js UI.
+Prototype for **Floor Hoefkens** (BDR @ [Willow](https://willow.co/)): **HubSpot company notes** → **LinkedIn + email sequence drafts** (approve → mark sent) → when a lead wants a demo, **Slack Floor** (with the conversation) so she **manually books Ludwig’s calendar**. Sales Nav CSV remains a fallback. Cursor/Claude **skills** ship alongside the Next.js UI.
 
-**Geography:** **Netherlands first**, Belgium second — **NL + BE only**. **Governance:** human-in-the-loop — nothing auto-blasts. **CRM language:** English writebacks. **HubSpot path:** prefer Floor’s Claude/Cursor HubSpot MCP/tools; web-app private-app token is optional fallback only.
+**Geography:** **Netherlands first**, Belgium second — **NL + BE only**. **Governance:** human-in-the-loop — nothing auto-blasts; **never auto-book** Calendar. **CRM language:** English writebacks. **HubSpot + Slack path:** prefer Floor’s Claude/Cursor session tools; web-app private-app token is optional fallback only.
 
 ## For Floor
 
@@ -41,7 +41,7 @@ Agent map: [AGENTS.md](./AGENTS.md). Plugin manifest: [`.cursor-plugin/plugin.js
 1. Open this repo in the Claude/Cursor session where **HubSpot is already connected**.
 2. “Pull my Netherlands HubSpot companies and show company notes.”
 3. “Draft LinkedIn + email sequences” → **approve** → send yourself → mark sent.
-4. “Book demo with \<AE\>” → use that AE’s calendar link → after meeting set Completed / Rescheduled / Cancelled.
+4. Lead wants demo → Slack Floor with **conversation** → Floor books **Ludwig** manually → Demo Booked → later Completed / Rescheduled / Cancelled.
 5. “Remember this feedback: skip company X / prefer Partner titles” → next pull applies it.
 
 ## Feedback learning
@@ -71,7 +71,7 @@ HUBSPOT_STAGE_MAP={"demo booked":"demo_booked","demo completed":"demo_completed"
 HUBSPOT_PROPERTY_MAP={"whyGood":"sg_why_good","opener":"sg_opener","rightContact":"sg_right_contact","socialPresence":"sg_social_presence","vertical":"sg_vertical"}
 ```
 
-**Still needed from Floor/ops:** confirm Claude↔HubSpot scopes, real AE calendar URLs, outreach language(s), pre–Demo Booked stages, auto-send policy.
+**Still needed from Floor/ops:** confirm Claude↔HubSpot + Slack scopes, outreach language(s), pre–Demo Booked stages, auto-send policy.
 
 ## Sequences (Floor’s #1 ask)
 
@@ -82,9 +82,9 @@ HUBSPOT_PROPERTY_MAP={"whyGood":"sg_why_good","opener":"sg_opener","rightContact
 
 Opportunity angles: consistency, content quality/mix, visibility, open vacancies — plus company CRM opener/rationale. Strong social presence → disqualified / no sequence.
 
-## Demo booking
+## Demo booking (Slack → Floor → Ludwig)
 
-Bookings use each AE’s **personal calendar link** — not a single shared Calendly. After Demo Booked, set **Completed / Rescheduled / Cancelled**.
+When a lead wants a demo: skills **Slack Floor** with lead/company, the **full conversation** (or detailed summary), why interested, and links. Floor **manually books Ludwig’s calendar** and verifies — agents **never auto-book**. After she confirms → HubSpot **Demo Booked** → later **Completed / Rescheduled / Cancelled**. See `START-HERE-FLOOR.md` and `skills/sales-demo-book/SKILL.md`.
 
 ## Sales Nav CSV (fallback)
 
