@@ -1,7 +1,7 @@
 # Floor feedback learning — how to teach Sales Generator
 
 **For:** Floor Hoefkens (BDR @ Willow)  
-**Product rule:** Netherlands first, NL second, NL+BE only · draft → approve → mark sent (feedback never auto-sends)
+**Product rule:** Netherlands first, Belgium second, NL+BE only · draft → approve → mark sent (feedback never auto-sends)
 
 Sales Generator remembers your steering on ICP, companies, tone, disqualifiers, geo, and sequence quality — then applies it on the **next** HubSpot pull, sequence draft, or lead-run.
 

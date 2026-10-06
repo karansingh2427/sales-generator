@@ -55,7 +55,7 @@ When **any** of these run, load active feedback first:
 
 - Feedback **never** auto-sends LinkedIn or email.
 - Feedback does **not** bypass draft → approve → mark sent.
-- Geo hard rule still wins: **Netherlands first**, NL second, **NL+BE only** — feedback cannot add other countries.
+- Geo hard rule still wins: **Netherlands first**, Belgium second, **NL+BE only** — feedback cannot add other countries.
 - CRM writebacks stay English.
 
 ## Examples
