@@ -128,6 +128,18 @@
         "Emails 2–3 continue same story; Email 1 CTA is soft (curious/chat), not feature dump",
         "Senior peer-to-peer tone (not junior AI pitch)"
       ]
+    },
+    {
+      "id": "V-13",
+      "scenario": "Reply→demo BOOK NOW: classify real intent, offer 2 Ludwig slots, Slack Floor",
+      "request": "Cowork skill sales-reply-demo on inbound Gmail ‘Can we book 30 min next week?’ from Dutch batch lead",
+      "expectations": [
+        "Classification BOOK NOW (not NOT YET)",
+        "Short outbound reply offers exactly 2 concrete Ludwig demo slots (calendar or edit-ready placeholders)",
+        "Slack Floor includes full thread + classification + slots",
+        "E2/E3 cancelled; HubSpot logs inbound + outbound",
+        "No calendar event auto-created"
+      ]
     }
   ],
   "invalid_cases": [
@@ -192,6 +204,18 @@
       "expectations": [
         "Response 400 still requires approve",
         "Feedback applied to drafts only — no auto-send"
+      ]
+    },
+    {
+      "id": "I-11",
+      "scenario": "Politeness / ‘sounds interesting’ must not be BOOK NOW or auto-book",
+      "request": "Cowork skill sales-reply-demo on inbound ‘Sounds interesting, thanks!’ with no ask for a call",
+      "expectations": [
+        "Classification is NOT YET (or CONFUSED if they missed the point) — never BOOK NOW",
+        "No Ludwig slot offer as a hard book ask",
+        "No Slack Floor booking ping",
+        "No calendar auto-create",
+        "E2/E3 kept if NOT YET"
       ]
     }
   ]

@@ -29,9 +29,10 @@ Plugin skills live under `skills/` (see [`.cursor-plugin/plugin.json`](.cursor-p
 | `sales-hubspot-pull` | [skills/sales-hubspot-pull/SKILL.md](skills/sales-hubspot-pull/SKILL.md) | Bulk Dutch HubSpot tasks / NL-first companies + notes |
 | `sales-sequence-draft` | [skills/sales-sequence-draft/SKILL.md](skills/sales-sequence-draft/SKILL.md) | Batch-draft Gmail sequences into approve queue |
 | `sales-gmail-send` | [skills/sales-gmail-send/SKILL.md](skills/sales-gmail-send/SKILL.md) | After approve — send via Gmail (Cowork connector) |
+| `sales-reply-demo` | [skills/sales-reply-demo/SKILL.md](skills/sales-reply-demo/SKILL.md) | Dutch-batch Gmail replies → BOOK NOW / NOT YET / NO / CONFUSED; Slack Floor on BOOK NOW |
 | `sales-demo-book` | [skills/sales-demo-book/SKILL.md](skills/sales-demo-book/SKILL.md) | Slack Floor + conversation → she books Ludwig; never auto-create events |
 | `sales-feedback-learn` | [skills/sales-feedback-learn/SKILL.md](skills/sales-feedback-learn/SKILL.md) | “Remember: …” — applied on next Dutch batch pull/drafts |
-| `sales-lead-run` | [skills/sales-lead-run/SKILL.md](skills/sales-lead-run/SKILL.md) | Orchestrate batch pass + Gmail send + demo handoff |
+| `sales-lead-run` | [skills/sales-lead-run/SKILL.md](skills/sales-lead-run/SKILL.md) | Orchestrate batch pass + Gmail send + reply→demo + demo handoff |
 
 Pattern mirrored from [agent-data/job-search](https://github.com/agent-data/job-search) (`skills/*/SKILL.md` + this map). Prefer **HubSpot + Gmail + Slack tools in Floor’s Claude Cowork session** over embedding tokens in the web app.
 

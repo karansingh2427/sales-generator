@@ -6,7 +6,8 @@
 | T-SEQ-01 | High-ICP Dutch HubSpot lead | `sales-sequence-draft` → Generate | Gmail sequence max 3 personalized from note |
 | T-SEQ-02 | Review touch | Edit → Approve → `sales-gmail-send` → Mark sent | Step `sent` via Gmail; lead `contacted` |
 | T-SEQ-03 | No reply after ~1 week | Approve next email (≤3) → Gmail send | Sequence progresses; hard cap 3 |
-| T-SEQ-04 | Clear no / interest reply | Stop sequence · interest → Slack Floor | No further emails; Ludwig booked by Floor |
+| T-SEQ-04 | Inbound reply | `sales-reply-demo` classify BOOK NOW / NOT YET / NO / CONFUSED | Politeness ≠ BOOK NOW; HubSpot log in+out |
+| T-SEQ-05 | BOOK NOW reply | Offer 2 Ludwig slots · Slack Floor · she books | Never auto-book; cancel E2/E3 |
 | T-01 | Offline list | Sales Nav CSV import (fallback) → **NL+BE** → select → Import | `sales_nav_csv` rows |
 | T-01b | Demo without CRM | Demo / sample data → Add demo samples | Labeled demo leads (NL/BE only) |
 | T-02 | Single-touch email | Email icon → review → Mark sent | Stage `contacted` |
@@ -24,9 +25,10 @@
 |---|---|---|
 | A-01 | `sales-hubspot-pull` | Dutch daily tasks + notes (background; no scrape) |
 | A-02 | `sales-sequence-draft` | Personalize full Gmail sequence from note; max 3; approve queue |
-| A-03 | `sales-gmail-send` | Send approved via Gmail; stop on no/interest |
-| A-04 | `sales-demo-book` | Slack Floor + conversation; she books Ludwig |
-| A-05 | `sales-lead-run` | Orchestrates A-01 → A-02 → A-03 → A-04 (loads feedback first) |
-| A-06 | `sales-feedback-learn` | Tone / ICP memory |
+| A-03 | `sales-gmail-send` | Send approved via Gmail; hand replies to reply-demo |
+| A-04 | `sales-reply-demo` | Classify replies; BOOK NOW → 2 slots + Slack Floor |
+| A-05 | `sales-demo-book` | Slack Floor + conversation; she books Ludwig |
+| A-06 | `sales-lead-run` | Orchestrates A-01 → A-02 → A-03 → A-04 → A-05 (loads feedback first) |
+| A-07 | `sales-feedback-learn` | Tone / ICP memory |
 
 Pilot keeps **approve-before-send**. No Lemlist. No LinkedIn API send.

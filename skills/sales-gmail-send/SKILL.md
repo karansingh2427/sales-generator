@@ -25,15 +25,18 @@ Send **approved** cold-sequence emails through **Gmail**. Auto-schedule follow-u
 | **Email 3** | **Exactly 7 days** after E2 if still **no reply** | Send → **log HubSpot** |
 | Cap | **Max 3** | Never a 4th |
 
-### Stop on reply
+### Stop on reply → `sales-reply-demo`
 
-| Reply class | Action |
+When any reply arrives (or Floor pastes “Check my replies…”), hand off to **`sales-reply-demo`** for full classify + act:
+
+| Class | Action (summary) |
 |---|---|
-| Clear **no** | Cancel E2/E3 · close · HubSpot-log the reply thread if useful |
-| **Interest** | Cancel E2/E3 · `sales-demo-book` (Slack Floor + conversation) |
-| **Confused / don’t understand / pushback on opener** | **Gracious short reply only** · HubSpot-log outbound reply · **cancel E2/E3** · **do not** push demo · close |
+| **BOOK NOW** | Cancel E2/E3 · short reply with **2 Ludwig slots** · Slack Floor + thread · she books Ludwig (`sales-demo-book`) · never auto-book |
+| **NOT YET** | One value-building reply (same story) · **keep** E2/E3 · HubSpot-log · no Slack book yet |
+| **NO** | Gracious close · cancel E2/E3 · HubSpot-log · no demo |
+| **CONFUSED** | Gracious short reply · cancel E2/E3 · HubSpot-log · **no** demo |
 
-For the confused class: draft 2–3 calm sentences for Floor (or send if she asks). Thank them, clarify lightly if needed, leave the door open — no Willow pitch, no Ludwig. **Do not** treat this as a ban on the consistency angle for other leads (one post ≠ posting consistently).
+Politeness / “sounds interesting” ≠ BOOK NOW. Consistency angle stays valid for other leads.
 
 ## HubSpot log (required after every successful lead send)
 

@@ -18,7 +18,7 @@ Prototype for **Floor Hoefkens** (BDR @ [Willow](https://willow.co/)): **HubSpot
 1. Unzip → open folder in Cowork (HubSpot + Gmail connected).
 2. Paste the **one prompt** in `START-HERE-FLOOR.md` (senior voice + HubSpot tone + one story).
 3. `approve 1-20` → `Send approved emails via Gmail.`
-4. Interest → Slack you → you book Ludwig.
+4. Replies → `Check my replies from the Dutch batch and handle them.` → BOOK NOW Slack you → you book Ludwig.
 
 ## Quick start
 
@@ -40,6 +40,7 @@ See **[docs/skills.md](./docs/skills.md)** for first-run steps.
 | `sales-hubspot-pull` | [`skills/sales-hubspot-pull/SKILL.md`](./skills/sales-hubspot-pull/SKILL.md) |
 | `sales-sequence-draft` | [`skills/sales-sequence-draft/SKILL.md`](./skills/sales-sequence-draft/SKILL.md) |
 | `sales-gmail-send` | [`skills/sales-gmail-send/SKILL.md`](./skills/sales-gmail-send/SKILL.md) |
+| `sales-reply-demo` | [`skills/sales-reply-demo/SKILL.md`](./skills/sales-reply-demo/SKILL.md) |
 | `sales-demo-book` | [`skills/sales-demo-book/SKILL.md`](./skills/sales-demo-book/SKILL.md) |
 | `sales-feedback-learn` | [`skills/sales-feedback-learn/SKILL.md`](./skills/sales-feedback-learn/SKILL.md) |
 | `sales-lead-run` | [`skills/sales-lead-run/SKILL.md`](./skills/sales-lead-run/SKILL.md) |

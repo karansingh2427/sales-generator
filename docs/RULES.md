@@ -56,11 +56,12 @@ These rules govern human and agent operators. Violations are **invalid** scenari
 2. `sales-hubspot-pull` must instruct NL-first pulls and company notes.
 3. `sales-sequence-draft` must draft **Gmail** sequences and require approve before send.
 4. `sales-gmail-send` sends only **approved** email steps via Gmail; never LinkedIn API or Lemlist.
-5. `sales-demo-book` must Slack Floor (with conversation), never auto-book Calendar, and use the three post-demo outcomes after she books Ludwig.
-6. Orchestrator `sales-lead-run` may compose the skills — it must not bypass HITL, geo lock, Gmail-only channel, or the Slack→Ludwig handoff.
-7. `sales-feedback-learn` persists structured feedback; pull/draft/lead-run **must** load active feedback.
-8. Feedback never bypasses draft → approve → Gmail send.
-9. Feedback cannot add countries outside NL+BE.
+5. `sales-reply-demo` classifies Dutch-batch Gmail replies as **BOOK NOW / NOT YET / NO / CONFUSED**; politeness ≠ BOOK NOW; never auto-book; HubSpot-log inbound + outbound.
+6. `sales-demo-book` must Slack Floor (with conversation), never auto-book Calendar, and use the three post-demo outcomes after she books Ludwig. BOOK NOW from reply-demo is the preferred trigger.
+7. Orchestrator `sales-lead-run` may compose the skills — it must not bypass HITL, geo lock, Gmail-only channel, or the Slack→Ludwig handoff.
+8. `sales-feedback-learn` persists structured feedback; pull/draft/lead-run **must** load active feedback.
+9. Feedback never bypasses draft → approve → Gmail send.
+10. Feedback cannot add countries outside NL+BE.
 
 ## Feedback learning rules
 

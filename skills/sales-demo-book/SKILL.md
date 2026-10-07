@@ -1,6 +1,6 @@
 ---
 name: sales-demo-book
-description: When a lead wants a demo, Slack Floor with lead + full conversation so she books herself on Ludwig’s calendar — never auto-create calendar events. Optional Calendar propose/draft only if Floor explicitly asks after the Slack ping. Optional Slack to Ludwig with lead context. Then HubSpot Demo Booked → Completed | Rescheduled | Cancelled. NL/BE only.
+description: When a lead wants a demo (BOOK NOW from sales-reply-demo or clear interest), Slack Floor with lead + full conversation + classification so she books herself on Ludwig’s calendar — never auto-create calendar events. Optional Calendar propose/draft only if Floor explicitly asks after the Slack ping. Optional Slack to Ludwig with lead context. Then HubSpot Demo Booked → Completed | Rescheduled | Cancelled. NL/BE only.
 ---
 
 # sales-demo-book
@@ -9,11 +9,12 @@ description: When a lead wants a demo, Slack Floor with lead + full conversation
 
 **When a lead wants a demo:**
 
-1. Send Floor a **Slack message** that includes the **conversation** (transcript or clear detailed summary), plus lead/company, why interested, links.
-2. Floor **books herself on Ludwig’s calendar** and verifies.
-3. **Do not** auto-create calendar events (Google Calendar / Calendly / HubSpot meetings / Outlook).
+1. Prefer upstream classification from **`sales-reply-demo`** (`BOOK NOW`). Do not Slack-book on politeness / NOT YET / NO / CONFUSED.
+2. Send Floor a **Slack message** that includes the **conversation** (transcript or clear detailed summary), plus lead/company, why interested, links, and (when from reply-demo) the **2 Ludwig slots** already offered in the Gmail reply.
+3. Floor **books herself on Ludwig’s calendar** and verifies.
+4. **Do not** auto-create calendar events (Google Calendar / Calendly / HubSpot meetings / Outlook).
 
-Google Calendar propose/draft is **optional and only if Floor explicitly asks** for help **after** the Slack ping. Primary flow = **Slack → manual Ludwig book**.
+Google Calendar propose/draft is **optional and only if Floor explicitly asks** for help **after** the Slack ping. Primary flow = **Slack → manual Ludwig book**. Reply handling + slot offers live in `sales-reply-demo`; this skill owns the Floor Slack handoff and post-demo HubSpot stages.
 
 ## Geography
 

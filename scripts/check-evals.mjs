@@ -57,6 +57,8 @@ if (!rules.includes("HubSpot")) {
 const skillDirs = [
   "skills/sales-hubspot-pull/SKILL.md",
   "skills/sales-sequence-draft/SKILL.md",
+  "skills/sales-gmail-send/SKILL.md",
+  "skills/sales-reply-demo/SKILL.md",
   "skills/sales-demo-book/SKILL.md",
   "skills/sales-lead-run/SKILL.md",
   "skills/sales-feedback-learn/SKILL.md",
@@ -74,6 +76,14 @@ if (!agents.includes("sales-hubspot-pull") || !agents.includes("Netherlands firs
 }
 if (!agents.includes("sales-feedback-learn") || !agents.includes("feedback")) {
   console.error("AGENTS.md must map sales-feedback-learn");
+  ok = false;
+}
+if (!agents.includes("sales-reply-demo")) {
+  console.error("AGENTS.md must map sales-reply-demo");
+  ok = false;
+}
+if (!rules.includes("BOOK NOW") || !rules.includes("NOT YET")) {
+  console.error("RULES.md must mention BOOK NOW / NOT YET reply classification");
   ok = false;
 }
 if (!rules.includes("feedback") && !rules.includes("Feedback")) {
@@ -100,12 +110,14 @@ for (const required of [
   "V-10",
   "V-11",
   "V-12",
+  "V-13",
   "I-05",
   "I-06",
   "I-07",
   "I-08",
   "I-09",
   "I-10",
+  "I-11",
 ]) {
   if (!ids.includes(required)) {
     console.error(`Missing eval case ${required}`);
