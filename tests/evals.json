@@ -1,15 +1,16 @@
 {
   "product": "sales-generator",
-  "harness": "MVP evals are structural and API-level. Run npm run test:evals. Invalid cases must return 4xx with plain error strings.",
+  "harness": "Run npm run test:evals, test:import, test:hubspot. Invalid cases must return 4xx with plain error strings. Gmail send only after approve. No LinkedIn API. No Lemlist.",
   "valid_cases": [
     {
       "id": "V-01",
-      "scenario": "Generate three corporate law leads",
+      "scenario": "Generate three corporate law demo sample leads (fallback)",
       "request": "POST /api/leads { action: generate, count: 3, practiceArea: Corporate / M&A, minScore: 80 }",
       "expectations": [
         "Response 200 with added.length === 3",
         "Each lead has practiceArea containing Corporate",
-        "Each icpScore >= 80"
+        "Each icpScore >= 80",
+        "source is demo_sample"
       ]
     },
     {
@@ -24,11 +25,120 @@
     },
     {
       "id": "V-03",
-      "scenario": "Book demo with valid AE",
+      "scenario": "Book demo with valid AE on per-AE calendar link",
       "request": "POST /api/bookings { leadId: lead_8, aeName: Sarah Chen, scheduledAt: future ISO, durationMinutes: 30 }",
       "expectations": [
-        "Response 200 with booking.meetingLink",
-        "Lead stage demo_booked"
+        "Response 200 with booking.meetingLink matching AE calendar URL pattern",
+        "Lead stage demo_booked",
+        "Not a shared Calendly URL"
+      ]
+    },
+    {
+      "id": "V-04",
+      "scenario": "Preview Sales Nav CSV with default NL+BE geo filter",
+      "request": "POST /api/leads { action: import_preview, csvText: <fixture>, geoFilter: [BE, NL], minScore: 70 }",
+      "expectations": [
+        "Response 200 with preview.rows length matching fixture",
+        "preview.geoFilter is NL + BE (Belgium primary)",
+        "BE and NL lawyer rows pass filter; non-NL/BE rows filtered out",
+        "Column mapping auto-detects First Name / Company / LinkedIn URL aliases"
+      ]
+    },
+    {
+      "id": "V-05",
+      "scenario": "Commit selected Sales Nav rows after human review",
+      "request": "POST /api/leads { action: import_commit, rows: [one BE lawyer] }",
+      "expectations": [
+        "Response 200 with added.length >= 1",
+        "added[0].source === sales_nav_csv",
+        "Lead persisted in workspace.json"
+      ]
+    },
+    {
+      "id": "V-06",
+      "scenario": "Deduplicate import by email or LinkedIn URL",
+      "request": "POST import_commit with email matching existing workspace lead",
+      "expectations": [
+        "Duplicate skipped (skippedDuplicates >= 1 or not re-added)",
+        "Workspace lead count does not double for same email"
+      ]
+    },
+    {
+      "id": "V-07",
+      "scenario": "HubSpot sync in mock mode without token (company notes)",
+      "request": "POST /api/hubspot { action: sync } with HUBSPOT_ACCESS_TOKEN unset",
+      "expectations": [
+        "Response 200 mode === mock",
+        "upserted leads include CRM whyGood/opener from company notes/props",
+        "source === hubspot",
+        "companyNotesFetched >= 1",
+        "strong social presence leads flagged (skippedStrongPresence >= 1 or stage disqualified)"
+      ]
+    },
+    {
+      "id": "V-09",
+      "scenario": "Post-demo stage push Completed / Rescheduled / Cancelled",
+      "request": "POST /api/hubspot { action: push_stage, leadId, stage: demo_completed|demo_rescheduled|demo_cancelled }",
+      "expectations": [
+        "Lead stage updates to chosen post-demo outcome",
+        "HubSpot push detail notes English CRM language"
+      ]
+    },
+    {
+      "id": "V-08",
+      "scenario": "Generate Gmail cold sequence (max 3) then approve and mark sent",
+      "request": "POST /api/sequences generate → approve_step → mark_sent",
+      "expectations": [
+        "Sequence has exactly 3 email steps and ~1 week waits (no linkedin_* steps)",
+        "Opportunity angles non-empty; drafts personalized from HubSpot note background",
+        "mark_sent without approve returns 400",
+        "After approve+mark_sent step status sent and lead stage contacted",
+        "Live Cowork send path is Gmail after approve (UI mark_sent is simulator)"
+      ]
+    },
+    {
+      "id": "V-10",
+      "scenario": "Remember Floor feedback and apply on next HubSpot sync",
+      "request": "POST /api/feedback { action: remember, category: company, text: Skip company Peeters Accountants } then POST /api/hubspot sync",
+      "expectations": [
+        "Feedback entry persisted with category, text, timestamp, source, active=true",
+        "Sync response includes feedbackSkipped containing Peeters Accountants",
+        "Skipped firm stage disqualified or omitted from active upserted set",
+        "Governance note still draft → approve → mark sent"
+      ]
+    },
+    {
+      "id": "V-11",
+      "scenario": "Disable feedback so later runs ignore it",
+      "request": "POST /api/feedback { action: disable, id } then list",
+      "expectations": [
+        "Entry active=false with disabledAt set",
+        "applyFeedbackToLeads no longer skips that company"
+      ]
+    },
+    {
+      "id": "V-12",
+      "scenario": "Vacancy HubSpot note drafts one coherent hiring-brand story (no content-calendar pivot)",
+      "request": "POST /api/sequences generate for lead with open-vacancies CRM note",
+      "expectations": [
+        "Email 1 opens from vacancy/quiet LinkedIn insight",
+        "One tension about hiring visibility / trust — same story",
+        "Soft Willow bridge continues hiring/visibility thread",
+        "Body must NOT mention content calendar / quarterly calendar as a random pivot",
+        "Emails 2–3 continue same story; Email 1 CTA is soft (curious/chat), not feature dump",
+        "Senior peer-to-peer tone (not junior AI pitch)"
+      ]
+    },
+    {
+      "id": "V-13",
+      "scenario": "Reply→demo BOOK NOW: classify real intent, offer 2 Ludwig slots, Slack Floor",
+      "request": "Cowork skill sales-reply-demo on inbound Gmail ‘Can we book 30 min next week?’ from Dutch batch lead",
+      "expectations": [
+        "Classification BOOK NOW (not NOT YET)",
+        "Short outbound reply offers exactly 2 concrete Ludwig demo slots (calendar or edit-ready placeholders)",
+        "Slack Floor includes full thread + classification + slots",
+        "E2/E3 cancelled; HubSpot logs inbound + outbound",
+        "No calendar event auto-created"
       ]
     }
   ],
@@ -56,6 +166,57 @@
       "scenario": "Booking duration out of range",
       "request": "POST /api/bookings { leadId: lead_1, aeName: Sarah Chen, scheduledAt: future ISO, durationMinutes: 5 }",
       "expectations": ["Response 400", "error mentions duration"]
+    },
+    {
+      "id": "I-05",
+      "scenario": "Import preview without csvText",
+      "request": "POST /api/leads { action: import_preview }",
+      "expectations": ["Response 400", "error mentions csvText"]
+    },
+    {
+      "id": "I-06",
+      "scenario": "Import commit without selected rows (no silent blast)",
+      "request": "POST /api/leads { action: import_commit, rows: [] }",
+      "expectations": ["Response 400", "error mentions rows / human-in-the-loop"]
+    },
+    {
+      "id": "I-07",
+      "scenario": "Sequence mark_sent before approve (no silent send)",
+      "request": "POST /api/sequences { action: mark_sent, sequenceId, stepId } on draft step",
+      "expectations": ["Response 400", "error mentions approve / human-in-the-loop"]
+    },
+    {
+      "id": "I-08",
+      "scenario": "Generate sequence for disqualified / strong-presence lead",
+      "request": "POST /api/sequences { action: generate, leadId: disqualified }",
+      "expectations": ["Response 422", "error mentions disqualified"]
+    },
+    {
+      "id": "I-09",
+      "scenario": "Feedback remember without text",
+      "request": "POST /api/feedback { action: remember, category: icp }",
+      "expectations": ["Response 400", "error mentions text"]
+    },
+    {
+      "id": "I-10",
+      "scenario": "Feedback cannot bypass approve-before-send",
+      "request": "Active never_pitch feedback + POST sequences mark_sent on draft step",
+      "expectations": [
+        "Response 400 still requires approve",
+        "Feedback applied to drafts only — no auto-send"
+      ]
+    },
+    {
+      "id": "I-11",
+      "scenario": "Politeness / ‘sounds interesting’ must not be BOOK NOW or auto-book",
+      "request": "Cowork skill sales-reply-demo on inbound ‘Sounds interesting, thanks!’ with no ask for a call",
+      "expectations": [
+        "Classification is NOT YET (or CONFUSED if they missed the point) — never BOOK NOW",
+        "No Ludwig slot offer as a hard book ask",
+        "No Slack Floor booking ping",
+        "No calendar auto-create",
+        "E2/E3 kept if NOT YET"
+      ]
     }
   ]
 }

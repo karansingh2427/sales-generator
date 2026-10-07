@@ -25,6 +25,105 @@ if (!rules.includes("disqualified")) {
   console.error("RULES.md must mention disqualified leads");
   ok = false;
 }
+if (!rules.includes("Netherlands") && !rules.includes("NL")) {
+  console.error("RULES.md must mention Netherlands / NL geography");
+  ok = false;
+}
+if (!rules.includes("Belgium") && !rules.includes("BE")) {
+  console.error("RULES.md must mention Belgium as secondary market");
+  ok = false;
+}
+if (!rules.includes("NL + BE") && !rules.includes("NL+BE") && !rules.includes("Netherlands first")) {
+  console.error("RULES.md must lock geography to Netherlands first / NL+BE only");
+  ok = false;
+}
+if (!rules.includes("company") && !rules.includes("Company")) {
+  console.error("RULES.md must mention company-level HubSpot notes");
+  ok = false;
+}
+if (!rules.includes("English")) {
+  console.error("RULES.md must mention English CRM language");
+  ok = false;
+}
+if (!rules.includes("approve") && !rules.includes("auto-send") && !rules.includes("auto-blast")) {
+  console.error("RULES.md must mention human approve / no auto-send");
+  ok = false;
+}
+if (!rules.includes("HubSpot")) {
+  console.error("RULES.md must mention HubSpot");
+  ok = false;
+}
+
+const skillDirs = [
+  "skills/sales-hubspot-pull/SKILL.md",
+  "skills/sales-sequence-draft/SKILL.md",
+  "skills/sales-gmail-send/SKILL.md",
+  "skills/sales-reply-demo/SKILL.md",
+  "skills/sales-demo-book/SKILL.md",
+  "skills/sales-lead-run/SKILL.md",
+  "skills/sales-feedback-learn/SKILL.md",
+];
+for (const rel of skillDirs) {
+  if (!fs.existsSync(path.join(root, rel))) {
+    console.error(`Missing skill file ${rel}`);
+    ok = false;
+  }
+}
+const agents = fs.readFileSync(path.join(root, "AGENTS.md"), "utf8");
+if (!agents.includes("sales-hubspot-pull") || !agents.includes("Netherlands first")) {
+  console.error("AGENTS.md must map skills and Netherlands-first geo");
+  ok = false;
+}
+if (!agents.includes("sales-feedback-learn") || !agents.includes("feedback")) {
+  console.error("AGENTS.md must map sales-feedback-learn");
+  ok = false;
+}
+if (!agents.includes("sales-reply-demo")) {
+  console.error("AGENTS.md must map sales-reply-demo");
+  ok = false;
+}
+if (!rules.includes("BOOK NOW") || !rules.includes("NOT YET")) {
+  console.error("RULES.md must mention BOOK NOW / NOT YET reply classification");
+  ok = false;
+}
+if (!rules.includes("feedback") && !rules.includes("Feedback")) {
+  console.error("RULES.md must mention feedback learning");
+  ok = false;
+}
+
+if (!rules.includes("story") && !rules.includes("Story")) {
+  console.error("RULES.md must mention story arc");
+  ok = false;
+}
+if (!rules.includes("content calendar") && !rules.includes("calendar")) {
+  console.error("RULES.md must forbid random content-calendar pivot");
+  ok = false;
+}
+
+const ids = [...evals.valid_cases, ...evals.invalid_cases].map((c) => c.id);
+for (const required of [
+  "V-04",
+  "V-05",
+  "V-07",
+  "V-08",
+  "V-09",
+  "V-10",
+  "V-11",
+  "V-12",
+  "V-13",
+  "I-05",
+  "I-06",
+  "I-07",
+  "I-08",
+  "I-09",
+  "I-10",
+  "I-11",
+]) {
+  if (!ids.includes(required)) {
+    console.error(`Missing eval case ${required}`);
+    ok = false;
+  }
+}
 
 if (ok) {
   console.log(`Eval structure OK: ${evals.valid_cases.length} valid, ${evals.invalid_cases.length} invalid`);

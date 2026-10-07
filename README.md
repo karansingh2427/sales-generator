@@ -1,45 +1,88 @@
 # Sales Generator (Willow BDR)
 
-Prototype automation for **Floor Hoefkens** (BDR @ [Willow](https://willow.co/)): lawyer-focused lead generation, AI-assisted outreach drafts, and AE demo booking — designed to minimize cold calling.
+Prototype for **Floor Hoefkens** (BDR @ [Willow](https://willow.co/)): **HubSpot company notes = preferred background** → agent **personalizes the full Gmail cold sequence** (LinkedIn **scrape/research** OK when notes are thin or she asks — not every run; LinkedIn **send** forbidden) → Floor **approves** → agent **sends via Gmail** → on interest, **Slack Floor** (with the conversation) so she **manually books Ludwig’s calendar**. Sales Nav CSV remains a fallback. Cursor/Claude **skills** ship alongside the Next.js UI.
+
+**Geography:** **Netherlands first**, Belgium second — **NL + BE only**.  
+**Channel (Dutch pilot):** **Gmail only** — max **3** emails, ~1 week between if no reply. **No LinkedIn API send. No Lemlist.**  
+**Governance:** approve-before-send (pilot); **never auto-book** Calendar. **CRM language:** English writebacks. Prefer Floor’s Cowork **HubSpot + Gmail + Slack** connectors.
+
+## For Floor
+
+- **Start here (zip):** [START-HERE-FLOOR.md](./START-HERE-FLOOR.md) — open in Cowork → paste one prompt → review → send
+- **Live pilot (mock HubSpot UI):** https://sales-generator-delta.vercel.app
+- **5-minute test guide:** [docs/floor-test-guide.md](./docs/floor-test-guide.md)
+- **Demo video:** [media/floor-sales-generator-demo.mp4](./media/floor-sales-generator-demo.mp4)
+
+### Floor first-run (short)
+
+1. Unzip → open folder in Cowork (HubSpot + Gmail connected).
+2. Paste the **one prompt** in `START-HERE-FLOOR.md` (senior voice + HubSpot tone + one story).
+3. `approve 1-20` → `Send approved emails via Gmail.`
+4. Replies → `Check my replies from the Dutch batch and handle them.` → BOOK NOW Slack you → you book Ludwig.
 
 ## Quick start
 
 ```bash
 npm install
 npm run dev
-# or for a stable local demo (avoids flaky HMR hydration):
-npm run build && npm start
+# stable demo:
+npm run build && npm run start:demo   # http://127.0.0.1:4341
 ```
 
-Open [http://127.0.0.1:4317](http://127.0.0.1:4317). Workspace state persists in `.data/workspace.json` (created on first run, gitignored).
+Workspace state: `.data/workspace.json` + `.data/feedback.json` (gitignored).
 
-Optional: set `OPENAI_API_KEY` in `.env.local` for future live model enrichment (MVP uses deterministic templates).
+## Skills (Floor / Claude Cowork)
+
+See **[docs/skills.md](./docs/skills.md)** for first-run steps.
+
+| Skill | Path |
+|---|---|
+| `sales-hubspot-pull` | [`skills/sales-hubspot-pull/SKILL.md`](./skills/sales-hubspot-pull/SKILL.md) |
+| `sales-sequence-draft` | [`skills/sales-sequence-draft/SKILL.md`](./skills/sales-sequence-draft/SKILL.md) |
+| `sales-gmail-send` | [`skills/sales-gmail-send/SKILL.md`](./skills/sales-gmail-send/SKILL.md) |
+| `sales-reply-demo` | [`skills/sales-reply-demo/SKILL.md`](./skills/sales-reply-demo/SKILL.md) |
+| `sales-demo-book` | [`skills/sales-demo-book/SKILL.md`](./skills/sales-demo-book/SKILL.md) |
+| `sales-feedback-learn` | [`skills/sales-feedback-learn/SKILL.md`](./skills/sales-feedback-learn/SKILL.md) |
+| `sales-lead-run` | [`skills/sales-lead-run/SKILL.md`](./skills/sales-lead-run/SKILL.md) |
+
+## Feedback learning
+
+| Path | How |
+|---|---|
+| UI | **Feedback** tab — form + disable/delete; per-lead **Teach agent** |
+| Skill | “Remember how I write: …” / “Remember this feedback: …” |
+| Storage | `.data/feedback.json` (gitignored); promote to `skills/memory/FEEDBACK.md` |
+| Guardrail | Feedback never bypasses draft → approve → Gmail send |
+
+## Sequences (Dutch pilot)
+
+1. Pull Dutch HubSpot daily tasks + company notes (skill) — notes = background only.
+2. Personalize full Gmail sequence (Email 1 → ~1 week → Email 2 → … **max 3**). Prefer HubSpot notes; LinkedIn research OK when thin / asked — never LinkedIn send.
+3. Approve → Gmail send via Cowork.
+4. Stop early on clear **no** or **interest** → Slack Floor → she books Ludwig.
+
+## Demo booking (Slack → Floor → Ludwig)
+
+When a lead wants a demo (or asks for more info): skills **Slack Floor** with lead/company, the **full conversation**, why interested, and links. Floor **manually books Ludwig** — agents **never auto-book**.
 
 ## Scripts
 
 | Command | Purpose |
 |---|---|
-| `npm run dev` | Dev server on port **4317** |
-| `npm run build` | Production build |
-| `npm run lint` | ESLint |
-| `npm run test:evals` | Validate governance test-case structure |
+| `npm run dev` | Dev server **4317** |
+| `npm run start:demo` | Production server **4341** |
+| `npm run test:evals` | Governance eval structure |
+| `npm run test:import` | Sales Nav CSV / NL-first geo unit checks |
+| `npm run test:hubspot` | HubSpot mock + Gmail sequence unit checks |
+| `npm run test:feedback` | Feedback persist + apply unit checks |
+| `npm run lint` / `build` | Quality gates |
 
-## Governance (agent structure)
+## Governance
 
-Mirrors [agent-data/job-search](https://github.com/agent-data/job-search):
-
-- [AGENTS.md](./AGENTS.md) — entry map
-- [ARCHITECTURE.md](./ARCHITECTURE.md) — domains × layers
-- [docs/PRD.md](./docs/PRD.md) — requirements
-- [docs/RULES.md](./docs/RULES.md) · [docs/TASKS.md](./docs/TASKS.md) · [docs/GOVERNANCE.md](./docs/GOVERNANCE.md)
-- [tests/evals.json](./tests/evals.json) — valid/invalid cases
-
-## API (local)
-
-- `GET/POST /api/leads` — list / generate / update stage
-- `GET/POST /api/outreach` — list / create draft
-- `GET/POST /api/bookings` — list / schedule demo
+- [AGENTS.md](./AGENTS.md) · [ARCHITECTURE.md](./ARCHITECTURE.md)
+- [docs/PRD.md](docs/PRD.md) · [RULES](docs/RULES.md) · [TASKS](docs/TASKS.md) · [GOVERNANCE](docs/GOVERNANCE.md) · [skills](docs/skills.md)
+- [tests/evals.json](./tests/evals.json)
 
 ## Stack
 
-Next.js 16 · TypeScript · Tailwind · shadcn/ui
+Next.js 16 · TypeScript · Tailwind · shadcn/ui · Cursor skills (`skills/`)
