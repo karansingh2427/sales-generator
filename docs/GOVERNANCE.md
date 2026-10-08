@@ -19,6 +19,7 @@
 - **No silent CSV import** — Sales Nav commit requires human-selected rows.
 - Skills prefer **session HubSpot MCP/tools**; do not require embedding a private-app token in the web app.
 - **Feedback learning** applies skip/prefer/tone on later runs but **never** auto-sends and never bypasses approve-before-send.
+- **Batch cadence:** 2–3 Dutch batches/day is normal; pulls use a **~30-day** HubSpot task lookback and **never-contacted** filter (skip prior outbound/logged outreach).
 - Future auto-sequences require documented opt-in and unsubscribe (EU GDPR; NL + BE book).
 - **CRM language:** HubSpot writebacks English-only; outreach drafts may be edited freely.
 
