@@ -9,7 +9,7 @@ Lead gen is already handled by an internal agent that writes **HubSpot company n
 
 ## Goals
 
-1. **HubSpot ingest** of Dutch daily tasks + **company-level** agent notes (why-good, opener, right contact) as **background** — hero path over Sales Nav CSV. Prefer **HubSpot + Gmail + Slack in Floor’s Cowork session**; web-app token is optional fallback.
+1. **HubSpot ingest** of Dutch tasks from the **last ~30 days** (not today-only) + **company-level** agent notes (why-good, opener, right contact) as **background** — hero path over Sales Nav CSV. **Never-contacted only** (skip prior outbound email / logged outreach). Default **2–3 batches/day** — re-runs are normal. Prefer **HubSpot + Gmail + Slack in Floor’s Cowork session**; web-app token is optional fallback.
 2. **Gmail cold sequences (Dutch pilot):** personalize Email 1–3 from the note only; ~1 week between if no reply; **max 3 emails**; approve → Gmail send. No LinkedIn API. No Lemlist.
 3. Encode opportunity angles from the note: consistency, content quality/mix, visibility, open vacancies — plus CRM opener/rationale.
 4. ICP: decision makers (Partner / Founder / Ops manager); verticals accountancy, legal, IT, HR/recruitment/exec search, coaching, expertise B2B; **skip strong social presence**; geo **Netherlands first**, Belgium second, **NL + BE only**.

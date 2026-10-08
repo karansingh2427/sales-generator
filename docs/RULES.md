@@ -27,6 +27,9 @@ These rules govern human and agent operators. Violations are **invalid** scenari
 7. Strong social presence → stage `disqualified` / skip outreach — do not sequence.
 8. HubSpot PII stays in `.data/workspace.json` only — never commit to git. Token only in `.env.local` if used.
 9. **CRM language = English** for anything written into HubSpot (stage labels, notes, outcomes).
+10. **Task lookback:** Dutch HubSpot tasks from the **last ~30 days** (not today-only) for batch pulls.
+11. **Never-contacted only:** skip contact/company with prior outbound email or logged outreach before drafting.
+12. **Multi-batch day:** 2–3 batches/day is normal; never treat “already ran once” as done forever.
 
 ## Lead generation & Sales Nav import rules
 
@@ -48,12 +51,12 @@ These rules govern human and agent operators. Violations are **invalid** scenari
 6. Demo Slack to Floor must include: lead/company, **conversation**, why interested, links/context.
 7. Optional: Slack Ludwig with lead context when Floor asks.
 8. Only after Floor confirms the Ludwig booking → HubSpot **Demo Booked**; later Completed | Rescheduled | Cancelled.
-9. **Dutch pilot batch:** Dutch HubSpot tasks in bulk → Gmail email approve queue → approve/edit/skip → **Gmail send** via Cowork. No LinkedIn API. No Lemlist.
+9. **Dutch pilot batch:** Dutch HubSpot tasks (**~30-day lookback**, never-contacted only) in bulk → Gmail email approve queue → approve/edit/skip → **Gmail send** via Cowork. Multiple batches/day OK. No LinkedIn API. No Lemlist.
 
 ## Skill pack rules
 
 1. Skills live under `skills/*/SKILL.md` and are mapped from [AGENTS.md](../AGENTS.md).
-2. `sales-hubspot-pull` must instruct NL-first pulls and company notes.
+2. `sales-hubspot-pull` must instruct NL-first pulls, **~30-day lookback**, **never-contacted** filter, multi-batch/day, and company notes.
 3. `sales-sequence-draft` must draft **Gmail** sequences and require approve before send.
 4. `sales-gmail-send` sends only **approved** email steps via Gmail; never LinkedIn API or Lemlist.
 5. `sales-reply-demo` classifies Dutch-batch Gmail replies as **BOOK NOW / NOT YET / NO / CONFUSED**; politeness ≠ BOOK NOW; never auto-book; HubSpot-log inbound + outbound.

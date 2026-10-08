@@ -140,6 +140,18 @@
         "E2/E3 cancelled; HubSpot logs inbound + outbound",
         "No calendar event auto-created"
       ]
+    },
+    {
+      "id": "V-14",
+      "scenario": "Multi-batch HubSpot pull: 30-day lookback, never-contacted only, re-run same day",
+      "request": "Cowork skill sales-hubspot-pull / sales-lead-run: second Dutch batch same day after one batch already ran",
+      "expectations": [
+        "Pulls Dutch HubSpot tasks from last ~30 days (not today-only)",
+        "Skips contacts/companies with prior outbound email or logged HubSpot outreach",
+        "Skips anyone already in today’s earlier approve/sent queues",
+        "Produces a new approve-queue chunk (default up to 50)",
+        "Does not treat prior run as done forever; offers another batch / next scheduled slot"
+      ]
     }
   ],
   "invalid_cases": [
@@ -216,6 +228,16 @@
         "No Slack Floor booking ping",
         "No calendar auto-create",
         "E2/E3 kept if NOT YET"
+      ]
+    },
+    {
+      "id": "I-12",
+      "scenario": "Must not draft outreach to already-contacted HubSpot lead",
+      "request": "Cowork skill sales-hubspot-pull on Dutch task whose contact has prior outbound email engagement",
+      "expectations": [
+        "Contact/company excluded from draft batch",
+        "Skip reason already contacted / prior outreach",
+        "No approve-queue item created for that lead"
       ]
     }
   ]

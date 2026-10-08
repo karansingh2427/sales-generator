@@ -56,7 +56,7 @@ See **[docs/skills.md](./docs/skills.md)** for first-run steps.
 
 ## Sequences (Dutch pilot)
 
-1. Pull Dutch HubSpot daily tasks + company notes (skill) — notes = background only.
+1. Pull Dutch HubSpot tasks from the **last ~30 days** (never-contacted only; 2–3 batches/day) + company notes (skill) — notes = background only.
 2. Personalize full Gmail sequence (Email 1 → ~1 week → Email 2 → … **max 3**). Prefer HubSpot notes; LinkedIn research OK when thin / asked — never LinkedIn send.
 3. Approve → Gmail send via Cowork.
 4. Stop early on clear **no** or **interest** → Slack Floor → she books Ludwig.

@@ -2,7 +2,7 @@
 
 | Task ID | Trigger | Steps | Done when |
 |---|---|---|---|
-| T-HS-01 | CRM notes ready | HubSpot panel → Sync **or** skill `sales-hubspot-pull` | Dutch tasks + company notes as background; NL-first; no scrape |
+| T-HS-01 | CRM notes ready | HubSpot panel → Sync **or** skill `sales-hubspot-pull` | Dutch tasks **last ~30d** + never-contacted only + company notes; NL-first; multi-batch OK |
 | T-SEQ-01 | High-ICP Dutch HubSpot lead | `sales-sequence-draft` → Generate | Gmail sequence max 3 personalized from note |
 | T-SEQ-02 | Review touch | Edit → Approve → `sales-gmail-send` → Mark sent | Step `sent` via Gmail; lead `contacted` |
 | T-SEQ-03 | No reply after ~1 week | Approve next email (≤3) → Gmail send | Sequence progresses; hard cap 3 |
@@ -23,12 +23,13 @@
 
 | Task ID | Skill | Notes |
 |---|---|---|
-| A-01 | `sales-hubspot-pull` | Dutch daily tasks + notes (background; no scrape) |
+| A-01 | `sales-hubspot-pull` | Dutch tasks last ~30d + never-contacted + notes (multi-batch/day) |
 | A-02 | `sales-sequence-draft` | Personalize full Gmail sequence from note; max 3; approve queue |
 | A-03 | `sales-gmail-send` | Send approved via Gmail; hand replies to reply-demo |
 | A-04 | `sales-reply-demo` | Classify replies; BOOK NOW → 2 slots + Slack Floor |
 | A-05 | `sales-demo-book` | Slack Floor + conversation; she books Ludwig |
-| A-06 | `sales-lead-run` | Orchestrates A-01 → A-02 → A-03 → A-04 → A-05 (loads feedback first) |
+| A-06 | `sales-lead-run` | Orchestrates A-01 → A-02 → A-03 → A-04 → A-05 (loads feedback first; 2–3 batches/day) |
+| A-08 | `sales-lead-run` re-batch | “Run another Dutch batch now” | Fresh 30d never-contacted chunk; not one-shot |
 | A-07 | `sales-feedback-learn` | Tone / ICP memory |
 
 Pilot keeps **approve-before-send**. No Lemlist. No LinkedIn API send.
