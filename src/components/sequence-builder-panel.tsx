@@ -15,7 +15,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Check, ListOrdered, Send, SkipForward } from "lucide-react";
+import { Check, ListOrdered, MessageSquareReply, Send, SkipForward } from "lucide-react";
+import { LINKEDIN_CONNECT_NOTE_MAX } from "@/lib/sequence-engine";
 
 type Props = {
   leads: Lead[];
@@ -96,7 +97,7 @@ export function SequenceBuilderPanel({
       onStatus(
         data.mode === "existing"
           ? `Opened existing sequence for ${leads.find((l) => l.id === leadId)?.firmName}.`
-          : `Draft sequence ready — LinkedIn → wait → follow-up → email. Approve each step before mark sent.`,
+          : `Draft sequence ready — LinkedIn connect → DM (day 3) → Email 1–3. Approve every line before anything sends.`,
       );
     } finally {
       setBusy(false);
@@ -141,18 +142,64 @@ export function SequenceBuilderPanel({
     }
   }
 
+  async function pushHeyReach() {
+    if (!active) return;
+    setBusy(true);
+    onError("");
+    try {
+      const res = await fetch("/api/heyreach", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sequenceId: active.id }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        onError(data.error ?? "HeyReach push failed.");
+        return;
+      }
+      onStatus(`${data.note} (${data.payload.messages.length} LinkedIn step(s) in payload)`);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function recordReply(channel: "linkedin" | "email") {
+    if (!active) return;
+    setBusy(true);
+    onError("");
+    try {
+      const res = await fetch("/api/sequences", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "record_reply", sequenceId: active.id, channel }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        onError(data.error ?? "Recording reply failed.");
+        return;
+      }
+      const seq = data.sequence as OutreachSequence;
+      setSequences((prev) => prev.map((s) => (s.id === seq.id ? seq : s)));
+      onChanged();
+      onStatus(data.note);
+    } finally {
+      setBusy(false);
+    }
+  }
+
   return (
     <div className="space-y-4">
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
             <ListOrdered className="h-4 w-4" />
-            Gmail cold sequence (max 3)
+            HeyReach + Gmail sequence
           </CardTitle>
           <CardDescription>
-            HubSpot notes = background — personalize Email 1 → wait ~1 week → Email 2 → Email 3.
-            No LinkedIn send, no Lemlist. Pilot: <strong>approve</strong> then send via Gmail
-            (Cowork); Mark sent here is a UI simulator.
+            HubSpot notes = background — LinkedIn connect (day 0) → LinkedIn DM (day 3) → Email 1
+            (day 6) → Email 2 → Email 3. <strong>Approve every line</strong>; LinkedIn goes via
+            HeyReach, email via Gmail (Cowork). Any reply stops the sequence. Mark sent here is a
+            UI simulator.
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-wrap items-end gap-3">
@@ -210,7 +257,28 @@ export function SequenceBuilderPanel({
           <CardHeader className="pb-2">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <CardTitle className="text-base">{active.name}</CardTitle>
-              <Badge variant="outline">{active.status}</Badge>
+              <div className="flex flex-wrap items-center gap-2">
+                {active.steps.some((st) => st.sendVia === "heyreach") && (
+                  <Button size="sm" variant="outline" disabled={busy} onClick={() => void pushHeyReach()}>
+                    Push LinkedIn to HeyReach (stub)
+                  </Button>
+                )}
+                {!active.stoppedOnReply && active.status !== "completed" && (
+                  <>
+                    <Button size="sm" variant="ghost" disabled={busy} onClick={() => void recordReply("linkedin")}>
+                      <MessageSquareReply className="mr-1 h-3.5 w-3.5" />
+                      Replied on LinkedIn
+                    </Button>
+                    <Button size="sm" variant="ghost" disabled={busy} onClick={() => void recordReply("email")}>
+                      <MessageSquareReply className="mr-1 h-3.5 w-3.5" />
+                      Replied by email
+                    </Button>
+                  </>
+                )}
+                <Badge variant="outline">
+                  {active.stoppedOnReply ? `stopped · ${active.stoppedOnReply.channel} reply` : active.status}
+                </Badge>
+              </div>
             </div>
             <CardDescription>
               Angles: {active.opportunityAngles.join(", ") || "—"}
@@ -223,6 +291,7 @@ export function SequenceBuilderPanel({
                   <div className="font-medium text-sm">
                     {i + 1}. {step.label}
                     {step.channel ? ` · ${step.channel}` : ""}
+                    {step.sendVia ? ` · via ${step.sendVia === "heyreach" ? "HeyReach" : "Gmail"}` : ""}
                   </div>
                   <Badge variant={stepBadge(step.status)}>{step.status}</Badge>
                 </div>
@@ -246,7 +315,11 @@ export function SequenceBuilderPanel({
                       </div>
                     )}
                     <div className="space-y-1">
-                      <Label className="text-xs">Draft body</Label>
+                      <Label className="text-xs">
+                        Draft body
+                        {step.kind === "linkedin_connect" &&
+                          ` · ${(edits[step.id]?.body ?? step.body ?? "").length}/${LINKEDIN_CONNECT_NOTE_MAX}`}
+                      </Label>
                       <Textarea
                         rows={6}
                         value={edits[step.id]?.body ?? step.body ?? ""}

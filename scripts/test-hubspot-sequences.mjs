@@ -14,7 +14,12 @@ fs.writeFileSync(
   `
 import assert from "node:assert/strict";
 import { mockHubSpotPayload, syncHubSpotContacts } from "../src/lib/hubspot.ts";
-import { buildSequenceForLead, validateSequenceAction } from "../src/lib/sequence-engine.ts";
+import {
+  buildSequenceForLead,
+  validateSequenceAction,
+  LINKEDIN_CONNECT_NOTE_MAX,
+} from "../src/lib/sequence-engine.ts";
+import { buildHeyReachPayload, pushToHeyReach, resolveHeyReachMode } from "../src/lib/heyreach.ts";
 import { scoreExpertiseIcp, parseSocialPresence } from "../src/lib/icp.ts";
 import { mapHubSpotStage, DEFAULT_STAGE_MAP } from "../src/lib/hubspot-config.ts";
 
@@ -65,16 +70,54 @@ assert.equal(joost?.geoCode, "NL");
 
 const seq = buildSequenceForLead(els!, "Floor Hoefkens");
 const emailSteps = seq.steps.filter((s) => s.kind === "email");
-assert.equal(emailSteps.length, 3, "Gmail cold sequence caps at 3 emails");
-assert.ok(seq.steps.some((s) => s.kind === "wait" && s.waitDays === 7), "waits ~1 week");
-assert.ok(!seq.steps.some((s) => s.kind.startsWith("linkedin")), "Dutch pilot is Gmail-only");
+assert.equal(emailSteps.length, 3, "multichannel sequence caps at 3 emails");
+assert.ok(seq.steps.some((s) => s.kind === "wait" && s.waitDays === 7), "emails wait ~1 week");
+const msgSteps = seq.steps.filter((s) => s.kind !== "wait");
+assert.deepEqual(
+  msgSteps.map((s) => s.kind),
+  ["linkedin_connect", "linkedin_message", "email", "email", "email"],
+  "LinkedIn connect → DM → Email 1–3",
+);
+assert.equal(seq.steps[1].kind, "wait");
+assert.equal(seq.steps[1].waitDays, 3, "DM goes out day 3");
+assert.ok(msgSteps.every((s) => s.sendVia === (s.kind === "email" ? "gmail" : "heyreach")));
+assert.ok(msgSteps.every((s) => s.status === "draft"), "every line starts as draft — approve first");
+const connect = msgSteps[0];
+assert.ok(connect.body.length <= LINKEDIN_CONNECT_NOTE_MAX, "connect note fits LinkedIn limit");
+assert.ok(connect.body.includes(els.firmName));
+assert.ok(msgSteps[1].body.includes("?"), "DM asks one question");
+assert.ok(seq.name.includes("HeyReach + Gmail"));
+
+// No LinkedIn URL → email-only, no 6-day dead wait
+const noLi = buildSequenceForLead({ ...els, linkedInUrl: undefined }, "Floor Hoefkens");
+assert.ok(!noLi.steps.some((s) => s.sendVia === "heyreach"));
+assert.equal(noLi.steps[0].kind, "email");
+assert.match(noLi.name, /no LinkedIn URL/);
+
+// HeyReach stub: refuses unapproved, returns payload only, never "sent"
+const stamp = { id: "seq_t", createdAt: "", updatedAt: "" };
+const draftSeq = { ...seq, ...stamp };
+const refused = buildHeyReachPayload(els, draftSeq);
+assert.equal(refused.ok, false, "unapproved LinkedIn steps are never pushed");
+const approvedSeq = {
+  ...draftSeq,
+  steps: draftSeq.steps.map((s) => (s.sendVia === "heyreach" ? { ...s, status: "approved" } : s)),
+};
+const pushed = await pushToHeyReach(els, approvedSeq, "");
+assert.equal(pushed.ok, true);
+assert.equal(pushed.mode, "stub");
+assert.equal(pushed.sent, false);
+assert.equal(pushed.payload.messages.length, 2);
+assert.equal(pushed.payload.messages[0].kind, "connect_note");
+assert.equal(resolveHeyReachMode("key"), "live_not_wired");
+const repliedSeq = { ...approvedSeq, stoppedOnReply: { channel: "linkedin", at: "" } };
+assert.equal(buildHeyReachPayload(els, repliedSeq).ok, false, "reply stops HeyReach push");
 assert.ok(seq.steps.every((s) => s.kind === "wait" || (s.body && s.body.length > 20)));
 assert.ok(seq.opportunityAngles.length > 0);
 assert.ok(
   emailSteps.some((s) => s.body && /chat|curious|radar|Ludwig|intro/i.test(s.body)),
   "sequence has soft CTA / Ludwig by later touch",
 );
-assert.match(seq.name, /Gmail/i);
 
 // Story arc: vacancy note must NOT pivot to content calendar
 const amelie = sync.upserted.find((l) => l.contactName.includes("Amélie") || l.firmName.includes("BrightHire"));
@@ -91,6 +134,9 @@ const bad = validateSequenceAction({ action: "mark_sent" });
 assert.equal(bad.ok, false);
 const gen = validateSequenceAction({ action: "generate", leadId: "hs_1" });
 assert.equal(gen.ok, true);
+const reply = validateSequenceAction({ action: "record_reply", sequenceId: "s1", channel: "linkedin" });
+assert.equal(reply.ok, true);
+assert.equal(validateSequenceAction({ action: "record_reply", sequenceId: "s1", channel: "sms" }).ok, false);
 
 console.log("HubSpot + sequence unit checks passed");
 `,

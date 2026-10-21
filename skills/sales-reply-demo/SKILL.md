@@ -1,11 +1,11 @@
 ---
 name: sales-reply-demo
-description: Pull Dutch-batch Gmail replies, classify BOOK NOW / NOT YET / NO / CONFUSED (politeness ≠ intent), draft the right next email, Slack Floor on BOOK NOW with thread + 2 Ludwig slots she can book manually. Never auto-book calendar. HubSpot-log inbound + outbound.
+description: Pull Dutch-batch Gmail + LinkedIn (HeyReach) replies, classify BOOK NOW / NOT YET / NO / CONFUSED (politeness ≠ intent), draft the right next email, Slack Floor on BOOK NOW with thread + 2 Ludwig slots she can book manually. Never auto-book calendar. HubSpot-log inbound + outbound.
 ---
 
 # sales-reply-demo
 
-Turn inbound Gmail replies into demo progress — or a clean stop. **Floor books Ludwig herself.** Never auto-create calendar events.
+Turn inbound Gmail and LinkedIn (HeyReach inbox) replies into demo progress — or a clean stop. **Floor books Ludwig herself.** Never auto-create calendar events.
 
 ## When to run
 
@@ -18,7 +18,9 @@ Also invoked from `sales-lead-run` after outbound sends, and from `sales-gmail-s
 ## Scope
 
 - **Dutch batch leads only** (NL HubSpot tasks / companies already in the pilot). Skip Belgian / non-pilot threads.
-- Pull **recent inbound Gmail replies** on threads where we sent E1/E2/E3.
+- Pull **recent inbound Gmail replies** on threads where we sent E1/E2/E3, **and LinkedIn replies** from HeyReach (once connected) on leads where we sent the connect note / DM.
+- **Any reply on either channel → cancel all remaining LinkedIn steps immediately** (HeyReach campaign + web-app `record_reply`). Email follow-ups then follow the class below (only NOT YET keeps E2/E3).
+- Answer on the channel they replied on (LinkedIn reply → LinkedIn answer via HeyReach, same approve rule).
 - One coherent story continues (same senior voice + consistency rules as outbound). Do **not** invent a new pitch.
 
 ## Classify each reply (exactly one)
@@ -114,7 +116,7 @@ For **every** handled reply:
 - Consistency phrasing: “haven’t been posting consistently” — never “I saw your post yesterday/Friday”.
 - One post does not kill the angle; skip frequent posters as leads (already handled upstream).
 - No em-dash spam; calm, short, oral. Match prospect language when they wrote in Dutch.
-- No LinkedIn API/send. No Lemlist. No auto-book.
+- LinkedIn only via HeyReach (stub until connected). No Lemlist. No auto-book.
 
 ## Prefer session tools
 
@@ -135,7 +137,7 @@ HubSpot logged (in/out): <n>/<n>
 - Treat politeness / “sounds interesting” as BOOK NOW.
 - Demo-push NO or CONFUSED.
 - Cancel E2/E3 on NOT YET solely for soft interest.
-- Expand send/setup, Lemlist, or LinkedIn send.
+- Expand send/setup, Lemlist, or LinkedIn send outside HeyReach.
 - Overwhelm Floor — one digest + drafts she can approve.
 
 ## Done when

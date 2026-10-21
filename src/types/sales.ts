@@ -119,6 +119,8 @@ export interface SequenceStep {
   /** Delay after previous step before this one is due (days). Wait steps use this as the wait length. */
   waitDays: number;
   channel?: OutreachChannel;
+  /** Who transmits the step after Floor approves: HeyReach for LinkedIn, Gmail for email. */
+  sendVia?: SendProvider;
   subject?: string;
   body?: string;
   rationale?: string;
@@ -127,6 +129,10 @@ export interface SequenceStep {
   sentAt?: string;
   outreachDraftId?: string;
 }
+
+export type SendProvider = "heyreach" | "gmail";
+
+export type ReplyChannel = "linkedin" | "email";
 
 export type SequenceStatus = "draft" | "active" | "completed" | "cancelled";
 
@@ -137,6 +143,8 @@ export interface OutreachSequence {
   status: SequenceStatus;
   steps: SequenceStep[];
   opportunityAngles: string[];
+  /** Set when the lead replied on any channel — every remaining step was skipped. */
+  stoppedOnReply?: { channel: ReplyChannel; at: string };
   createdAt: string;
   updatedAt: string;
 }

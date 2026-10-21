@@ -1,6 +1,6 @@
 ---
 name: sales-lead-run
-description: Floor Dutch cold-email pass — multi-batch day (2–3×), 30-day HubSpot lookback, never-contacted only, Gmail self-test, one story, E1 + auto E2/E3, HubSpot email log after every send, reply→demo classifier. Approve → Gmail. Re-runs are normal; never treat “already ran once” as done forever.
+description: Floor Dutch HeyReach (LinkedIn) + Gmail pass — multi-batch day (2–3×), 30-day HubSpot lookback, never-contacted only, Gmail self-test, one story, E1 + auto E2/E3, HubSpot email log after every send, reply→demo classifier. Approve every line → HeyReach (LinkedIn, stub until connected) + Gmail. Re-runs are normal; never treat “already ran once” as done forever.
 ---
 
 # sales-lead-run
@@ -18,13 +18,14 @@ Floor follows `START-HERE-FLOOR.md`. Follow-ups auto-scheduled; **every lead ema
 | **Filter** | **Never-contacted only** — skip prior outbound email / logged HubSpot outreach |
 | **Cadence** | **2–3 batches/day**; re-runs normal; never “already ran once → done forever” |
 | **Voice** | Sales pro 20+ years; match past HubSpot sent emails |
-| **Sequence** | One story · E1 now · E2 @ +7d if no reply · E3 @ +14d · max 3 |
+| **Sequence** | One story · LI connect d0 → LI DM d3 → E1 d6 → E2 d13 → E3 d20 · max 3 emails · while HeyReach is a stub: LinkedIn lines approved + held, E1 on approve / +7 / +14 |
+| **Send** | LinkedIn → `sales-heyreach-push` · email → `sales-gmail-send` |
 | **Consistency** | Phrase “haven’t been posting consistently” — never “saw your post Friday”; one post ≠ consistent; skip **frequent** posters |
 | **Schedule** | Gmail schedule or Cowork/HubSpot reminder for E2/E3; Cowork recurring for batch runs |
 | **HubSpot** | After every successful Gmail send → email engagement (dedup if already synced) |
 | **Replies** | `sales-reply-demo` — BOOK NOW / NOT YET / NO / CONFUSED (politeness ≠ intent) |
 | **Stop** | NO → close · BOOK NOW → Slack Floor + 2 Ludwig slots · CONFUSED → gracious + cancel E2/E3 · NOT YET → value reply, keep E2/E3 |
-| **Pilot** | Approve before send |
+| **Pilot** | Approve every line (LinkedIn + email) before send · any reply stops remaining LinkedIn steps |
 
 ## Invoke in order
 
@@ -44,7 +45,7 @@ Floor follows `START-HERE-FLOOR.md`. Follow-ups auto-scheduled; **every lead ema
 
 **Batch (first run or any run):**
 
-> You are a sales pro with 20+ years experience. Read my past HubSpot sent emails for tone/format. Then batch up to 50 Dutch HubSpot tasks from the last ~30 days (not only today). Only include contacts/companies never contacted before — skip anyone with prior outbound email or logged outreach in HubSpot. From each company note only, draft one coherent 3-email Gmail story (insight → one tension → soft Willow bridge → short CTA). Same story in emails 2–3. Consistency angle phrasing: “I see you haven’t been posting consistently” — never “I saw your post yesterday/Friday”. One post does not kill that angle. Skip frequent posters (bad lead). Don’t live-check LinkedIn every run — trust HubSpot notes. Email 2 after exactly 7 days if no reply; email 3 after another 7 days if still no reply (max 3). Auto-schedule follow-ups via Gmail/Cowork — don’t ask me to remember. After every send, log the email in HubSpot on the contact (skip if already synced). Stop on reply (no/interest → Slack me; if confused / don’t get the point → short gracious reply, log HubSpot, cancel follow-ups, no demo). Show approve queue. Do not send yet. Skip Belgian leads. This is one batch of 2–3 today — running again later is normal; do not treat a prior run as done forever.
+> You are a sales pro with 20+ years experience. Read my past HubSpot sent emails for tone/format. Then batch up to 50 Dutch HubSpot tasks from the last ~30 days (not only today). Only include contacts/companies never contacted before — skip anyone with prior outbound email or logged outreach in HubSpot. From each company note only, draft one coherent story: LinkedIn connect note (≤300 chars) → LinkedIn DM on day 3 (2–3 lines, one question) → 3 Gmail emails (insight → one tension → soft Willow bridge → short CTA). Same story in emails 2–3. Consistency angle phrasing: “I see you haven’t been posting consistently” — never “I saw your post yesterday/Friday”. One post does not kill that angle. Skip frequent posters (bad lead). Don’t live-check LinkedIn every run — trust HubSpot notes. Email 2 after exactly 7 days if no reply; email 3 after another 7 days if still no reply (max 3). Auto-schedule follow-ups via Gmail/Cowork — don’t ask me to remember. After every send, log the email in HubSpot on the contact (skip if already synced). Stop on any reply, LinkedIn or email (no/interest → Slack me; if confused / don’t get the point → short gracious reply, log HubSpot, cancel follow-ups, no demo). Show approve queue. Do not send yet. Skip Belgian leads. This is one batch of 2–3 today — running again later is normal; do not treat a prior run as done forever.
 
 **Run another batch now:**
 
@@ -77,7 +78,7 @@ Floor follows `START-HERE-FLOOR.md`. Follow-ups auto-scheduled; **every lead ema
 - Push demo after NO or CONFUSED.
 - Auto-book Ludwig / Calendar.
 - Skip HubSpot logging after a successful lead send (unless dedup).
-- Ask Floor to remember follow-ups · vacancy → content calendar · >3 emails · LinkedIn send · Lemlist · send before approve.
+- Ask Floor to remember follow-ups · vacancy → content calendar · >3 emails · LinkedIn send outside HeyReach · claiming a LinkedIn send while HeyReach is a stub · Lemlist · send before approve.
 
 ## Digest
 

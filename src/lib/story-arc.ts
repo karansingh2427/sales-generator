@@ -73,13 +73,13 @@ function insightFromNote(lead: Lead, angle: OpportunityAngle): string {
   if (opener) {
     // Strip product-pitch / calendar pivots. Prefer consistency phrasing
     // ("haven't been posting consistently") over pointing at a single post date.
-    let cleaned = opener
+    const cleaned = opener
       .replace(/\bwillow\b[^.?!]*/gi, "")
       .replace(/\b(quarterly\s+)?content\s+calendar(s)?\b/gi, "")
       .replace(/\bi saw (your|the) post (yesterday|friday|today|this week)\b/gi, "I see you haven’t been posting consistently")
       .replace(/\bnothing happening on linkedin\b/gi, "you haven’t been posting consistently")
       .replace(/\s{2,}/g, " ")
-      .replace(/\s*[—–-]\s*$/g, "")
+      .replace(/\s*[—–-]\s*([.?!]?)\s*$/g, "$1")
       .trim();
     if (cleaned.length > 12) return cleaned;
   }

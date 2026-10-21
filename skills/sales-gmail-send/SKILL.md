@@ -5,7 +5,9 @@ description: Gmail self-test; send approved E1 and auto-schedule E2/E3; log ever
 
 # sales-gmail-send
 
-Send **approved** cold-sequence emails through **Gmail**. Auto-schedule follow-ups. **Log every successful send in HubSpot.**
+Send **approved** email steps of the HeyReach + Gmail sequence through **Gmail**. Auto-schedule follow-ups. **Log every successful send in HubSpot.** LinkedIn steps are not this skill’s job — see `sales-heyreach-push`.
+
+**Timing:** with HeyReach live, E1 is due **day 6** (after LinkedIn connect d0 + DM d3, if no reply). While HeyReach is still a stub, E1 goes out on approve as below.
 
 ## Step 0 — Gmail self-test (before any Dutch batch)
 
@@ -27,7 +29,7 @@ Send **approved** cold-sequence emails through **Gmail**. Auto-schedule follow-u
 
 ### Stop on reply → `sales-reply-demo`
 
-When any reply arrives (or Floor pastes “Check my replies…”), hand off to **`sales-reply-demo`** for full classify + act:
+When any reply arrives **on Gmail or LinkedIn (HeyReach inbox)** (or Floor pastes “Check my replies…”), cancel every remaining LinkedIn + email step for that lead and hand off to **`sales-reply-demo`** for full classify + act:
 
 | Class | Action (summary) |
 |---|---|

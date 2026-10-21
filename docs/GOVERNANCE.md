@@ -8,11 +8,12 @@
 | Mock PII | Demo / mock HubSpot leads with `.example` emails | `.data/workspace.json` | No (gitignored) |
 | Live PII | HubSpot sync + Sales Nav CSV imports | `.data/workspace.json` on BDR machine | Never |
 | Floor feedback | ICP/company/tone/geo memory (may name clients) | `.data/feedback.json` (+ optional promote to `skills/memory/FEEDBACK.md`) | Runtime no; promote markdown only if Floor OK |
-| Secrets | Optional `HUBSPOT_ACCESS_TOKEN`, `OPENAI_API_KEY` | `.env.local` | Never |
+| Secrets | Optional `HUBSPOT_ACCESS_TOKEN`, `HEYREACH_API_KEY`, `OPENAI_API_KEY` | `.env.local` | Never |
 
 ## Consent & automation
 
-- **Approve → Gmail send (pilot)** — Floor must **approve** each email step; then agent sends via **Gmail** (`sales-gmail-send`). No LinkedIn API. No Lemlist.
+- **Approve every line → HeyReach + Gmail send** — Floor must **approve** each LinkedIn and email step; LinkedIn steps go via **HeyReach** (`sales-heyreach-push`, stub until API key), email via **Gmail** (`sales-gmail-send`). No other LinkedIn automation. No Lemlist.
+- **Stop on reply** — a reply on LinkedIn or email skips every remaining step on both channels.
 - HubSpot notes are **background only**; personalize the full sequence from the note — **no re-scrape**.
 - Unattended send without approve stays out until Willow policy + explicit OK.
 - **No silent HubSpot write storms** — stage push is explicit; sync is operator-triggered.
@@ -37,6 +38,6 @@
 
 ## Incident response
 
-1. Revoke keys in `.env.local` (HubSpot private app + OpenAI) and/or disconnect HubSpot from Claude/Cursor if compromised.
+1. Revoke keys in `.env.local` (HubSpot private app + HeyReach + OpenAI) and/or disconnect HubSpot from Claude/Cursor if compromised.
 2. Delete `.data/workspace.json` and `.data/feedback.json` (clears imported PII + client-named feedback).
 3. File issue with eval case ID if behavior regressed.

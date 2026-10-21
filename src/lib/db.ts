@@ -4,6 +4,7 @@ import type {
   Lead,
   OutreachDraft,
   OutreachSequence,
+  ReplyChannel,
   SequenceStep,
   WorkspaceState,
 } from "@/types/sales";
@@ -225,9 +226,13 @@ export async function updateSequenceStep(
   if (stIdx === -1) return null;
 
   const { bodyText, ...rest } = patch;
+  // Absent fields (e.g. approve without edits) must not wipe the stored subject/body.
+  const defined = Object.fromEntries(
+    Object.entries(rest).filter(([, v]) => v !== undefined),
+  ) as Partial<SequenceStep>;
   const step = {
     ...seq.steps[stIdx],
-    ...rest,
+    ...defined,
     body: bodyText !== undefined ? bodyText : rest.body ?? seq.steps[stIdx].body,
   };
   seq.steps[stIdx] = step;
@@ -255,6 +260,33 @@ export async function updateSequenceStep(
 
   await writeState(state);
   return seq;
+}
+
+/** Lead replied on LinkedIn or email → skip every step not yet sent and close the sequence. */
+export async function stopSequenceOnReply(
+  sequenceId: string,
+  channel: ReplyChannel,
+): Promise<OutreachSequence | null> {
+  const state = await readState();
+  const sIdx = state.sequences.findIndex((s) => s.id === sequenceId);
+  if (sIdx === -1) return null;
+  const now = new Date().toISOString();
+  const seq = state.sequences[sIdx];
+  state.sequences[sIdx] = {
+    ...seq,
+    status: "completed",
+    stoppedOnReply: { channel, at: now },
+    steps: seq.steps.map((st) =>
+      st.status === "sent" || st.status === "skipped" ? st : { ...st, status: "skipped" },
+    ),
+    updatedAt: now,
+  };
+  const leadIdx = state.leads.findIndex((l) => l.id === seq.leadId);
+  if (leadIdx !== -1) {
+    state.leads[leadIdx] = { ...state.leads[leadIdx], stage: "replied", lastTouchAt: now };
+  }
+  await writeState(state);
+  return state.sequences[sIdx];
 }
 
 export async function markSequenceStepSent(

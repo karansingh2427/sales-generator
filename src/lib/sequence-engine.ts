@@ -4,6 +4,8 @@ import type {
   OutreachSequence,
   SequenceStep,
   SequenceStepKind,
+  ReplyChannel,
+  SendProvider,
 } from "@/types/sales";
 import { inferOpportunityAngles } from "@/lib/icp";
 import { buildStoryArc, type StoryArc } from "@/lib/story-arc";
@@ -84,10 +86,55 @@ ${bdrName}`;
   return { subject: arc.subjectHint, body, rationale };
 }
 
+/** LinkedIn caps connection notes at 300 characters. */
+export const LINKEDIN_CONNECT_NOTE_MAX = 300;
+
+/** Short noun phrase for the angle — LinkedIn copy has no room for the full insight. */
+const ANGLE_PHRASE: Record<StoryArc["angle"], string> = {
+  open_vacancies: "hiring visibility",
+  visibility: "online visibility",
+  consistency: "steady posting",
+  content_quality: "firm voice online",
+  content_mix: "POV vs promo posts",
+};
+
+/** One easy question per angle — Reachium-style opener, never a pitch. */
+const ANGLE_QUESTION: Record<StoryArc["angle"], (firm: string) => string> = {
+  open_vacancies: (firm) => `How does ${firm} tell the story behind its open roles today?`,
+  visibility: (firm) => `Who at ${firm} owns LinkedIn visibility today?`,
+  consistency: () => `How much time does the team spend on posts each week?`,
+  content_quality: (firm) => `Who writes ${firm}’s posts today?`,
+  content_mix: () => `How do you decide what the firm posts about?`,
+};
+
 /**
- * Floor Dutch pilot: max 3 Gmail emails.
- * Email 1 now → wait ~1 week → Email 2 → wait ~1 week → Email 3.
- * Same story arc on every touch. Stop early on clear no or interest (skills).
+ * LinkedIn copy via HeyReach: short, peer-to-peer, one question.
+ * Connect note ≤300 chars; DM is 2–3 lines. Same story thread as the emails.
+ */
+function draftLinkedIn(
+  lead: Lead,
+  arc: StoryArc,
+  bdrName: string,
+  kind: "linkedin_connect" | "linkedin_message",
+): string {
+  const name = firstName(lead.contactName);
+  const me = firstName(bdrName);
+  if (kind === "linkedin_connect") {
+    const note = `Hi ${name}, I came across ${lead.firmName} while looking at ${ANGLE_PHRASE[arc.angle]} at expertise firms. I work on exactly that at Willow — would be good to connect. ${me}`;
+    return note.length <= LINKEDIN_CONNECT_NOTE_MAX
+      ? note
+      : `Hi ${name}, I work with expertise firms like ${lead.firmName} on ${ANGLE_PHRASE[arc.angle]}. Would be good to connect. ${me}`;
+  }
+  return `Thanks for connecting, ${name}.
+${arc.tension}
+${ANGLE_QUESTION[arc.angle](lead.firmName)}`;
+}
+
+/**
+ * HeyReach + Gmail multichannel (Floor, Oct 2026):
+ * LinkedIn connect (day 0) → LinkedIn DM (day 3) → Email 1 (day 6) → Email 2 (day 13) → Email 3 (day 20).
+ * Max 3 emails. Same story arc on every touch. Any reply on either channel stops the rest.
+ * Every message step needs Floor's approval before HeyReach / Gmail sends it.
  */
 const DEFAULT_PLAYBOOK: {
   kind: SequenceStepKind;
@@ -95,18 +142,33 @@ const DEFAULT_PLAYBOOK: {
   waitDays: number;
   touch?: EmailTouch;
 }[] = [
-  { kind: "email", label: "Email 1 — HubSpot insight → one story", waitDays: 0, touch: 1 },
-  { kind: "wait", label: "Wait exactly 7 days (if no reply) → Email 2 auto-scheduled", waitDays: 7 },
-  { kind: "email", label: "Email 2 — same story (+7d if no reply)", waitDays: 0, touch: 2 },
-  { kind: "wait", label: "Wait exactly 7 days (if no reply) → Email 3 auto-scheduled", waitDays: 7 },
-  { kind: "email", label: "Email 3 — same story (+14d if no reply)", waitDays: 0, touch: 3 },
+  { kind: "linkedin_connect", label: "LinkedIn connect + note (HeyReach)", waitDays: 0 },
+  { kind: "wait", label: "Wait 3 days (if no reply) → LinkedIn DM", waitDays: 3 },
+  { kind: "linkedin_message", label: "LinkedIn DM — one question (HeyReach, day 3)", waitDays: 0 },
+  { kind: "wait", label: "Wait 3 days (if no reply) → Email 1", waitDays: 3 },
+  { kind: "email", label: "Email 1 — HubSpot insight → one story (Gmail, day 6)", waitDays: 0, touch: 1 },
+  { kind: "wait", label: "Wait exactly 7 days (if no reply) → Email 2", waitDays: 7 },
+  { kind: "email", label: "Email 2 — same story (Gmail, day 13)", waitDays: 0, touch: 2 },
+  { kind: "wait", label: "Wait exactly 7 days (if no reply) → Email 3", waitDays: 7 },
+  { kind: "email", label: "Email 3 — same story, last note (Gmail, day 20)", waitDays: 0, touch: 3 },
 ];
+
+/** No LinkedIn URL on the lead → HeyReach can't reach them; run the email part straight away. */
+const EMAIL_ONLY_PLAYBOOK = DEFAULT_PLAYBOOK.filter(
+  (p, i) => i >= DEFAULT_PLAYBOOK.findIndex((x) => x.kind === "email"),
+);
 
 function channelFor(kind: SequenceStepKind): OutreachChannel | undefined {
   if (kind === "linkedin_connect") return "linkedin_connect";
   if (kind === "linkedin_message" || kind === "linkedin_followup") return "linkedin_dm";
   if (kind === "email") return "email";
   return undefined;
+}
+
+function sendViaFor(kind: SequenceStepKind): SendProvider | undefined {
+  if (kind === "email") return "gmail";
+  if (kind === "wait") return undefined;
+  return "heyreach";
 }
 
 export type BuildSequenceOptions = {
@@ -135,9 +197,11 @@ function scrubBody(body: string, topics?: string[]): string {
 export function buildSequenceForLead(
   lead: Lead,
   bdrName: string,
-  playbook = DEFAULT_PLAYBOOK,
+  playbookOverride?: typeof DEFAULT_PLAYBOOK,
   options: BuildSequenceOptions = {},
 ): Omit<OutreachSequence, "id" | "createdAt" | "updatedAt"> {
+  const hasLinkedIn = Boolean(lead.linkedInUrl?.trim());
+  const playbook = playbookOverride ?? (hasLinkedIn ? DEFAULT_PLAYBOOK : EMAIL_ONLY_PLAYBOOK);
   const angles = inferOpportunityAngles(lead);
   const arc = buildStoryArc(lead);
   const guidance = options.feedbackGuidance;
@@ -154,7 +218,7 @@ export function buildSequenceForLead(
         waitDays: p.waitDays,
         status: "pending" as const,
         rationale: withFeedbackRationale(
-          `Pause exactly ${p.waitDays} days. Auto-schedule next email (Gmail schedule or Cowork reminder). Cap 3. Cancel on reply → stop or Slack Floor.`,
+          `Pause exactly ${p.waitDays} days. Next step goes out only if no reply on LinkedIn or email. Any reply → stop the sequence (record_reply) → classify / Slack Floor.`,
           guidance,
         ),
       };
@@ -169,23 +233,22 @@ export function buildSequenceForLead(
         label: p.label,
         waitDays: p.waitDays,
         channel: channelFor(p.kind),
+        sendVia: sendViaFor(p.kind),
         subject: d.subject,
         body: scrubBody(d.body, neverPitch),
         rationale: withFeedbackRationale(d.rationale, guidance),
         status: "draft" as const,
       };
     }
-    // LinkedIn kinds kept for type compat — not in Dutch pilot playbook.
+    const liKind = p.kind === "linkedin_connect" ? "linkedin_connect" : "linkedin_message";
     return {
       id,
       kind: p.kind,
       label: p.label,
       waitDays: p.waitDays,
       channel: channelFor(p.kind),
-      body: scrubBody(
-        `(Not used in Dutch pilot — Gmail only.) Contact ${firstName(lead.contactName)} at ${lead.firmName}.`,
-        neverPitch,
-      ),
+      sendVia: sendViaFor(p.kind),
+      body: scrubBody(draftLinkedIn(lead, arc, bdrName, liKind), neverPitch),
       rationale: withFeedbackRationale(whyBlock(lead, arc), guidance),
       status: "draft" as const,
     };
@@ -193,7 +256,9 @@ export function buildSequenceForLead(
 
   return {
     leadId: lead.id,
-    name: `Gmail cold sequence (max 3) · ${lead.firmName}`,
+    name: hasLinkedIn || playbookOverride
+      ? `HeyReach + Gmail sequence · ${lead.firmName}`
+      : `Gmail sequence (no LinkedIn URL) · ${lead.firmName}`,
     status: "draft",
     steps,
     opportunityAngles: angles.length ? [arc.angle, ...angles.filter((a) => a !== arc.angle)] : [arc.angle],
@@ -209,6 +274,7 @@ export function validateSequenceAction(body: unknown):
       stepId?: string;
       subject?: string;
       bodyText?: string;
+      replyChannel?: ReplyChannel;
     }
   | { ok: false; error: string } {
   if (!body || typeof body !== "object") return { ok: false, error: "Body must be JSON object" };
@@ -252,9 +318,17 @@ export function validateSequenceAction(body: unknown):
     };
   }
 
+  if (action === "record_reply") {
+    if (typeof b.sequenceId !== "string" || !b.sequenceId.trim())
+      return { ok: false, error: "sequenceId is required" };
+    if (b.channel !== "linkedin" && b.channel !== "email")
+      return { ok: false, error: "channel must be linkedin | email" };
+    return { ok: true, action, sequenceId: b.sequenceId, replyChannel: b.channel };
+  }
+
   return {
     ok: false,
     error:
-      "Unknown action — use generate | update_step | approve_step | mark_sent | skip_step (Gmail send only after approve)",
+      "Unknown action — use generate | update_step | approve_step | mark_sent | skip_step | record_reply (HeyReach / Gmail send only after approve)",
   };
 }

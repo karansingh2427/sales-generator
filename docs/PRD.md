@@ -5,12 +5,12 @@
 
 ## Problem
 
-Lead gen is already handled by an internal agent that writes **HubSpot company notes**. Floor cold-calls today; the Dutch pilot replaces that with **Gmail cold email sequences**. **HubSpot notes = background**; the agent **personalizes the full email sequence from that note only** (no LinkedIn/website re-scrape). Approve → send via Gmail → on interest **Slack her** (with the conversation) so she **manually books Ludwig** — never auto-book.
+Lead gen is already handled by an internal agent that writes **HubSpot company notes**. Floor cold-calls today; the Dutch pilot replaces that with **multichannel sequences: LinkedIn via HeyReach + Gmail email** (Willow is taking a HeyReach subscription — Floor, 2026-10-21; reference flow: the Reachium campaign page she shared). **HubSpot notes = background**; the agent **personalizes the full sequence from that note** (no LinkedIn/website re-scrape). Floor approves every line → HeyReach sends LinkedIn, Gmail sends email → any reply stops the sequence → on interest **Slack her** (with the conversation) so she **manually books Ludwig** — never auto-book.
 
 ## Goals
 
 1. **HubSpot ingest** of Dutch tasks from the **last ~30 days** (not today-only) + **company-level** agent notes (why-good, opener, right contact) as **background** — hero path over Sales Nav CSV. **Never-contacted only** (skip prior outbound email / logged outreach). Default **2–3 batches/day** — re-runs are normal. Prefer **HubSpot + Gmail + Slack in Floor’s Cowork session**; web-app token is optional fallback.
-2. **Gmail cold sequences (Dutch pilot):** personalize Email 1–3 from the note only; ~1 week between if no reply; **max 3 emails**; approve → Gmail send. No LinkedIn API. No Lemlist.
+2. **HeyReach + Gmail sequences:** LinkedIn connect + note (day 0) → LinkedIn DM (day 3) → Email 1 (day 6) → Email 2 (day 13) → Email 3 (day 20); **max 3 emails**; personalize every line from the note; **approve every line** → HeyReach (LinkedIn) / Gmail (email) send; **any reply stops the sequence**. Lead without LinkedIn URL → email-only. No Lemlist.
 3. Encode opportunity angles from the note: consistency, content quality/mix, visibility, open vacancies — plus CRM opener/rationale.
 4. ICP: decision makers (Partner / Founder / Ops manager); verticals accountancy, legal, IT, HR/recruitment/exec search, coaching, expertise B2B; **skip strong social presence**; geo **Netherlands first**, Belgium second, **NL + BE only**.
 5. Keep Sales Nav CSV as **fallback** import.
@@ -31,7 +31,8 @@ Supersedes earlier Belgium-first defaults (Karandeep preference 2026-10-06).
 
 ## Non-goals (this turn)
 
-- LinkedIn API send / LinkedIn connection automation.
+- LinkedIn automation outside HeyReach (direct LinkedIn API, browser bots).
+- Live HeyReach API call — **stubbed** until Willow's API key exists; the push returns the payload for review only.
 - Lemlist (Willow does not have it).
 - Re-scraping LinkedIn or company websites (notes are the only source).
 - Unattended send without approve (pilot keeps approve-before-send).
@@ -49,8 +50,9 @@ Supersedes earlier Belgium-first defaults (Karandeep preference 2026-10-06).
 | RF-HS-02 | As Floor, with session HubSpot tools (or optional token) I pull live company notes | NL-first list; company notes preferred |
 | RF-HS-03 | As Floor, stage labels map via configurable `HUBSPOT_STAGE_MAP` | Includes Demo Booked → Completed / Rescheduled / Cancelled |
 | RF-HS-04 | As Floor, HubSpot writebacks stay English | Stage push uses English labels |
-| RF-SEQ-01 | As Floor, I get a Gmail cold sequence from a HubSpot note | Max 3 emails; Email 1 from note opener; ~1 week waits; no re-scrape |
-| RF-SEQ-02 | As Floor, I approve then Claude sends via Gmail | Cannot send until approved; Gmail via Cowork |
+| RF-SEQ-01 | As Floor, I get a HeyReach + Gmail sequence from a HubSpot note | LinkedIn connect → DM day 3 → max 3 emails; ~1 week email waits; no re-scrape |
+| RF-SEQ-02 | As Floor, I approve every line, then HeyReach / Gmail send | Cannot send until approved; LinkedIn via HeyReach (stub until key), email via Gmail (Cowork) |
+| RF-SEQ-04 | As Floor, a reply on either channel stops the sequence | `record_reply` skips all remaining LinkedIn + email steps |
 | RF-SEQ-03 | As Floor, strong social presence leads are skipped/DQ | Sync flags; sequence generate rejects DQ |
 | RF-SK-01 | As Floor, I run `sales-hubspot-pull` / `sales-sequence-draft` / `sales-demo-book` from Cursor | Skills present under `skills/`; AGENTS.md maps them |
 | RF-FB-01 | As Floor, I submit feedback via UI form or “remember this feedback” | Entry persisted with category, target, text, timestamp, source |
@@ -65,17 +67,19 @@ Supersedes earlier Belgium-first defaults (Karandeep preference 2026-10-06).
 
 ## Success metrics (pilot)
 
-- Dutch cold outreach via **Gmail** (max 3) before calls.
+- Dutch cold outreach via **HeyReach (LinkedIn) + Gmail** (max 3 emails) before calls.
 - Sequences **personalize from company notes only** (no re-scrape).
 - Lists stay **NL-first / NL+BE only**.
 - Demo handoff = Slack Floor (with conversation) → she books Ludwig; never auto-book.
-- Pilot: every step approved before Gmail send.
+- Every step approved before HeyReach / Gmail send.
 - Zero PII committed to git.
 - Skills usable in Floor’s HubSpot + Gmail + Slack Cowork session.
 
 ## Still needs from Floor / ops
 
 - Confirm Claude↔HubSpot + Gmail + Slack connection scopes.
+- **HeyReach API key** + which LinkedIn sender account(s) and campaign to push into.
+- Whether HeyReach should also send the emails (it can connect inboxes) or Gmail stays the email sender.
 - Pipeline name + stages **before** Demo Booked.
 - Property names if structured company props differ from defaults.
 - Explicit OK to drop approve-before-send later (Willow policy).

@@ -7,7 +7,7 @@ _Last assessed: 2026-10-02 (P1 skill pack + Netherlands-first geo lock)._
 | Area | Kind | Grade | Gaps |
 |---|---|---|---|
 | `crm-ingest` | domain | strong | Company notes mock + live; prefer session HubSpot tools |
-| `sequence-drafting` | domain | strong | Draft→approve→mark sent; no LinkedIn/email transmit API |
+| `sequence-drafting` | domain | strong | LinkedIn connect → DM → Email 1–3; draft→approve→mark sent; stop on reply; HeyReach push stubbed (no live transmit) |
 | `lead-discovery` | domain | adequate | CSV fallback NL+BE; no Sales Nav API |
 | `outreach-drafting` | domain | adequate | Template not live LLM; no A/B analytics |
 | `demo-scheduling` | domain | adequate | Per-AE calendar links (placeholders until Floor pastes real URLs) |

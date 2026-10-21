@@ -3,9 +3,10 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, BookOpen } from "lucide-react";
+import { LayoutDashboard, BookOpen, Sparkles } from "lucide-react";
 
 const nav = [
+  { href: "/campaign", label: "Campaigns", icon: Sparkles },
   { href: "/", label: "Pipeline", icon: LayoutDashboard },
   { href: "/governance", label: "Governance", icon: BookOpen },
 ];
@@ -23,7 +24,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </div>
             <div>
               <p className="text-sm font-semibold leading-tight">Sales Generator</p>
-              <p className="text-xs text-muted-foreground">Willow BDR · NL+BE · HubSpot + sequences</p>
+              <p className="hidden text-xs text-muted-foreground sm:block">Willow BDR · NL+BE · LinkedIn + email agent</p>
             </div>
           </div>
           <nav className="flex items-center gap-1">
@@ -31,6 +32,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <Link
                 key={href}
                 href={href}
+                aria-label={label}
                 className={cn(
                   "flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm transition-colors",
                   pathname === href
@@ -39,7 +41,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 )}
               >
                 <Icon className="h-4 w-4" />
-                {label}
+                <span className="hidden sm:inline">{label}</span>
               </Link>
             ))}
           </nav>

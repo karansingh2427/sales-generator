@@ -58,6 +58,7 @@ const skillDirs = [
   "skills/sales-hubspot-pull/SKILL.md",
   "skills/sales-sequence-draft/SKILL.md",
   "skills/sales-gmail-send/SKILL.md",
+  "skills/sales-heyreach-push/SKILL.md",
   "skills/sales-reply-demo/SKILL.md",
   "skills/sales-demo-book/SKILL.md",
   "skills/sales-lead-run/SKILL.md",
@@ -76,6 +77,14 @@ if (!agents.includes("sales-hubspot-pull") || !agents.includes("Netherlands firs
 }
 if (!agents.includes("sales-feedback-learn") || !agents.includes("feedback")) {
   console.error("AGENTS.md must map sales-feedback-learn");
+  ok = false;
+}
+if (!agents.includes("sales-heyreach-push")) {
+  console.error("AGENTS.md must map sales-heyreach-push");
+  ok = false;
+}
+if (!rules.includes("HeyReach") || !rules.includes("Stop on reply")) {
+  console.error("RULES.md must define HeyReach + Gmail channels and stop-on-reply");
   ok = false;
 }
 if (!agents.includes("sales-reply-demo")) {
@@ -118,6 +127,11 @@ for (const required of [
   "I-09",
   "I-10",
   "I-11",
+  "V-15",
+  "V-16",
+  "I-13",
+  "I-14",
+  "I-15",
 ]) {
   if (!ids.includes(required)) {
     console.error(`Missing eval case ${required}`);

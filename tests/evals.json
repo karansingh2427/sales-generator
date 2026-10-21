@@ -1,6 +1,6 @@
 {
   "product": "sales-generator",
-  "harness": "Run npm run test:evals, test:import, test:hubspot. Invalid cases must return 4xx with plain error strings. Gmail send only after approve. No LinkedIn API. No Lemlist.",
+  "harness": "Run npm run test:evals, test:import, test:hubspot. Invalid cases must return 4xx with plain error strings. HeyReach (LinkedIn) + Gmail send only after approve; any reply stops the sequence. HeyReach push is a stub until API key. No Lemlist.",
   "valid_cases": [
     {
       "id": "V-01",
@@ -86,14 +86,16 @@
     },
     {
       "id": "V-08",
-      "scenario": "Generate Gmail cold sequence (max 3) then approve and mark sent",
+      "scenario": "Generate HeyReach + Gmail sequence (LinkedIn connect → DM day 3 → max 3 emails) then approve and mark sent",
       "request": "POST /api/sequences generate → approve_step → mark_sent",
       "expectations": [
-        "Sequence has exactly 3 email steps and ~1 week waits (no linkedin_* steps)",
+        "Steps in order: linkedin_connect (HeyReach) → wait 3d → linkedin_message (HeyReach) → wait 3d → Email 1–3 (Gmail) with 7-day waits",
+        "Exactly 3 email steps; connect note ≤300 chars; DM ends in one question",
+        "Lead without LinkedIn URL gets email-only sequence",
         "Opportunity angles non-empty; drafts personalized from HubSpot note background",
         "mark_sent without approve returns 400",
         "After approve+mark_sent step status sent and lead stage contacted",
-        "Live Cowork send path is Gmail after approve (UI mark_sent is simulator)"
+        "Live send path: LinkedIn via HeyReach, email via Gmail, both after approve (UI mark_sent is simulator)"
       ]
     },
     {
@@ -152,6 +154,27 @@
         "Produces a new approve-queue chunk (default up to 50)",
         "Does not treat prior run as done forever; offers another batch / next scheduled slot"
       ]
+    },
+    {
+      "id": "V-15",
+      "scenario": "Reply on LinkedIn stops the multichannel sequence",
+      "request": "POST /api/sequences record_reply {sequenceId, channel: linkedin}",
+      "expectations": [
+        "Every step not yet sent becomes skipped (LinkedIn and email)",
+        "Sequence status completed with stoppedOnReply.channel = linkedin",
+        "Lead stage replied",
+        "HeyReach push for that sequence is refused afterwards"
+      ]
+    },
+    {
+      "id": "V-16",
+      "scenario": "HeyReach push stub returns payload only after every LinkedIn line is approved",
+      "request": "POST /api/heyreach {sequenceId} with approved connect note + DM, no HEYREACH_API_KEY",
+      "expectations": [
+        "Response mode stub, sent false",
+        "Payload has LinkedIn URL, name, company and both approved messages",
+        "Note says nothing was sent to LinkedIn"
+      ]
     }
   ],
   "invalid_cases": [
@@ -159,55 +182,82 @@
       "id": "I-01",
       "scenario": "Outreach missing channel",
       "request": "POST /api/outreach { leadId: lead_1 }",
-      "expectations": ["Response 400", "error mentions channel"]
+      "expectations": [
+        "Response 400",
+        "error mentions channel"
+      ]
     },
     {
       "id": "I-02",
       "scenario": "Outreach to disqualified lead",
       "request": "POST /api/outreach { leadId: lead_7, channel: email }",
-      "expectations": ["Response 422", "error mentions disqualified"]
+      "expectations": [
+        "Response 422",
+        "error mentions disqualified"
+      ]
     },
     {
       "id": "I-03",
       "scenario": "Booking unknown AE",
       "request": "POST /api/bookings { leadId: lead_1, aeName: Fake Person, scheduledAt: future ISO }",
-      "expectations": ["Response 400", "error lists allowed AEs"]
+      "expectations": [
+        "Response 400",
+        "error lists allowed AEs"
+      ]
     },
     {
       "id": "I-04",
       "scenario": "Booking duration out of range",
       "request": "POST /api/bookings { leadId: lead_1, aeName: Sarah Chen, scheduledAt: future ISO, durationMinutes: 5 }",
-      "expectations": ["Response 400", "error mentions duration"]
+      "expectations": [
+        "Response 400",
+        "error mentions duration"
+      ]
     },
     {
       "id": "I-05",
       "scenario": "Import preview without csvText",
       "request": "POST /api/leads { action: import_preview }",
-      "expectations": ["Response 400", "error mentions csvText"]
+      "expectations": [
+        "Response 400",
+        "error mentions csvText"
+      ]
     },
     {
       "id": "I-06",
       "scenario": "Import commit without selected rows (no silent blast)",
       "request": "POST /api/leads { action: import_commit, rows: [] }",
-      "expectations": ["Response 400", "error mentions rows / human-in-the-loop"]
+      "expectations": [
+        "Response 400",
+        "error mentions rows / human-in-the-loop"
+      ]
     },
     {
       "id": "I-07",
       "scenario": "Sequence mark_sent before approve (no silent send)",
       "request": "POST /api/sequences { action: mark_sent, sequenceId, stepId } on draft step",
-      "expectations": ["Response 400", "error mentions approve / human-in-the-loop"]
+      "expectations": [
+        "Response 400",
+        "error mentions approve / human-in-the-loop"
+      ]
     },
     {
       "id": "I-08",
       "scenario": "Generate sequence for disqualified / strong-presence lead",
       "request": "POST /api/sequences { action: generate, leadId: disqualified }",
-      "expectations": ["Response 422", "error mentions disqualified"]
+      "expectations": [
+        "Response 422",
+        "error mentions disqualified"
+      ]
     },
     {
       "id": "I-09",
       "scenario": "Feedback remember without text",
       "request": "POST /api/feedback { action: remember, category: icp }",
-      "expectations": ["Response 400", "error mentions text"]
+      "expectations": [
+        "Response 400",
+        "error mentions text"
+      ]
     },
     {
       "id": "I-10",
@@ -238,6 +288,33 @@
         "Contact/company excluded from draft batch",
         "Skip reason already contacted / prior outreach",
         "No approve-queue item created for that lead"
+      ]
+    },
+    {
+      "id": "I-13",
+      "scenario": "Must not push unapproved LinkedIn steps to HeyReach",
+      "request": "POST /api/heyreach {sequenceId} while connect note or DM is still draft",
+      "expectations": [
+        "Returns 422 with plain error naming the unapproved step(s)",
+        "Nothing pushed"
+      ]
+    },
+    {
+      "id": "I-14",
+      "scenario": "Must not approve a LinkedIn connect note over 300 characters",
+      "request": "POST /api/sequences approve_step on linkedin_connect with 301+ char body",
+      "expectations": [
+        "Returns 400 with char count and max",
+        "Step stays draft"
+      ]
+    },
+    {
+      "id": "I-15",
+      "scenario": "Must not claim a LinkedIn send while HeyReach is a stub",
+      "request": "Cowork skill sales-lead-run / sales-heyreach-push without HeyReach connected",
+      "expectations": [
+        "Agent says LinkedIn lines are approved and held until HeyReach is connected",
+        "No message claims a connect request or DM was sent"
       ]
     }
   ]

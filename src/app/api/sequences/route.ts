@@ -4,9 +4,14 @@ import {
   findLead,
   markSequenceStepSent,
   readState,
+  stopSequenceOnReply,
   updateSequenceStep,
 } from "@/lib/db";
-import { buildSequenceForLead, validateSequenceAction } from "@/lib/sequence-engine";
+import {
+  buildSequenceForLead,
+  LINKEDIN_CONNECT_NOTE_MAX,
+  validateSequenceAction,
+} from "@/lib/sequence-engine";
 import {
   applyFeedbackToLeads,
   listFeedback,
@@ -69,7 +74,7 @@ export async function POST(request: Request) {
       mode: "draft",
       feedbackApplication: applied.application,
       governance:
-        "Draft only — Floor must approve each step, then mark sent. No auto-send. Active feedback applied to tone/never-pitch/ICP notes.",
+        "Draft only — Floor must approve every line (LinkedIn via HeyReach, email via Gmail) before anything sends. Any reply stops the sequence. Active feedback applied to tone/never-pitch/ICP notes.",
     });
   }
 
@@ -84,6 +89,16 @@ export async function POST(request: Request) {
   }
 
   if (parsed.action === "approve_step") {
+    const current = state.sequences
+      .find((s) => s.id === parsed.sequenceId)
+      ?.steps.find((s) => s.id === parsed.stepId);
+    const note = parsed.bodyText ?? current?.body ?? "";
+    if (current?.kind === "linkedin_connect" && note.length > LINKEDIN_CONNECT_NOTE_MAX) {
+      return NextResponse.json(
+        { error: `LinkedIn connect note is ${note.length} chars — max ${LINKEDIN_CONNECT_NOTE_MAX}` },
+        { status: 400 },
+      );
+    }
     const seq = await updateSequenceStep(parsed.sequenceId!, parsed.stepId!, {
       subject: parsed.subject,
       bodyText: parsed.bodyText,
@@ -99,7 +114,10 @@ export async function POST(request: Request) {
     }
     return NextResponse.json({
       sequence: seq,
-      note: "Step approved — copy/send externally, then Mark sent. Nothing was auto-sent.",
+      note:
+        step?.sendVia === "heyreach"
+          ? "Step approved — HeyReach sends it once pushed (stub until API key). Nothing was auto-sent."
+          : "Step approved — send via Gmail, then Mark sent. Nothing was auto-sent.",
     });
   }
 
@@ -132,6 +150,15 @@ export async function POST(request: Request) {
     return NextResponse.json({
       sequence: seq,
       note: "Marked sent locally. Copy was not transmitted by this app.",
+    });
+  }
+
+  if (parsed.action === "record_reply") {
+    const seq = await stopSequenceOnReply(parsed.sequenceId!, parsed.replyChannel!);
+    if (!seq) return NextResponse.json({ error: "Sequence not found" }, { status: 404 });
+    return NextResponse.json({
+      sequence: seq,
+      note: `Reply on ${parsed.replyChannel} — remaining LinkedIn + email steps skipped. Classify with sales-reply-demo.`,
     });
   }
 
