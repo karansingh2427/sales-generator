@@ -72,7 +72,7 @@ function MessageCard({
   const [editing, setEditing] = useState(false);
   const [body, setBody] = useState(step.body ?? "");
   const [subject, setSubject] = useState(step.subject ?? "");
-  const isLinkedIn = step.sendVia === "heyreach";
+  const isLinkedIn = step.kind !== "email";
   const done = step.status === "sent" || step.status === "skipped";
   const tooLong = step.kind === "linkedin_connect" && body.length > LINKEDIN_CONNECT_NOTE_MAX;
 
@@ -103,7 +103,7 @@ function MessageCard({
         <p className="text-[15px] font-semibold text-slate-800">
           {item.title}
           <span className="ml-2 font-normal text-slate-500">
-            Day {item.day} · {isLinkedIn ? "LinkedIn via HeyReach" : "your Gmail"}
+            Day {item.day} · {isLinkedIn ? "LinkedIn" : "email"} via Lemlist
           </span>
         </p>
         <StatusPill status={step.status} />

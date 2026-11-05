@@ -180,10 +180,10 @@ export function CampaignStudio({ initialLeads, initialSequences, bdrName, initia
       return "Every line approved. Nothing has been sent yet.";
     });
 
-  const pushLinkedIn = () =>
+  const sendToLemlist = () =>
     guarded(async () => {
       if (!sequence) return;
-      const data = await post<{ note: string }>("/api/heyreach", { sequenceId: sequence.id });
+      const data = await post<{ note: string }>("/api/lemlist", { sequenceId: sequence.id });
       return data.note;
     });
 
@@ -234,11 +234,8 @@ export function CampaignStudio({ initialLeads, initialSequences, bdrName, initia
   const msgs = sequence ? messageSteps(sequence) : [];
   const live = msgs.filter((s) => s.status !== "skipped");
   const approvedCount = live.filter((s) => s.status === "approved" || s.status === "sent").length;
-  const linkedInReady =
-    !!sequence &&
-    !sequence.stoppedOnReply &&
-    msgs.some((s) => s.sendVia === "heyreach") &&
-    msgs.filter((s) => s.sendVia === "heyreach" && s.status !== "skipped").every((s) => s.status === "approved" || s.status === "sent");
+  const lemlistReady =
+    !!sequence && !sequence.stoppedOnReply && live.length > 0 && live.every((s) => s.status === "approved");
   const totalDays = sequence?.steps.reduce((d, s) => d + (s.kind === "wait" ? s.waitDays : 0), 0) ?? 0;
 
   return (
@@ -431,22 +428,20 @@ export function CampaignStudio({ initialLeads, initialSequences, bdrName, initia
               {sequence && !sequence.stoppedOnReply && (
                 <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 bg-slate-50/60 px-5 py-3">
                   <p className="text-xs text-slate-500">
-                    LinkedIn goes out through HeyReach, email from your Gmail. Nothing sends before you approve.
+                    Lemlist sends LinkedIn and email from your accounts, and stops on a reply. Nothing sends before you approve every line.
                   </p>
                   <div className="flex flex-wrap gap-2">
                     <Button size="sm" variant="outline" disabled={busy || approvedCount === live.length} onClick={() => void approveAll()}>
                       <CheckCheck /> Approve all
                     </Button>
-                    {msgs.some((s) => s.sendVia === "heyreach") && (
-                      <Button
-                        size="sm"
-                        disabled={busy || !linkedInReady}
-                        onClick={() => void pushLinkedIn()}
-                        className="bg-[#0a66c2] text-white hover:bg-[#0a66c2]/90"
-                      >
-                        <Send /> Queue LinkedIn
-                      </Button>
-                    )}
+                    <Button
+                      size="sm"
+                      disabled={busy || !lemlistReady}
+                      onClick={() => void sendToLemlist()}
+                      className="bg-emerald-600 text-white hover:bg-emerald-700"
+                    >
+                      <Send /> Send to Lemlist
+                    </Button>
                   </div>
                 </div>
               )}

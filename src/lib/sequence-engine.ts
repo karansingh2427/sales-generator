@@ -108,7 +108,7 @@ const ANGLE_QUESTION: Record<StoryArc["angle"], (firm: string) => string> = {
 };
 
 /**
- * LinkedIn copy via HeyReach: short, peer-to-peer, one question.
+ * LinkedIn copy (sent by Lemlist): short, peer-to-peer, one question.
  * Connect note ≤300 chars; DM is 2–3 lines. Same story thread as the emails.
  */
 function draftLinkedIn(
@@ -131,10 +131,10 @@ ${ANGLE_QUESTION[arc.angle](lead.firmName)}`;
 }
 
 /**
- * HeyReach + Gmail multichannel (Floor, Oct 2026):
+ * Lemlist multichannel (Floor, Nov 2026 — Willow took Lemlist):
  * LinkedIn connect (day 0) → LinkedIn DM (day 3) → Email 1 (day 6) → Email 2 (day 13) → Email 3 (day 20).
  * Max 3 emails. Same story arc on every touch. Any reply on either channel stops the rest.
- * Every message step needs Floor's approval before HeyReach / Gmail sends it.
+ * Every message step needs Floor's approval before Lemlist sends it.
  */
 const DEFAULT_PLAYBOOK: {
   kind: SequenceStepKind;
@@ -142,18 +142,18 @@ const DEFAULT_PLAYBOOK: {
   waitDays: number;
   touch?: EmailTouch;
 }[] = [
-  { kind: "linkedin_connect", label: "LinkedIn connect + note (HeyReach)", waitDays: 0 },
+  { kind: "linkedin_connect", label: "LinkedIn connect + note (day 0)", waitDays: 0 },
   { kind: "wait", label: "Wait 3 days (if no reply) → LinkedIn DM", waitDays: 3 },
-  { kind: "linkedin_message", label: "LinkedIn DM — one question (HeyReach, day 3)", waitDays: 0 },
+  { kind: "linkedin_message", label: "LinkedIn DM — one question (day 3)", waitDays: 0 },
   { kind: "wait", label: "Wait 3 days (if no reply) → Email 1", waitDays: 3 },
-  { kind: "email", label: "Email 1 — HubSpot insight → one story (Gmail, day 6)", waitDays: 0, touch: 1 },
+  { kind: "email", label: "Email 1 — HubSpot insight → one story (day 6)", waitDays: 0, touch: 1 },
   { kind: "wait", label: "Wait exactly 7 days (if no reply) → Email 2", waitDays: 7 },
-  { kind: "email", label: "Email 2 — same story (Gmail, day 13)", waitDays: 0, touch: 2 },
+  { kind: "email", label: "Email 2 — same story (day 13)", waitDays: 0, touch: 2 },
   { kind: "wait", label: "Wait exactly 7 days (if no reply) → Email 3", waitDays: 7 },
-  { kind: "email", label: "Email 3 — same story, last note (Gmail, day 20)", waitDays: 0, touch: 3 },
+  { kind: "email", label: "Email 3 — same story, last note (day 20)", waitDays: 0, touch: 3 },
 ];
 
-/** No LinkedIn URL on the lead → HeyReach can't reach them; run the email part straight away. */
+/** No LinkedIn URL on the lead → no LinkedIn steps; run the email part straight away. */
 const EMAIL_ONLY_PLAYBOOK = DEFAULT_PLAYBOOK.filter(
   (p, i) => i >= DEFAULT_PLAYBOOK.findIndex((x) => x.kind === "email"),
 );
@@ -166,9 +166,7 @@ function channelFor(kind: SequenceStepKind): OutreachChannel | undefined {
 }
 
 function sendViaFor(kind: SequenceStepKind): SendProvider | undefined {
-  if (kind === "email") return "gmail";
-  if (kind === "wait") return undefined;
-  return "heyreach";
+  return kind === "wait" ? undefined : "lemlist";
 }
 
 export type BuildSequenceOptions = {
@@ -257,8 +255,8 @@ export function buildSequenceForLead(
   return {
     leadId: lead.id,
     name: hasLinkedIn || playbookOverride
-      ? `HeyReach + Gmail sequence · ${lead.firmName}`
-      : `Gmail sequence (no LinkedIn URL) · ${lead.firmName}`,
+      ? `LinkedIn + email sequence · ${lead.firmName}`
+      : `Email sequence (no LinkedIn URL) · ${lead.firmName}`,
     status: "draft",
     steps,
     opportunityAngles: angles.length ? [arc.angle, ...angles.filter((a) => a !== arc.angle)] : [arc.angle],
@@ -329,6 +327,6 @@ export function validateSequenceAction(body: unknown):
   return {
     ok: false,
     error:
-      "Unknown action — use generate | update_step | approve_step | mark_sent | skip_step | record_reply (HeyReach / Gmail send only after approve)",
+      "Unknown action — use generate | update_step | approve_step | mark_sent | skip_step | record_reply (Lemlist send only after approve)",
   };
 }

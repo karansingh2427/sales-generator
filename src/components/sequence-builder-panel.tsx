@@ -142,22 +142,22 @@ export function SequenceBuilderPanel({
     }
   }
 
-  async function pushHeyReach() {
+  async function sendToLemlist() {
     if (!active) return;
     setBusy(true);
     onError("");
     try {
-      const res = await fetch("/api/heyreach", {
+      const res = await fetch("/api/lemlist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ sequenceId: active.id }),
       });
       const data = await res.json();
       if (!res.ok) {
-        onError(data.error ?? "HeyReach push failed.");
+        onError(data.error ?? "Lemlist push failed.");
         return;
       }
-      onStatus(`${data.note} (${data.payload.messages.length} LinkedIn step(s) in payload)`);
+      onStatus(`${data.note} (${Object.keys(data.payload.variables).length} variables in payload)`);
     } finally {
       setBusy(false);
     }
@@ -193,12 +193,12 @@ export function SequenceBuilderPanel({
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
             <ListOrdered className="h-4 w-4" />
-            HeyReach + Gmail sequence
+            LinkedIn + email sequence (Lemlist)
           </CardTitle>
           <CardDescription>
             HubSpot notes = background — LinkedIn connect (day 0) → LinkedIn DM (day 3) → Email 1
-            (day 6) → Email 2 → Email 3. <strong>Approve every line</strong>; LinkedIn goes via
-            HeyReach, email via Gmail (Cowork). Any reply stops the sequence. Mark sent here is a
+            (day 6) → Email 2 → Email 3. <strong>Approve every line</strong>; Lemlist sends
+            LinkedIn + email (stub until API key). Any reply stops the sequence. Mark sent here is a
             UI simulator.
           </CardDescription>
         </CardHeader>
@@ -258,11 +258,9 @@ export function SequenceBuilderPanel({
             <div className="flex flex-wrap items-center justify-between gap-2">
               <CardTitle className="text-base">{active.name}</CardTitle>
               <div className="flex flex-wrap items-center gap-2">
-                {active.steps.some((st) => st.sendVia === "heyreach") && (
-                  <Button size="sm" variant="outline" disabled={busy} onClick={() => void pushHeyReach()}>
-                    Push LinkedIn to HeyReach (stub)
-                  </Button>
-                )}
+                <Button size="sm" variant="outline" disabled={busy} onClick={() => void sendToLemlist()}>
+                  Send to Lemlist (stub)
+                </Button>
                 {!active.stoppedOnReply && active.status !== "completed" && (
                   <>
                     <Button size="sm" variant="ghost" disabled={busy} onClick={() => void recordReply("linkedin")}>
@@ -291,7 +289,7 @@ export function SequenceBuilderPanel({
                   <div className="font-medium text-sm">
                     {i + 1}. {step.label}
                     {step.channel ? ` · ${step.channel}` : ""}
-                    {step.sendVia ? ` · via ${step.sendVia === "heyreach" ? "HeyReach" : "Gmail"}` : ""}
+                    {step.sendVia ? " · via Lemlist" : ""}
                   </div>
                   <Badge variant={stepBadge(step.status)}>{step.status}</Badge>
                 </div>

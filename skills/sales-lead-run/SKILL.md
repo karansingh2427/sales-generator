@@ -1,6 +1,6 @@
 ---
 name: sales-lead-run
-description: Floor Dutch HeyReach (LinkedIn) + Gmail pass — multi-batch day (2–3×), 30-day HubSpot lookback, never-contacted only, Gmail self-test, one story, E1 + auto E2/E3, HubSpot email log after every send, reply→demo classifier. Approve every line → HeyReach (LinkedIn, stub until connected) + Gmail. Re-runs are normal; never treat “already ran once” as done forever.
+description: Floor Dutch LinkedIn + email pass (Lemlist; Gmail fallback) — multi-batch day (2–3×), 30-day HubSpot lookback, never-contacted only, Gmail self-test, one story, E1 + auto E2/E3, HubSpot email log after every send, reply→demo classifier. Approve every line → Lemlist (LinkedIn + email, stub until connected; Gmail for email meanwhile). Re-runs are normal; never treat “already ran once” as done forever.
 ---
 
 # sales-lead-run
@@ -18,8 +18,8 @@ Floor follows `START-HERE-FLOOR.md`. Follow-ups auto-scheduled; **every lead ema
 | **Filter** | **Never-contacted only** — skip prior outbound email / logged HubSpot outreach |
 | **Cadence** | **2–3 batches/day**; re-runs normal; never “already ran once → done forever” |
 | **Voice** | Sales pro 20+ years; match past HubSpot sent emails |
-| **Sequence** | One story · LI connect d0 → LI DM d3 → E1 d6 → E2 d13 → E3 d20 · max 3 emails · while HeyReach is a stub: LinkedIn lines approved + held, E1 on approve / +7 / +14 |
-| **Send** | LinkedIn → `sales-heyreach-push` · email → `sales-gmail-send` |
+| **Sequence** | One story · LI connect d0 → LI DM d3 → E1 d6 → E2 d13 → E3 d20 · max 3 emails · while Lemlist is a stub: LinkedIn lines approved + held, emails via Gmail E1 on approve / +7 / +14 |
+| **Send** | Fully approved lead → `sales-lemlist-push` (LinkedIn + email) · until Lemlist is live: email → `sales-gmail-send` |
 | **Consistency** | Phrase “haven’t been posting consistently” — never “saw your post Friday”; one post ≠ consistent; skip **frequent** posters |
 | **Schedule** | Gmail schedule or Cowork/HubSpot reminder for E2/E3; Cowork recurring for batch runs |
 | **HubSpot** | After every successful Gmail send → email engagement (dedup if already synced) |
@@ -78,7 +78,7 @@ Floor follows `START-HERE-FLOOR.md`. Follow-ups auto-scheduled; **every lead ema
 - Push demo after NO or CONFUSED.
 - Auto-book Ludwig / Calendar.
 - Skip HubSpot logging after a successful lead send (unless dedup).
-- Ask Floor to remember follow-ups · vacancy → content calendar · >3 emails · LinkedIn send outside HeyReach · claiming a LinkedIn send while HeyReach is a stub · Lemlist · send before approve.
+- Ask Floor to remember follow-ups · vacancy → content calendar · >3 emails · LinkedIn send outside Lemlist · claiming a send while Lemlist is a stub · sending a Lemlist lead’s emails from Gmail too · send before approve.
 
 ## Digest
 

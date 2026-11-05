@@ -58,7 +58,7 @@ const skillDirs = [
   "skills/sales-hubspot-pull/SKILL.md",
   "skills/sales-sequence-draft/SKILL.md",
   "skills/sales-gmail-send/SKILL.md",
-  "skills/sales-heyreach-push/SKILL.md",
+  "skills/sales-lemlist-push/SKILL.md",
   "skills/sales-reply-demo/SKILL.md",
   "skills/sales-demo-book/SKILL.md",
   "skills/sales-lead-run/SKILL.md",
@@ -79,12 +79,12 @@ if (!agents.includes("sales-feedback-learn") || !agents.includes("feedback")) {
   console.error("AGENTS.md must map sales-feedback-learn");
   ok = false;
 }
-if (!agents.includes("sales-heyreach-push")) {
-  console.error("AGENTS.md must map sales-heyreach-push");
+if (!agents.includes("sales-lemlist-push")) {
+  console.error("AGENTS.md must map sales-lemlist-push");
   ok = false;
 }
-if (!rules.includes("HeyReach") || !rules.includes("Stop on reply")) {
-  console.error("RULES.md must define HeyReach + Gmail channels and stop-on-reply");
+if (!rules.includes("Lemlist") || !rules.includes("Stop on reply")) {
+  console.error("RULES.md must define Lemlist channels and stop-on-reply");
   ok = false;
 }
 if (!agents.includes("sales-reply-demo")) {
@@ -132,6 +132,7 @@ for (const required of [
   "I-13",
   "I-14",
   "I-15",
+  "I-16",
 ]) {
   if (!ids.includes(required)) {
     console.error(`Missing eval case ${required}`);

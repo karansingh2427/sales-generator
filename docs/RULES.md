@@ -5,7 +5,7 @@ These rules govern human and agent operators. Violations are **invalid** scenari
 ## Outreach & sequence rules
 
 1. **No outreach to disqualified leads** — including **strong social presence** (Floor disqualifier).
-2. **Channels — HeyReach (LinkedIn) + Gmail** (Floor, 2026-10-21; supersedes Gmail-only pilot). Default playbook: LinkedIn connect + note (day 0) → LinkedIn DM (day 3) → Email 1 (day 6) → Email 2 (day 13) → Email 3 (day 20). **HeyReach** sends LinkedIn steps; **Gmail** sends email steps. Max 3 emails. Lead with no LinkedIn URL → email-only. No direct LinkedIn API / browser automation outside HeyReach. No Lemlist (Willow does not have it).
+2. **Channels — Lemlist (LinkedIn + email)** (Floor, 2026-11-05: Willow took Lemlist; supersedes the HeyReach plan and the Gmail-only pilot). Default playbook: LinkedIn connect + note (day 0) → LinkedIn DM (day 3) → Email 1 (day 6) → Email 2 (day 13) → Email 3 (day 20). **Lemlist** sends every step (emails from Floor’s inbox connected in Lemlist). Max 3 emails. Lead with no LinkedIn URL → email-only. **Until the Lemlist API key is wired:** emails go via **Gmail** in Cowork (`sales-gmail-send`, E1 on approve / +7d / +14d) and LinkedIn lines are approved + held. No LinkedIn automation outside Lemlist.
 2a. **Stop on reply** — any reply on LinkedIn **or** email stops every remaining LinkedIn step and the automated sequence (`record_reply`), then `sales-reply-demo` classifies it. Only a **NOT YET** reply may keep E2/E3 (existing reply-demo rule).
 2b. **LinkedIn copy** — connect note ≤300 chars, no pitch; DM 2–3 short lines with one question. Same story arc as the emails.
 3. **Every draft includes rationale** — CRM why-good / opener / opportunity angles (`scoreLeadRationale` / sequence engine).
@@ -13,7 +13,7 @@ These rules govern human and agent operators. Violations are **invalid** scenari
 5. **Senior voice** — write as a sales pro with 20–30 years experience; calm, peer-to-peer; never AI-ish or feature dump. Once per batch, learn tone from Floor’s past HubSpot sent emails + feedback playbook.
 6. **CTA** — Email 1 = curious / open to chat (soft). Ludwig intro ok by Email 3. When they agree, **Slack Floor** (include conversation) — she books Ludwig’s calendar manually. Do not promise pricing or legal outcomes.
 7. **No fabricated case studies** — use only Willow public claims (expertise firms, EU/GDPR, coaching) and only when they continue the same story.
-8. **Approve every line → send** — draft → Floor **approves each step** → LinkedIn steps pushed to **HeyReach** (`sales-heyreach-push`), email steps sent via **Gmail** (`sales-gmail-send`) → mark sent. Unattended send without approve is invalid on either channel.
+8. **Approve every line → send** — draft → Floor **approves each step** → the lead + all approved copy go to **Lemlist** in one push (`sales-lemlist-push`; only when every non-skipped line is approved) → Lemlist sends. Gmail fallback (`sales-gmail-send`) until Lemlist is live. Unattended send without approve is invalid on either channel.
 9. **Sequence mark_sent** without prior **approve_step** is invalid for message steps.
 10. Outreach drafts are **editable** (any language Floor prefers); CRM writebacks stay English.
 11. **Floor UX** — `START-HERE-FLOOR.md` stays tiny; one paste prompt; do not overwhelm her with jargon or extra docs.
@@ -53,20 +53,20 @@ These rules govern human and agent operators. Violations are **invalid** scenari
 6. Demo Slack to Floor must include: lead/company, **conversation**, why interested, links/context.
 7. Optional: Slack Ludwig with lead context when Floor asks.
 8. Only after Floor confirms the Ludwig booking → HubSpot **Demo Booked**; later Completed | Rescheduled | Cancelled.
-9. **Dutch batch:** Dutch HubSpot tasks (**~30-day lookback**, never-contacted only) in bulk → HeyReach + Gmail approve queue → approve/edit/skip → **HeyReach** (LinkedIn) + **Gmail** send. Multiple batches/day OK. No Lemlist.
+9. **Dutch batch:** Dutch HubSpot tasks (**~30-day lookback**, never-contacted only) in bulk → LinkedIn + email approve queue → approve/edit/skip → **Lemlist** send (Gmail fallback for email until connected). Multiple batches/day OK.
 
 ## Skill pack rules
 
 1. Skills live under `skills/*/SKILL.md` and are mapped from [AGENTS.md](../AGENTS.md).
 2. `sales-hubspot-pull` must instruct NL-first pulls, **~30-day lookback**, **never-contacted** filter, multi-batch/day, and company notes.
-3. `sales-sequence-draft` must draft **HeyReach + Gmail** sequences (LinkedIn connect → DM day 3 → Email 1–3) and require approve before send.
-4. `sales-gmail-send` sends only **approved** email steps via Gmail; never LinkedIn or Lemlist.
-4a. `sales-heyreach-push` pushes only **approved** LinkedIn steps to HeyReach; **stub** until `HEYREACH_API_KEY` is wired — it must never claim a LinkedIn send happened.
-5. `sales-reply-demo` classifies Dutch-batch replies from **Gmail and LinkedIn (HeyReach)** as **BOOK NOW / NOT YET / NO / CONFUSED**; politeness ≠ BOOK NOW; never auto-book; HubSpot-log inbound + outbound.
+3. `sales-sequence-draft` must draft **LinkedIn + email** sequences for Lemlist (LinkedIn connect → DM day 3 → Email 1–3) and require approve before send.
+4. `sales-gmail-send` is the **email fallback until Lemlist is live**: sends only **approved** email steps via Gmail; never LinkedIn. Once a lead is in Lemlist, never also send its emails from Gmail.
+4a. `sales-lemlist-push` pushes a lead to Lemlist only when **every** non-skipped line is approved; **stub** until `LEMLIST_API_KEY` is wired — it must never claim a LinkedIn or email send happened.
+5. `sales-reply-demo` classifies Dutch-batch replies from **email and LinkedIn (Gmail + Lemlist inbox)** as **BOOK NOW / NOT YET / NO / CONFUSED**; politeness ≠ BOOK NOW; never auto-book; HubSpot-log inbound + outbound.
 6. `sales-demo-book` must Slack Floor (with conversation), never auto-book Calendar, and use the three post-demo outcomes after she books Ludwig. BOOK NOW from reply-demo is the preferred trigger.
-7. Orchestrator `sales-lead-run` may compose the skills — it must not bypass HITL, geo lock, the HeyReach + Gmail channel rules, stop-on-reply, or the Slack→Ludwig handoff.
+7. Orchestrator `sales-lead-run` may compose the skills — it must not bypass HITL, geo lock, the Lemlist channel rules, stop-on-reply, or the Slack→Ludwig handoff.
 8. `sales-feedback-learn` persists structured feedback; pull/draft/lead-run **must** load active feedback.
-9. Feedback never bypasses draft → approve → HeyReach / Gmail send.
+9. Feedback never bypasses draft → approve → Lemlist / Gmail send.
 10. Feedback cannot add countries outside NL+BE.
 
 ## Feedback learning rules

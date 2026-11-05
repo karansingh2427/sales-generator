@@ -74,7 +74,7 @@ export async function POST(request: Request) {
       mode: "draft",
       feedbackApplication: applied.application,
       governance:
-        "Draft only — Floor must approve every line (LinkedIn via HeyReach, email via Gmail) before anything sends. Any reply stops the sequence. Active feedback applied to tone/never-pitch/ICP notes.",
+        "Draft only — Floor must approve every line (Lemlist sends LinkedIn + email) before anything sends. Any reply stops the sequence. Active feedback applied to tone/never-pitch/ICP notes.",
     });
   }
 
@@ -115,9 +115,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       sequence: seq,
       note:
-        step?.sendVia === "heyreach"
-          ? "Step approved — HeyReach sends it once pushed (stub until API key). Nothing was auto-sent."
-          : "Step approved — send via Gmail, then Mark sent. Nothing was auto-sent.",
+        "Step approved — Lemlist sends it once the whole sequence is approved and pushed (stub until API key). Nothing was auto-sent.",
     });
   }
 

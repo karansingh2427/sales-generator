@@ -1,11 +1,11 @@
 ---
 name: sales-sequence-draft
-description: Batch-draft HeyReach (LinkedIn) + Gmail sequences for Dutch HubSpot leads — LinkedIn connect → DM day 3 → Email 1–3 (max 3). Senior voice, one story arc, stop on any reply. Approve every line.
+description: Batch-draft LinkedIn + email sequences (sent by Lemlist) for Dutch HubSpot leads — LinkedIn connect → DM day 3 → Email 1–3 (max 3). Senior voice, one story arc, stop on any reply. Approve every line.
 ---
 
 # sales-sequence-draft
 
-**Floor path:** HubSpot notes → one coherent story across LinkedIn + email → approve every line → HeyReach sends LinkedIn, Gmail sends email → any reply stops everything.
+**Floor path:** HubSpot notes → one coherent story across LinkedIn + email → approve every line → Lemlist sends LinkedIn + email → any reply stops everything.
 
 Reference flow Floor shared (Reachium campaign page): short messages in her voice, one question, stop the moment someone replies, nothing sends until she approves the list and every line.
 
@@ -48,7 +48,7 @@ Emails **2–3** continue the same story; escalate lightly. Do not restart with 
 
 Before drafting: pull Floor’s **past HubSpot sent emails** for tone + apply feedback playbook.
 
-## LinkedIn steps (HeyReach)
+## LinkedIn steps
 
 | Step | Rule |
 |---|---|
@@ -60,14 +60,14 @@ Before drafting: pull Floor’s **past HubSpot sent emails** for tone + apply fe
 
 | Step | Channel | Timing |
 |---|---|---|
-| Connect + note | LinkedIn (HeyReach) | Day 0 on approve |
-| DM | LinkedIn (HeyReach) | Day 3 if no reply |
-| Email 1 | Gmail | Day 6 if no reply |
-| Email 2 | Gmail | Day 13 — **exactly 7 days** after E1 if no reply |
-| Email 3 | Gmail | Day 20 — **exactly 7 days** after E2 if no reply |
+| Connect + note | LinkedIn (Lemlist) | Day 0 on approve |
+| DM | LinkedIn (Lemlist) | Day 3 if no reply |
+| Email 1 | Email (Lemlist) | Day 6 if no reply |
+| Email 2 | Email (Lemlist) | Day 13 — **exactly 7 days** after E1 if no reply |
+| Email 3 | Email (Lemlist) | Day 20 — **exactly 7 days** after E2 if no reply |
 | Cap | — | **Max 3 emails** |
 
-**Until HeyReach is connected** (`sales-heyreach-push` is a stub): still draft + get approval on the LinkedIn lines, but they are **held** — run the emails on the email-only cadence (E1 on approve, E2 +7d, E3 +14d). Never tell Floor a LinkedIn message was sent.
+**Until Lemlist is connected** (`sales-lemlist-push` is a stub): still draft + get approval on the LinkedIn lines, but they are **held** — send the emails via `sales-gmail-send` on the email-only cadence (E1 on approve, E2 +7d, E3 +14d). Never tell Floor a LinkedIn message was sent. Once Lemlist is live, the whole approved sequence goes to Lemlist in one push and Gmail sends nothing for that lead.
 
 **Stop on any reply — LinkedIn or email** — cancel every remaining step on both channels, then `sales-reply-demo`.
 
@@ -88,7 +88,7 @@ Stop on reply: **no** → close · **interest** → Slack Floor · **confused / 
 ## Research / send rules
 
 - Prefer HubSpot notes; LinkedIn research OK when thin / asked — not every run.
-- **HeyReach** sends LinkedIn steps (`sales-heyreach-push`); **Gmail** sends email steps (`sales-gmail-send`). No other LinkedIn automation. No Lemlist.
+- **Lemlist** sends LinkedIn + email (`sales-lemlist-push`, once every line is approved). **Gmail** (`sales-gmail-send`) only as the email fallback until Lemlist is connected. No other LinkedIn automation.
 - **Approve-before-send on every line** (pilot). Dutch only in pilot batches.
 
 ## Guardrail
@@ -96,7 +96,7 @@ Stop on reply: **no** → close · **interest** → Slack Floor · **confused / 
 ```text
 Step 0 self-test → style from HubSpot sent emails
   → ONE story → draft LI connect + LI DM + E1–E3 → approve every line
-  → HeyReach: connect d0 · DM d3   |   Gmail: E1 d6 · E2 d13 · E3 d20
+  → Lemlist: connect d0 · DM d3 · E1 d6 · E2 d13 · E3 d20   (Gmail fallback for emails until connected)
   → reply on either channel? cancel ALL remaining · no → stop · interest → Slack Floor
 ```
 
@@ -105,11 +105,11 @@ Step 0 self-test → style from HubSpot sent emails
 1. Draft connect note + DM + 3 emails per company (one story); label each step’s day.
 2. Numbered approve queue — show LinkedIn lines **and** emails.
 3. Floor: **approve** · **edit** · **skip** (per line or per company).
-4. `sales-heyreach-push` takes LinkedIn steps; `sales-gmail-send` sends emails + schedules follow-ups.
+4. `sales-lemlist-push` takes the fully approved lead; until Lemlist is live, `sales-gmail-send` sends emails + schedules follow-ups.
 5. Chunk default **50**.
 
 ```text
-# Approve queue — <date> · Dutch · HeyReach + Gmail (max 3 emails)
+# Approve queue — <date> · Dutch · LinkedIn + email via Lemlist (max 3 emails)
 
 | # | Company | Contact | Status | Story | Schedule |
 |---|---------|---------|--------|-------|----------|
@@ -128,4 +128,4 @@ Step 0 self-test → style from HubSpot sent emails
 ## Done when
 
 - Connect note + DM + ≤3 emails, one story, senior tone; timing explicit per step.
-- Floor approved every line before any send; LinkedIn handed to `sales-heyreach-push`, email to `sales-gmail-send`.
+- Floor approved every line before any send; handed to `sales-lemlist-push` (or emails to `sales-gmail-send` until Lemlist is live).

@@ -1,6 +1,6 @@
 {
   "product": "sales-generator",
-  "harness": "Run npm run test:evals, test:import, test:hubspot. Invalid cases must return 4xx with plain error strings. HeyReach (LinkedIn) + Gmail send only after approve; any reply stops the sequence. HeyReach push is a stub until API key. No Lemlist.",
+  "harness": "Run npm run test:evals, test:import, test:hubspot. Invalid cases must return 4xx with plain error strings. Lemlist (LinkedIn + email) send only after every line is approved; any reply stops the sequence. Lemlist push is a stub until API key; Gmail sends email meanwhile.",
   "valid_cases": [
     {
       "id": "V-01",
@@ -86,16 +86,16 @@
     },
     {
       "id": "V-08",
-      "scenario": "Generate HeyReach + Gmail sequence (LinkedIn connect → DM day 3 → max 3 emails) then approve and mark sent",
+      "scenario": "Generate LinkedIn + email sequence for Lemlist (connect → DM day 3 → max 3 emails) then approve and mark sent",
       "request": "POST /api/sequences generate → approve_step → mark_sent",
       "expectations": [
-        "Steps in order: linkedin_connect (HeyReach) → wait 3d → linkedin_message (HeyReach) → wait 3d → Email 1–3 (Gmail) with 7-day waits",
+        "Steps in order: linkedin_connect → wait 3d → linkedin_message → wait 3d → Email 1–3 with 7-day waits; every message step sendVia lemlist",
         "Exactly 3 email steps; connect note ≤300 chars; DM ends in one question",
         "Lead without LinkedIn URL gets email-only sequence",
         "Opportunity angles non-empty; drafts personalized from HubSpot note background",
         "mark_sent without approve returns 400",
         "After approve+mark_sent step status sent and lead stage contacted",
-        "Live send path: LinkedIn via HeyReach, email via Gmail, both after approve (UI mark_sent is simulator)"
+        "Live send path: Lemlist sends LinkedIn + email after approve (Gmail fallback for email until connected; UI mark_sent is simulator)"
       ]
     },
     {
@@ -163,17 +163,18 @@
         "Every step not yet sent becomes skipped (LinkedIn and email)",
         "Sequence status completed with stoppedOnReply.channel = linkedin",
         "Lead stage replied",
-        "HeyReach push for that sequence is refused afterwards"
+        "Lemlist push for that sequence is refused afterwards"
       ]
     },
     {
       "id": "V-16",
-      "scenario": "HeyReach push stub returns payload only after every LinkedIn line is approved",
-      "request": "POST /api/heyreach {sequenceId} with approved connect note + DM, no HEYREACH_API_KEY",
+      "scenario": "Lemlist push stub returns the lead payload only after every line is approved",
+      "request": "POST /api/lemlist {sequenceId} with every LinkedIn + email line approved, no LEMLIST_API_KEY",
       "expectations": [
         "Response mode stub, sent false",
-        "Payload has LinkedIn URL, name, company and both approved messages",
-        "Note says nothing was sent to LinkedIn"
+        "Payload has email, name, company, LinkedIn URL and variables connectNote, linkedinMessage, email1–3 Subject/Body",
+        "Skipped steps arrive as empty variables listed in skippedSteps",
+        "Note says nothing was sent"
       ]
     }
   ],
@@ -292,8 +293,8 @@
     },
     {
       "id": "I-13",
-      "scenario": "Must not push unapproved LinkedIn steps to HeyReach",
-      "request": "POST /api/heyreach {sequenceId} while connect note or DM is still draft",
+      "scenario": "Must not push a sequence to Lemlist until every line is approved",
+      "request": "POST /api/lemlist {sequenceId} while any LinkedIn or email line is still draft",
       "expectations": [
         "Returns 422 with plain error naming the unapproved step(s)",
         "Nothing pushed"
@@ -310,11 +311,20 @@
     },
     {
       "id": "I-15",
-      "scenario": "Must not claim a LinkedIn send while HeyReach is a stub",
-      "request": "Cowork skill sales-lead-run / sales-heyreach-push without HeyReach connected",
+      "scenario": "Must not claim a LinkedIn or email send through Lemlist while it is a stub",
+      "request": "Cowork skill sales-lead-run / sales-lemlist-push without Lemlist connected",
       "expectations": [
-        "Agent says LinkedIn lines are approved and held until HeyReach is connected",
-        "No message claims a connect request or DM was sent"
+        "Agent says the lines are approved and held until Lemlist is connected (emails may still go via Gmail fallback)",
+        "No message claims Lemlist sent anything"
+      ]
+    },
+    {
+      "id": "I-16",
+      "scenario": "Must not send a Lemlist lead's emails from Gmail too",
+      "request": "sales-gmail-send on a lead whose sequence was already pushed to Lemlist",
+      "expectations": [
+        "Gmail send refused / skipped for that lead",
+        "No duplicate email reaches the prospect"
       ]
     }
   ]

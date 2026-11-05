@@ -5,9 +5,9 @@ description: Gmail self-test; send approved E1 and auto-schedule E2/E3; log ever
 
 # sales-gmail-send
 
-Send **approved** email steps of the HeyReach + Gmail sequence through **Gmail**. Auto-schedule follow-ups. **Log every successful send in HubSpot.** LinkedIn steps are not this skill’s job — see `sales-heyreach-push`.
+**Email fallback until Lemlist is connected.** Send **approved** email steps through **Gmail**. Auto-schedule follow-ups. **Log every successful send in HubSpot.** Once Lemlist is live it sends the emails itself (`sales-lemlist-push`) — never send a Lemlist lead’s emails from Gmail too. LinkedIn steps are not this skill’s job.
 
-**Timing:** with HeyReach live, E1 is due **day 6** (after LinkedIn connect d0 + DM d3, if no reply). While HeyReach is still a stub, E1 goes out on approve as below.
+**Timing:** while Lemlist is still a stub, E1 goes out on approve as below (LinkedIn lines are held).
 
 ## Step 0 — Gmail self-test (before any Dutch batch)
 
@@ -29,7 +29,7 @@ Send **approved** email steps of the HeyReach + Gmail sequence through **Gmail**
 
 ### Stop on reply → `sales-reply-demo`
 
-When any reply arrives **on Gmail or LinkedIn (HeyReach inbox)** (or Floor pastes “Check my replies…”), cancel every remaining LinkedIn + email step for that lead and hand off to **`sales-reply-demo`** for full classify + act:
+When any reply arrives **on Gmail or LinkedIn (Lemlist inbox, once connected)** (or Floor pastes “Check my replies…”), cancel every remaining LinkedIn + email step for that lead and hand off to **`sales-reply-demo`** for full classify + act:
 
 | Class | Action (summary) |
 |---|---|

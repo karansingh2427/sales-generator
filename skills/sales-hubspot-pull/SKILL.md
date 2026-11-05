@@ -63,7 +63,7 @@ Batch pull contract
 - Cadence: multiple batches/day OK (default 2–3); re-runs are normal
 - Size: tens–hundreds; present in reviewable chunks (default 50)
 - Next: sales-sequence-draft (Gmail max 3 from notes) → approve queue
-- Never: LinkedIn API send, Lemlist, other countries, rebuild lead-gen, force LinkedIn scrape on every company every batch, treat “already ran once” as done forever
+- Never: LinkedIn send outside Lemlist, other countries, rebuild lead-gen, force LinkedIn scrape on every company every batch, treat “already ran once” as done forever
 ```
 
 ## Prefer live HubSpot via session tools

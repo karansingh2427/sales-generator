@@ -119,7 +119,7 @@ export interface SequenceStep {
   /** Delay after previous step before this one is due (days). Wait steps use this as the wait length. */
   waitDays: number;
   channel?: OutreachChannel;
-  /** Who transmits the step after Floor approves: HeyReach for LinkedIn, Gmail for email. */
+  /** Who transmits the step after Floor approves: Lemlist sends LinkedIn and email. */
   sendVia?: SendProvider;
   subject?: string;
   body?: string;
@@ -130,7 +130,7 @@ export interface SequenceStep {
   outreachDraftId?: string;
 }
 
-export type SendProvider = "heyreach" | "gmail";
+export type SendProvider = "lemlist";
 
 export type ReplyChannel = "linkedin" | "email";
 

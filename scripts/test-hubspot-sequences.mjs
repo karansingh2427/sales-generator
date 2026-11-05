@@ -19,7 +19,7 @@ import {
   validateSequenceAction,
   LINKEDIN_CONNECT_NOTE_MAX,
 } from "../src/lib/sequence-engine.ts";
-import { buildHeyReachPayload, pushToHeyReach, resolveHeyReachMode } from "../src/lib/heyreach.ts";
+import { buildLemlistPayload, pushToLemlist, resolveLemlistMode } from "../src/lib/lemlist.ts";
 import { scoreExpertiseIcp, parseSocialPresence } from "../src/lib/icp.ts";
 import { mapHubSpotStage, DEFAULT_STAGE_MAP } from "../src/lib/hubspot-config.ts";
 
@@ -80,38 +80,56 @@ assert.deepEqual(
 );
 assert.equal(seq.steps[1].kind, "wait");
 assert.equal(seq.steps[1].waitDays, 3, "DM goes out day 3");
-assert.ok(msgSteps.every((s) => s.sendVia === (s.kind === "email" ? "gmail" : "heyreach")));
+assert.ok(msgSteps.every((s) => s.sendVia === "lemlist"), "Lemlist sends LinkedIn + email");
 assert.ok(msgSteps.every((s) => s.status === "draft"), "every line starts as draft — approve first");
 const connect = msgSteps[0];
 assert.ok(connect.body.length <= LINKEDIN_CONNECT_NOTE_MAX, "connect note fits LinkedIn limit");
 assert.ok(connect.body.includes(els.firmName));
 assert.ok(msgSteps[1].body.includes("?"), "DM asks one question");
-assert.ok(seq.name.includes("HeyReach + Gmail"));
+assert.ok(seq.name.includes("LinkedIn + email"));
 
 // No LinkedIn URL → email-only, no 6-day dead wait
 const noLi = buildSequenceForLead({ ...els, linkedInUrl: undefined }, "Floor Hoefkens");
-assert.ok(!noLi.steps.some((s) => s.sendVia === "heyreach"));
+assert.ok(!noLi.steps.some((s) => s.kind.startsWith("linkedin")));
 assert.equal(noLi.steps[0].kind, "email");
 assert.match(noLi.name, /no LinkedIn URL/);
 
-// HeyReach stub: refuses unapproved, returns payload only, never "sent"
+// Lemlist stub: refuses until every line is approved, returns payload only, never "sent"
 const stamp = { id: "seq_t", createdAt: "", updatedAt: "" };
 const draftSeq = { ...seq, ...stamp };
-const refused = buildHeyReachPayload(els, draftSeq);
-assert.equal(refused.ok, false, "unapproved LinkedIn steps are never pushed");
-const approvedSeq = {
+assert.equal(buildLemlistPayload(els, draftSeq).ok, false, "unapproved sequence is never pushed");
+const approveAll = (q) => ({
+  ...q,
+  steps: q.steps.map((s) => (s.kind === "wait" ? s : { ...s, status: "approved" })),
+});
+const linkedInOnly = {
   ...draftSeq,
-  steps: draftSeq.steps.map((s) => (s.sendVia === "heyreach" ? { ...s, status: "approved" } : s)),
+  steps: draftSeq.steps.map((s) => (s.kind.startsWith("linkedin") ? { ...s, status: "approved" } : s)),
 };
-const pushed = await pushToHeyReach(els, approvedSeq, "");
+assert.equal(buildLemlistPayload(els, linkedInOnly).ok, false, "emails must be approved too");
+const approvedSeq = approveAll(draftSeq);
+const pushed = await pushToLemlist(els, approvedSeq, "", "cmp_test");
 assert.equal(pushed.ok, true);
 assert.equal(pushed.mode, "stub");
 assert.equal(pushed.sent, false);
-assert.equal(pushed.payload.messages.length, 2);
-assert.equal(pushed.payload.messages[0].kind, "connect_note");
-assert.equal(resolveHeyReachMode("key"), "live_not_wired");
+assert.equal(pushed.payload.campaignId, "cmp_test");
+assert.equal(pushed.payload.email, els.email);
+assert.equal(pushed.payload.variables.connectNote, connect.body);
+assert.equal(pushed.payload.variables.linkedinMessage, msgSteps[1].body);
+assert.equal(pushed.payload.variables.email1Subject, emailSteps[0].subject);
+assert.equal(pushed.payload.variables.email3Body, emailSteps[2].body);
+const skippedE3 = {
+  ...approvedSeq,
+  steps: approvedSeq.steps.map((s) => (s.id === emailSteps[2].id ? { ...s, status: "skipped" } : s)),
+};
+const withSkip = buildLemlistPayload(els, skippedE3);
+assert.equal(withSkip.ok, true);
+assert.equal(withSkip.payload.variables.email3Body, "", "skipped step sends empty copy");
+assert.deepEqual(withSkip.payload.skippedSteps, [emailSteps[2].id]);
+assert.equal(buildLemlistPayload({ ...els, email: "" }, approvedSeq).ok, false, "Lemlist needs an email");
+assert.equal(resolveLemlistMode("key"), "live_not_wired");
 const repliedSeq = { ...approvedSeq, stoppedOnReply: { channel: "linkedin", at: "" } };
-assert.equal(buildHeyReachPayload(els, repliedSeq).ok, false, "reply stops HeyReach push");
+assert.equal(buildLemlistPayload(els, repliedSeq).ok, false, "reply stops Lemlist push");
 assert.ok(seq.steps.every((s) => s.kind === "wait" || (s.body && s.body.length > 20)));
 assert.ok(seq.opportunityAngles.length > 0);
 assert.ok(
