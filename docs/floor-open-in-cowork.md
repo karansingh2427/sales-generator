@@ -4,7 +4,7 @@ No GitHub. Unzip on **your** Mac → open **that** folder in Cowork (HubSpot + G
 
 Follow `START-HERE-FLOOR.md`: Step 0 self-test → **batch** (30-day Dutch tasks, never-contacted only) → approve → send → **run another batch** (2–3×/day) → **check replies**.
 
-Every lead send is **logged in HubSpot**; E2/E3 auto-schedule (+7d / +14d).  
+Every lead send is **logged in HubSpot**. One email per lead; the follow-ups happen on LinkedIn through Lemlist.  
 Replies: paste **“Check my replies from the Dutch batch and handle them.”** — BOOK NOW → Slack you + 2 Ludwig slots (you book Ludwig; never auto-book).
 
 ## Cadence

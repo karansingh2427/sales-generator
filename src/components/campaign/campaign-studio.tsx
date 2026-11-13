@@ -6,6 +6,7 @@ import type { Lead, OutreachSequence, SequenceStep } from "@/types/sales";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { buildStoryArc } from "@/lib/story-arc";
+import { needsApproval } from "@/lib/sequence-engine";
 import { cn } from "@/lib/utils";
 import {
   ArrowRight,
@@ -49,8 +50,9 @@ const VERTICAL_LABEL: Record<string, string> = {
   expertise_b2b: "Expertise B2B",
 };
 
+/** Written lines Floor approves — waits and automatic LinkedIn actions don't count. */
 function messageSteps(seq: OutreachSequence): SequenceStep[] {
-  return seq.steps.filter((s) => s.kind !== "wait");
+  return seq.steps.filter(needsApproval);
 }
 
 function campaignState(seq: OutreachSequence | undefined): CampaignState {
@@ -379,7 +381,7 @@ export function CampaignStudio({ initialLeads, initialSequences, bdrName, initia
                 title="Sequence"
                 hint={
                   sequence
-                    ? `${msgs.length} messages over ${totalDays} days · in ${bdrName.split(" ")[0]}’s voice`
+                    ? `${msgs.length} ${msgs.length === 1 ? "message" : "messages"}${totalDays ? ` over ${totalDays} days` : ""} · in ${bdrName.split(" ")[0]}’s voice`
                     : "Not built yet"
                 }
                 right={
@@ -412,8 +414,8 @@ export function CampaignStudio({ initialLeads, initialSequences, bdrName, initia
                       <Mail className="size-5 text-emerald-600" />
                     </div>
                     <p className="max-w-sm text-sm text-slate-600">
-                      The agent writes a connection request, a LinkedIn message and up to three emails —
-                      all on the one story above.
+                      Lemlist visits their profile and likes their latest post; the agent writes the
+                      invite, one personal email and two LinkedIn messages — all on the one story above.
                     </p>
                     <Button
                       disabled={busy}

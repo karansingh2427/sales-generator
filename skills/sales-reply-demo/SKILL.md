@@ -18,8 +18,8 @@ Also invoked from `sales-lead-run` after outbound sends, and from `sales-gmail-s
 ## Scope
 
 - **Dutch batch leads only** (NL HubSpot tasks / companies already in the pilot). Skip Belgian / non-pilot threads.
-- Pull **recent inbound Gmail replies** on threads where we sent E1/E2/E3, **and replies from Lemlist** (once connected — LinkedIn and email) on leads where we sent the connect note / DM.
-- **Any reply on either channel → cancel all remaining LinkedIn steps immediately** (Lemlist stops the lead itself; also cancel any Gmail-scheduled sends + web-app `record_reply`). Email follow-ups then follow the class below (only NOT YET keeps E2/E3).
+- Pull **recent inbound Gmail replies** on threads where we sent the email, **and replies from Lemlist** (once connected — LinkedIn and email) on leads where we sent the connect note / DM.
+- **Any reply on either channel → cancel all remaining LinkedIn steps immediately** (Lemlist stops the lead itself; also mirror it with web-app `record_reply`). There are no email follow-ups to keep; the class below (only NOT YET keeps E2/E3).
 - Answer on the channel they replied on (LinkedIn reply → LinkedIn answer via Lemlist, same approve rule).
 - One coherent story continues (same senior voice + consistency rules as outbound). Do **not** invent a new pitch.
 
@@ -38,7 +38,7 @@ Also invoked from `sales-lead-run` after outbound sends, and from `sales-gmail-s
 
 ### BOOK NOW
 
-1. Cancel scheduled E2/E3 (reply already happened).
+1. Confirm the sequence stopped (Lemlist / `record_reply`) — the reply already happened.
 2. Draft a **short** senior reply that offers **exactly 2 concrete Ludwig demo time slots** (30 min):
    - If Floor’s **Google Calendar** is connected: pick 2 real open slots in the next ~5–10 business days (CET), phrased as concrete options.
    - If Calendar is **not** connected or slots are unclear: use clear **placeholders** Floor can edit, e.g. `Tue 14 Oct, 10:00–10:30 CET` / `Thu 16 Oct, 15:00–15:30 CET` — mark them as edit-ready.
@@ -51,7 +51,7 @@ Also invoked from `sales-lead-run` after outbound sends, and from `sales-gmail-s
 ### NOT YET
 
 1. Draft **one** value-building reply that continues the **same story** (insight → tension → soft Willow bridge). No hard demo ask. One light open question max.
-2. **Keep** scheduled E2/E3 if still relevant and no further reply; do not cancel solely for soft interest.
+2. The automated sequence stays stopped; no more scheduled touches. Floor can re-approach later by hand.
 3. Show draft → send when approved (or when Floor’s handle-replies instruction includes send).
 4. **HubSpot-log** inbound + outbound.
 5. **Do not** Slack Floor for booking yet. **Do not** offer Ludwig slots yet.
@@ -59,14 +59,14 @@ Also invoked from `sales-lead-run` after outbound sends, and from `sales-gmail-s
 ### NO
 
 1. Draft a **gracious close** (2–3 sentences). No Willow pitch, no Ludwig, no “are you sure?”.
-2. **Cancel** E2/E3.
+2. Sequence already stopped — nothing left to cancel.
 3. **HubSpot-log** inbound + outbound; note closed/lost in English if useful.
 4. **No** demo push. **No** Slack booking ping.
 
 ### CONFUSED
 
 1. Draft a **gracious short ack** — thank them, clarify lightly if needed, leave the door open. No pitch, no Ludwig.
-2. **Cancel** E2/E3.
+2. Sequence already stopped — nothing left to cancel.
 3. **HubSpot-log** inbound + outbound.
 4. **No** demo push. **No** Slack booking ping.
 5. Consistency angle stays valid for **other** leads (one post ≠ posting consistently).
@@ -127,7 +127,7 @@ Gmail (read replies + send) · HubSpot (log) · Slack (Floor ping) · Google Cal
 ```text
 # Reply → demo — <date>
 Replies pulled: <n> · BOOK NOW: <n> · NOT YET: <n> · NO: <n> · CONFUSED: <n>
-Slack Floor (BOOK NOW): <n> · E2/E3 cancelled: <n> · Kept scheduled: <n>
+Slack Floor (BOOK NOW): <n> · Sequences stopped: <n>
 HubSpot logged (in/out): <n>/<n>
 ```
 
@@ -136,7 +136,7 @@ HubSpot logged (in/out): <n>/<n>
 - Auto-create calendar events or silent Ludwig invites.
 - Treat politeness / “sounds interesting” as BOOK NOW.
 - Demo-push NO or CONFUSED.
-- Cancel E2/E3 on NOT YET solely for soft interest.
+- Keep automated touches running after any reply.
 - Expand send/setup, or LinkedIn send outside Lemlist.
 - Overwhelm Floor — one digest + drafts she can approve.
 

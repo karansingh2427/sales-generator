@@ -3,11 +3,11 @@
 | Task ID | Trigger | Steps | Done when |
 |---|---|---|---|
 | T-HS-01 | CRM notes ready | HubSpot panel → Sync **or** skill `sales-hubspot-pull` | Dutch tasks **last ~30d** + never-contacted only + company notes; NL-first; multi-batch OK |
-| T-SEQ-01 | High-ICP Dutch HubSpot lead | `sales-sequence-draft` → Generate | LinkedIn connect → DM (day 3) → max 3 emails, personalized from note |
+| T-SEQ-01 | High-ICP Dutch HubSpot lead | `sales-sequence-draft` → Generate | Visit + like + invite → 1 email → LinkedIn message + follow-up, personalized from note |
 | T-SEQ-02 | Review touch | Edit → Approve → `sales-lemlist-push` (all lines; Gmail fallback for email) → Mark sent | Step `sent`; lead `contacted` |
-| T-SEQ-03 | No reply after ~1 week | Approve next email (≤3) → Gmail send | Sequence progresses; hard cap 3 |
+| T-SEQ-03 | Invite accepted, no reply | Lemlist sends the LinkedIn message (day 3), then the follow-up (day 5) | Max 1 email; follow-ups on LinkedIn |
 | T-SEQ-04 | Inbound reply (LinkedIn or email) | `record_reply` stops sequence → `sales-reply-demo` classify BOOK NOW / NOT YET / NO / CONFUSED | Politeness ≠ BOOK NOW; HubSpot log in+out |
-| T-SEQ-05 | BOOK NOW reply | Offer 2 Ludwig slots · Slack Floor · she books | Never auto-book; cancel E2/E3 |
+| T-SEQ-05 | BOOK NOW reply | Offer 2 Ludwig slots · Slack Floor · she books | Never auto-book; sequence already stopped |
 | T-01 | Offline list | Sales Nav CSV import (fallback) → **NL+BE** → select → Import | `sales_nav_csv` rows |
 | T-01b | Demo without CRM | Demo / sample data → Add demo samples | Labeled demo leads (NL/BE only) |
 | T-02 | Single-touch email | Email icon → review → Mark sent | Stage `contacted` |
@@ -24,7 +24,7 @@
 | Task ID | Skill | Notes |
 |---|---|---|
 | A-01 | `sales-hubspot-pull` | Dutch tasks last ~30d + never-contacted + notes (multi-batch/day) |
-| A-02 | `sales-sequence-draft` | Personalize LinkedIn connect + DM + Email 1–3 from note; approve queue |
+| A-02 | `sales-sequence-draft` | Personalize invite + 1 email + 2 LinkedIn messages from note; approve queue |
 | A-03 | `sales-gmail-send` | Send approved email steps via Gmail; hand replies to reply-demo |
 | A-03b | `sales-lemlist-push` | Push fully approved lead + copy to Lemlist (stub until API key) |
 | A-04 | `sales-reply-demo` | Classify replies; BOOK NOW → 2 slots + Slack Floor |

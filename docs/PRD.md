@@ -10,7 +10,7 @@ Lead gen is already handled by an internal agent that writes **HubSpot company n
 ## Goals
 
 1. **HubSpot ingest** of Dutch tasks from the **last ~30 days** (not today-only) + **company-level** agent notes (why-good, opener, right contact) as **background** — hero path over Sales Nav CSV. **Never-contacted only** (skip prior outbound email / logged outreach). Default **2–3 batches/day** — re-runs are normal. Prefer **HubSpot + Gmail + Slack in Floor’s Cowork session**; web-app token is optional fallback.
-2. **Lemlist sequences (LinkedIn + email):** LinkedIn connect + note (day 0) → LinkedIn DM (day 3) → Email 1 (day 6) → Email 2 (day 13) → Email 3 (day 20); **max 3 emails**; personalize every line from the note; **approve every line** → one push to Lemlist, which sends both channels; **any reply stops the sequence**. Lead without LinkedIn URL → email-only. Until the Lemlist key is wired, emails go via Gmail in Cowork.
+2. **Lemlist multichannel sequences:** profile visit + like latest post + invite (day 0) → **one** personal email (day 1) → LinkedIn message if the invite was accepted (day 3) → LinkedIn follow-up (day 5); **max 1 email**, follow-ups on LinkedIn; personalize every written line from the HubSpot note for the person it names (often the CEO); **approve every line** → one push to Lemlist, which runs both channels; **any reply stops the sequence**. Lead without LinkedIn URL → just the email. Until Lemlist is connected, the email goes via Gmail in Cowork.
 3. Encode opportunity angles from the note: consistency, content quality/mix, visibility, open vacancies — plus CRM opener/rationale.
 4. ICP: decision makers (Partner / Founder / Ops manager); verticals accountancy, legal, IT, HR/recruitment/exec search, coaching, expertise B2B; **skip strong social presence**; geo **Netherlands first**, Belgium second, **NL + BE only**.
 5. Keep Sales Nav CSV as **fallback** import.
@@ -49,7 +49,7 @@ Supersedes earlier Belgium-first defaults (Karandeep preference 2026-10-06).
 | RF-HS-02 | As Floor, with session HubSpot tools (or optional token) I pull live company notes | NL-first list; company notes preferred |
 | RF-HS-03 | As Floor, stage labels map via configurable `HUBSPOT_STAGE_MAP` | Includes Demo Booked → Completed / Rescheduled / Cancelled |
 | RF-HS-04 | As Floor, HubSpot writebacks stay English | Stage push uses English labels |
-| RF-SEQ-01 | As Floor, I get a LinkedIn + email sequence from a HubSpot note | LinkedIn connect → DM day 3 → max 3 emails; ~1 week email waits; no re-scrape |
+| RF-SEQ-01 | As Floor, I get a personal LinkedIn + email sequence from a HubSpot note | Visit + like + invite → 1 email → LinkedIn message (if accepted) → LinkedIn follow-up; no re-scrape |
 | RF-SEQ-02 | As Floor, I approve every line, then Lemlist sends | Cannot push until every line is approved; Lemlist sends LinkedIn + email (stub until key; Gmail in Cowork meanwhile) |
 | RF-SEQ-04 | As Floor, a reply on either channel stops the sequence | `record_reply` skips all remaining LinkedIn + email steps |
 | RF-SEQ-03 | As Floor, strong social presence leads are skipped/DQ | Sync flags; sequence generate rejects DQ |
@@ -66,7 +66,7 @@ Supersedes earlier Belgium-first defaults (Karandeep preference 2026-10-06).
 
 ## Success metrics (pilot)
 
-- Dutch cold outreach via **Lemlist (LinkedIn + email)** (max 3 emails) before calls.
+- Dutch cold outreach via **Lemlist (LinkedIn + 1 personal email)** before calls.
 - Sequences **personalize from company notes only** (no re-scrape).
 - Lists stay **NL-first / NL+BE only**.
 - Demo handoff = Slack Floor (with conversation) → she books Ludwig; never auto-book.
@@ -79,6 +79,7 @@ Supersedes earlier Belgium-first defaults (Karandeep preference 2026-10-06).
 - Confirm Claude↔HubSpot + Gmail + Slack connection scopes.
 - **Lemlist API key**, the pilot **campaign** to push into, and Floor’s **LinkedIn account + email inbox connected in Lemlist** (plan must include LinkedIn steps).
 - Confirm Lemlist sends the emails too (recommended — one sender, native stop-on-reply) rather than keeping Gmail as the email sender.
+- **Lemlist plan:** the API key works but the API answers 402 (“available starting emailPro plan”); LinkedIn steps need the **Multichannel** plan — or use Lemlist’s Claude connector in Cowork if it covers adding leads with variables.
 - Pipeline name + stages **before** Demo Booked.
 - Property names if structured company props differ from defaults.
 - Explicit OK to drop approve-before-send later (Willow policy).

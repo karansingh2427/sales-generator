@@ -1,26 +1,24 @@
 ---
 name: sales-sequence-draft
-description: Batch-draft LinkedIn + email sequences (sent by Lemlist) for Dutch HubSpot leads — LinkedIn connect → DM day 3 → Email 1–3 (max 3). Senior voice, one story arc, stop on any reply. Approve every line.
+description: Batch-draft personal multichannel sequences (run by Lemlist) for Dutch HubSpot leads — profile visit + like latest post + invite → ONE personal email (day 1) → LinkedIn message if accepted (day 3) → LinkedIn follow-up (day 5). Senior voice, one story arc, stop on any reply. Approve every line.
 ---
 
 # sales-sequence-draft
 
-**Floor path:** HubSpot notes → one coherent story across LinkedIn + email → approve every line → Lemlist sends LinkedIn + email → any reply stops everything.
-
-Reference flow Floor shared (Reachium campaign page): short messages in her voice, one question, stop the moment someone replies, nothing sends until she approves the list and every line.
+**Floor path (Nov 2026):** HubSpot note → warm up on LinkedIn → **one** personal email → the follow-ups happen on **LinkedIn**, because that’s more personal than more emails → any reply stops everything.
 
 ## Persona (hard)
 
-Write as a **sales professional with 20–30 years experience**. Calm, specific, peer-to-peer. Never AI-ish, never junior, never a feature dump.
+Write as a **sales professional with 20–30 years experience**. Calm, specific, peer-to-peer. Never AI-ish, never junior, never a feature dump. **Personal over generic** — Floor likes personalized messages.
 
 ## Story arc (hard rule) — one thread only
 
 1. **Open** with the HubSpot-note insight (vacancy / consistency / visibility / etc.).
 2. Develop **one** tension that logically follows that insight.
 3. Soft **Willow bridge** that continues the *same* story — never pivot to an unrelated product angle.
-4. Short CTA (curious / open to chat) — not a demo pitch dump in Email 1.
+4. Short CTA (curious / open to chat) — not a demo pitch dump.
 
-Emails **2–3** continue the same story; escalate lightly. Do not restart with a new random angle.
+The LinkedIn messages continue the same story as the email. Never restart with a new random angle.
 
 ### Consistency / LinkedIn posting (Floor-corrected)
 
@@ -33,99 +31,85 @@ Emails **2–3** continue the same story; escalate lightly. Do not restart with 
 
 | | |
 |---|---|
-| **BAD** | Vacancy opener → sudden Willow “content calendar”. **Or** “I saw your post on Friday…” |
-| **GOOD** | “I see you haven’t been posting consistently…” → one tension → soft Willow on same thread. **Or** vacancy → hiring-brand story (no random pivot). |
-
-### Reply classes (when they answer)
-
-| Reply | Do |
-|---|---|
-| Clear no | Cancel E2/E3 · close |
-| Interest | Cancel E2/E3 · Slack Floor + conversation |
-| Confused / “don’t understand your point” / pushback on opener | Gracious short reply · HubSpot log · **cancel E2/E3** · **no demo** · close — **do not** ban the consistency angle on future leads |
+| **BAD** | Vacancy opener → sudden Willow “content calendar”. **Or** “I saw your post on Friday…” **Or** a second and third cold email. |
+| **GOOD** | “I see you haven’t been posting consistently…” → one tension → soft Willow on same thread → then a personal LinkedIn message that refers back to the email. |
 
 ## CRM style learning (once per session / batch)
 
 Before drafting: pull Floor’s **past HubSpot sent emails** for tone + apply feedback playbook.
 
-## LinkedIn steps
+## The sequence (hard)
 
-| Step | Rule |
-|---|---|
-| **Connect note** (day 0) | **≤300 characters**. Name + firm + the one angle from the note. No pitch, no link, no demo ask. |
-| **DM** (day 3, only if connected + no reply) | 2–3 short lines: thanks → the same tension → **one** easy question. Reachium-style. |
-| No LinkedIn URL in HubSpot | Skip LinkedIn steps — email-only, E1 on approve. Don’t scrape to find the URL unless Floor asks. |
+The person to contact is the one in the HubSpot note (often the CEO / founder / managing partner).
 
-## Cadence (hard)
+| Day | Step | Who writes it | Rule |
+|---|---|---|---|
+| 0 | **Visit profile** | automatic (Lemlist) | — |
+| 0 | **Like latest post** | automatic (Lemlist) | Skip it if the latest post is old, sensitive or off-topic. |
+| 0 | **Connection request + note** | agent → Floor approves | **≤200 characters** (Lemlist limit, variables included). Name + firm + the one angle. No pitch, no link. |
+| 1 | **The email** (the only one) | agent → Floor approves | Why we’re reaching out, from the HubSpot note: insight → one tension → soft Willow bridge → short CTA. PS: “I also sent you a connection request on LinkedIn.” |
+| 3 | **LinkedIn message** | agent → Floor approves | **Only if the invite was accepted** and no reply. “Thanks for connecting — I sent you an email earlier this week, reaching out here as well because …” + **one** easy question. |
+| 5 | **LinkedIn follow-up** | agent → Floor approves | 2 days later if still no reply. One more thought on the same story + “worth a short chat, or is the timing off?” |
 
-| Step | Channel | Timing |
-|---|---|---|
-| Connect + note | LinkedIn (Lemlist) | Day 0 on approve |
-| DM | LinkedIn (Lemlist) | Day 3 if no reply |
-| Email 1 | Email (Lemlist) | Day 6 if no reply |
-| Email 2 | Email (Lemlist) | Day 13 — **exactly 7 days** after E1 if no reply |
-| Email 3 | Email (Lemlist) | Day 20 — **exactly 7 days** after E2 if no reply |
-| Cap | — | **Max 3 emails** |
+- **Max 1 email.** No email follow-ups — follow up on LinkedIn.
+- **Stop on any reply** — LinkedIn or email — at any point. Lemlist stops the lead; mirror with `record_reply`, then `sales-reply-demo`.
+- Invite not accepted → no LinkedIn messages (Lemlist can’t message non-connections). The email still goes out.
+- **No LinkedIn URL in HubSpot** → just the one email. Don’t scrape to find the URL unless Floor asks.
 
-**Until Lemlist is connected** (`sales-lemlist-push` is a stub): still draft + get approval on the LinkedIn lines, but they are **held** — send the emails via `sales-gmail-send` on the email-only cadence (E1 on approve, E2 +7d, E3 +14d). Never tell Floor a LinkedIn message was sent. Once Lemlist is live, the whole approved sequence goes to Lemlist in one push and Gmail sends nothing for that lead.
+**Until Lemlist is connected** (`sales-lemlist-push` is a stub): still draft + get approval on every line, but the LinkedIn lines are **held**; send the approved email via `sales-gmail-send`. Never tell Floor a LinkedIn action happened. Once Lemlist is live, the whole approved sequence goes to Lemlist in one push and Gmail sends nothing for that lead.
 
-**Stop on any reply — LinkedIn or email** — cancel every remaining step on both channels, then `sales-reply-demo`.
-
-Stop on reply: **no** → close · **interest** → Slack Floor · **confused / don’t understand** → gracious short reply + HubSpot log + cancel E2/E3 + **no demo**. Cancel remaining scheduled sends. Consistency angle stays valid for other leads.
-
-`sales-gmail-send` owns scheduling **and** HubSpot email logging after every successful send (dedup if Gmail sync already created one). **Never rely on Floor remembering.**
+Reply classes: **no** → close · **interest** → Slack Floor + conversation · **confused / don’t understand** → gracious short reply + HubSpot log + **no demo**. The consistency angle stays valid for other leads.
 
 ## Default prompts (from START-HERE)
 
-**Step 0 — Gmail self-test:**
+**Step 0 — Gmail self-test (only while Gmail is the email fallback):**
 
 > Send me one short test email via Gmail to my own inbox with subject “Willow Sales Generator test” and body “Gmail send works.” Don’t contact any leads yet.
 
 **Then batch:**
 
-> You are a sales pro with 20+ years experience. Read my past HubSpot sent emails for tone/format. Then batch 50 Dutch HubSpot tasks. From each company note only, draft one coherent story: LinkedIn connect note (≤300 chars) → LinkedIn DM on day 3 (2–3 lines, one question) → 3 Gmail emails (insight → one tension → soft Willow bridge → short CTA). Same story in emails 2–3. Consistency angle phrasing: “I see you haven’t been posting consistently” — never “I saw your post yesterday/Friday”. One post does not kill that angle. Skip frequent posters (bad lead). Don’t live-check LinkedIn every run — trust HubSpot notes. Email 2 after exactly 7 days if no reply; email 3 after another 7 days if still no reply (max 3). Auto-schedule follow-ups via Gmail/Cowork — don’t ask me to remember. After every send, log the email in HubSpot on the contact (skip if already synced). Stop on any reply, LinkedIn or email (no/interest → Slack me; if confused / don’t get the point → short gracious reply, log HubSpot, cancel follow-ups, no demo). Show approve queue. Do not send yet. Skip Belgian leads.
+> You are a sales pro with 20+ years experience. Read my past HubSpot sent emails for tone/format. Then batch up to 50 Dutch HubSpot tasks from the last ~30 days (never contacted before). For each, from the company note only, draft one personal multichannel sequence for the person in the note: Lemlist visits their LinkedIn profile and likes their latest post → connection request with a short note (≤200 characters) → day 1: ONE personal email on why I’m reaching out → day 3, only if they accepted: LinkedIn message (“I sent you an email — connecting here because …”, one question) → day 5: LinkedIn follow-up. Only one email; the follow-ups are on LinkedIn. Consistency angle phrasing: “I see you haven’t been posting consistently” — never “I saw your post yesterday/Friday”. Skip frequent posters (bad lead). Trust the HubSpot notes. Stop on any reply, LinkedIn or email (no/interest → Slack me; confused → short gracious reply, log HubSpot, no demo). Show approve queue. Do not send yet. Skip Belgian leads.
 
 ## Research / send rules
 
 - Prefer HubSpot notes; LinkedIn research OK when thin / asked — not every run.
-- **Lemlist** sends LinkedIn + email (`sales-lemlist-push`, once every line is approved). **Gmail** (`sales-gmail-send`) only as the email fallback until Lemlist is connected. No other LinkedIn automation.
-- **Approve-before-send on every line** (pilot). Dutch only in pilot batches.
+- **Lemlist** runs every step (`sales-lemlist-push`, once every written line is approved). **Gmail** (`sales-gmail-send`) only as the email fallback until Lemlist is connected. No other LinkedIn automation.
+- **Approve-before-send on every written line** (pilot). Dutch only in pilot batches.
 
 ## Guardrail
 
 ```text
-Step 0 self-test → style from HubSpot sent emails
-  → ONE story → draft LI connect + LI DM + E1–E3 → approve every line
-  → Lemlist: connect d0 · DM d3 · E1 d6 · E2 d13 · E3 d20   (Gmail fallback for emails until connected)
-  → reply on either channel? cancel ALL remaining · no → stop · interest → Slack Floor
+style from HubSpot sent emails → ONE story
+  → visit + like (auto) · invite note · the email · LinkedIn msg · LinkedIn follow-up → approve every line
+  → Lemlist: d0 visit/like/invite · d1 email · d3 msg (if accepted) · d5 follow-up
+  → reply on either channel? stop ALL · no → close · interest → Slack Floor
 ```
 
 ## Approve queue
 
-1. Draft connect note + DM + 3 emails per company (one story); label each step’s day.
-2. Numbered approve queue — show LinkedIn lines **and** emails.
+1. Draft invite note + email + 2 LinkedIn messages per company (one story); label each step’s day.
+2. Numbered approve queue — show the LinkedIn lines **and** the email; list the automatic visit/like so Floor can skip them.
 3. Floor: **approve** · **edit** · **skip** (per line or per company).
-4. `sales-lemlist-push` takes the fully approved lead; until Lemlist is live, `sales-gmail-send` sends emails + schedules follow-ups.
+4. `sales-lemlist-push` takes the fully approved lead; until Lemlist is live, `sales-gmail-send` sends the email.
 5. Chunk default **50**.
 
 ```text
-# Approve queue — <date> · Dutch · LinkedIn + email via Lemlist (max 3 emails)
+# Approve queue — <date> · Dutch · LinkedIn + 1 email via Lemlist
 
 | # | Company | Contact | Status | Story | Schedule |
 |---|---------|---------|--------|-------|----------|
-| 1 | Acme NL  | Jan | pending | vacancy→hiring trust | LI connect d0 · LI DM d3 · E1 d6 · E2 d13 · E3 d20 |
+| 1 | Acme NL  | Jan (CEO) | pending | vacancy→hiring trust | d0 visit·like·invite · d1 email · d3 LI msg · d5 LI follow-up |
 ```
 
 ## Drafting checklist
 
-1. One insight from HubSpot note; one tension; soft Willow on same thread.
-2. Short CTA in E1; same story in E2–E3.
+1. One insight from the HubSpot note; one tension; soft Willow on the same thread.
+2. Exactly one email; LinkedIn messages refer back to it and stay on the same story.
 3. Never content-calendar pivot on a vacancy story.
-4. Consistency phrasing: “haven’t been posting consistently” — never a single-post date callout; one post ≠ consistent; skip frequent posters; no live LinkedIn check every run.
-5. Connect note ≤300 chars, no pitch; DM ends in one question.
-6. Label waits: DM day 3; E1 day 6; E2 **exactly 7 days** after E1; E3 **another 7 days**.
+4. Consistency phrasing: “haven’t been posting consistently” — never a single-post date callout; skip frequent posters.
+5. Invite note ≤200 chars, no pitch; LinkedIn message ends in one question.
 
 ## Done when
 
-- Connect note + DM + ≤3 emails, one story, senior tone; timing explicit per step.
-- Floor approved every line before any send; handed to `sales-lemlist-push` (or emails to `sales-gmail-send` until Lemlist is live).
+- Invite note + 1 email + 2 LinkedIn messages, one story, senior and personal; day + condition explicit per step.
+- Floor approved every line before any send; handed to `sales-lemlist-push` (or the email to `sales-gmail-send` until Lemlist is live).

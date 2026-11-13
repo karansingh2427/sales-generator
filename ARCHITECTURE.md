@@ -38,7 +38,7 @@ sales-feedback-learn / .data/feedback.json  (tone / “how I write”)
         ↓
 sales-hubspot-pull / /api/hubspot (Dutch tasks · NL first)
         ↓
-sales-sequence-draft  (LinkedIn connect + DM, Email 1–3 from note · approve queue)
+sales-sequence-draft  (visit + like + invite · 1 email · 2 LinkedIn messages, from note · approve queue)
         ↓
 sales-lemlist-push (LinkedIn + email · stub)  ·  sales-gmail-send (email fallback until Lemlist is live)
         ↓  any reply on either channel → stop sequence

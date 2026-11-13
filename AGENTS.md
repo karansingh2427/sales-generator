@@ -10,7 +10,7 @@ never auto-book Calendar.
 
 **Geography locked:** **Netherlands first**, Belgium second — **NL + BE only**.
 
-**Channels:** **Lemlist (LinkedIn + email)** — Willow took a Lemlist subscription (Nov 2026; replaces the earlier HeyReach plan). LinkedIn connect (day 0) → LinkedIn DM (day 3) → Email 1–3 (max 3). Any reply stops the sequence. Lemlist push is a **stub** until Willow's API key exists — until then emails go out via Gmail in Cowork and LinkedIn lines are held. No LinkedIn automation outside Lemlist.
+**Channels:** **Lemlist (LinkedIn + email)** — Willow took a Lemlist subscription (Nov 2026; replaces the earlier HeyReach plan). Profile visit + like latest post + invite (day 0) → **one** personal email (day 1) → LinkedIn message if accepted (day 3) → LinkedIn follow-up (day 5). Max 1 email; follow-ups on LinkedIn. Any reply stops the sequence. Lemlist push is a **stub** until Willow's API key exists — until then emails go out via Gmail in Cowork and LinkedIn lines are held. No LinkedIn automation outside Lemlist.
 
 **This file is the entry point for coding agents.** Start here, then follow the pointers.
 
@@ -28,7 +28,7 @@ Plugin skills live under `skills/` (see [`.cursor-plugin/plugin.json`](.cursor-p
 | Skill | Path | Use when |
 |---|---|---|
 | `sales-hubspot-pull` | [skills/sales-hubspot-pull/SKILL.md](skills/sales-hubspot-pull/SKILL.md) | Dutch HubSpot tasks **last ~30 days**, never-contacted only, NL-first notes; multi-batch/day |
-| `sales-sequence-draft` | [skills/sales-sequence-draft/SKILL.md](skills/sales-sequence-draft/SKILL.md) | Batch-draft LinkedIn + email sequences (connect → DM → Email 1–3) into approve queue |
+| `sales-sequence-draft` | [skills/sales-sequence-draft/SKILL.md](skills/sales-sequence-draft/SKILL.md) | Batch-draft multichannel sequences (visit + like + invite → 1 email → 2 LinkedIn messages) into approve queue |
 | `sales-gmail-send` | [skills/sales-gmail-send/SKILL.md](skills/sales-gmail-send/SKILL.md) | Email fallback until Lemlist is connected — send approved email steps via Gmail (Cowork connector) |
 | `sales-lemlist-push` | [skills/sales-lemlist-push/SKILL.md](skills/sales-lemlist-push/SKILL.md) | After every line is approved — add the lead + its copy to the Lemlist campaign (**stub** until API key) |
 | `sales-reply-demo` | [skills/sales-reply-demo/SKILL.md](skills/sales-reply-demo/SKILL.md) | Dutch-batch Gmail + LinkedIn replies → BOOK NOW / NOT YET / NO / CONFUSED; Slack Floor on BOOK NOW |
@@ -36,7 +36,7 @@ Plugin skills live under `skills/` (see [`.cursor-plugin/plugin.json`](.cursor-p
 | `sales-feedback-learn` | [skills/sales-feedback-learn/SKILL.md](skills/sales-feedback-learn/SKILL.md) | “Remember: …” — applied on next Dutch batch pull/drafts |
 | `sales-lead-run` | [skills/sales-lead-run/SKILL.md](skills/sales-lead-run/SKILL.md) | Orchestrate batch pass (2–3×/day) + Lemlist send (Gmail fallback) + reply→demo + demo handoff |
 
-Pattern mirrored from [agent-data/job-search](https://github.com/agent-data/job-search) (`skills/*/SKILL.md` + this map). Prefer **HubSpot + Gmail + Slack (+ Lemlist once connected) tools in Floor’s Claude Cowork session** over embedding tokens in the web app.
+Pattern mirrored from [agent-data/job-search](https://github.com/agent-data/job-search) (`skills/*/SKILL.md` + this map). Prefer **HubSpot + Gmail + Slack (+ Lemlist via its Claude connector once accepted) tools in Floor’s Claude Cowork session** over embedding tokens in the web app.
 
 **Feedback memory:** `.data/feedback.json` (runtime) + optional promote copy in [`skills/memory/FEEDBACK.md`](skills/memory/FEEDBACK.md). Next HubSpot pull / sequence draft / lead-run **must** load active feedback. Feedback never bypasses approve-before-send (Lemlist or Gmail).
 

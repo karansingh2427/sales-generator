@@ -25,8 +25,8 @@ function whyBlock(lead: Lead, arc: StoryArc): string {
 type EmailTouch = 1 | 2 | 3;
 
 /**
- * Senior sales voice: calm, specific, peer-to-peer.
- * One story thread across Email 1–3. Soft CTA — never a demo/feature dump in E1.
+ * Senior sales voice: calm, specific, peer-to-peer. The default playbook sends ONE email
+ * (touch 1); touches 2–3 remain for custom playbooks. Soft CTA — never a demo/feature dump.
  */
 function draftEmail(
   lead: Lead,
@@ -81,13 +81,23 @@ ${arc.willowBridge}
 Curious whether this is on your radar — open to a short chat if useful.
 
 Best,
-${bdrName}`;
+${bdrName}${lead.linkedInUrl?.trim() ? "\n\nPS — I also sent you a connection request on LinkedIn." : ""}`;
 
   return { subject: arc.subjectHint, body, rationale };
 }
 
-/** LinkedIn caps connection notes at 300 characters. */
-export const LINKEDIN_CONNECT_NOTE_MAX = 300;
+/** Lemlist caps invite notes at 200 characters, variables included (some Premium senders get 300). */
+export const LINKEDIN_CONNECT_NOTE_MAX = 200;
+
+/** Automatic LinkedIn actions — Lemlist runs them, there is no copy for Floor to approve. */
+export function isActionStep(kind: SequenceStepKind): boolean {
+  return kind === "linkedin_visit" || kind === "linkedin_like";
+}
+
+/** Steps with copy Floor must approve before anything is sent. */
+export function needsApproval(step: Pick<SequenceStep, "kind">): boolean {
+  return step.kind !== "wait" && !isActionStep(step.kind);
+}
 
 /** Short noun phrase for the angle — LinkedIn copy has no room for the full insight. */
 const ANGLE_PHRASE: Record<StoryArc["angle"], string> = {
@@ -98,7 +108,16 @@ const ANGLE_PHRASE: Record<StoryArc["angle"], string> = {
   content_mix: "POV vs promo posts",
 };
 
-/** One easy question per angle — Reachium-style opener, never a pitch. */
+/** Why we're also reaching out on LinkedIn — the same story as the email, in one clause. */
+const ANGLE_REASON: Record<StoryArc["angle"], (firm: string) => string> = {
+  open_vacancies: (firm) => `${firm} is hiring, and the story around those roles matters on LinkedIn`,
+  visibility: (firm) => `there’s more expertise at ${firm} than shows online`,
+  consistency: (firm) => `I see ${firm} hasn’t been posting consistently`,
+  content_quality: (firm) => `the posts don’t yet sound like the people at ${firm}`,
+  content_mix: (firm) => `there’s room for more of ${firm}’s own point of view in its posts`,
+};
+
+/** One easy question per angle — never a pitch. */
 const ANGLE_QUESTION: Record<StoryArc["angle"], (firm: string) => string> = {
   open_vacancies: (firm) => `How does ${firm} tell the story behind its open roles today?`,
   visibility: (firm) => `Who at ${firm} owns LinkedIn visibility today?`,
@@ -107,56 +126,67 @@ const ANGLE_QUESTION: Record<StoryArc["angle"], (firm: string) => string> = {
   content_mix: () => `How do you decide what the firm posts about?`,
 };
 
+const AFTER_ACCEPT = "Only if they accepted your invite and haven’t replied";
+
 /**
- * LinkedIn copy (sent by Lemlist): short, peer-to-peer, one question.
- * Connect note ≤300 chars; DM is 2–3 lines. Same story thread as the emails.
+ * LinkedIn copy (sent by Lemlist): short, personal, peer-to-peer.
+ * Invite note ≤200 chars; messages 2–3 lines. Same story thread as the email.
  */
 function draftLinkedIn(
   lead: Lead,
   arc: StoryArc,
   bdrName: string,
-  kind: "linkedin_connect" | "linkedin_message",
+  kind: "linkedin_connect" | "linkedin_message" | "linkedin_followup",
 ): string {
   const name = firstName(lead.contactName);
   const me = firstName(bdrName);
+  const phrase = ANGLE_PHRASE[arc.angle];
   if (kind === "linkedin_connect") {
-    const note = `Hi ${name}, I came across ${lead.firmName} while looking at ${ANGLE_PHRASE[arc.angle]} at expertise firms. I work on exactly that at Willow — would be good to connect. ${me}`;
-    return note.length <= LINKEDIN_CONNECT_NOTE_MAX
-      ? note
-      : `Hi ${name}, I work with expertise firms like ${lead.firmName} on ${ANGLE_PHRASE[arc.angle]}. Would be good to connect. ${me}`;
+    const options = [
+      `Hi ${name}, I came across ${lead.firmName} while looking at ${phrase} at expertise firms. I work on exactly that at Willow — would be good to connect. ${me}`,
+      `Hi ${name}, I work with expertise firms like ${lead.firmName} on ${phrase}. Would be good to connect. ${me}`,
+      `Hi ${name}, I work with expertise firms on ${phrase}. Would be good to connect. ${me}`,
+    ];
+    return options.find((o) => o.length <= LINKEDIN_CONNECT_NOTE_MAX) ?? options[options.length - 1];
   }
-  return `Thanks for connecting, ${name}.
-${arc.tension}
+  if (kind === "linkedin_message") {
+    return `Thanks for connecting, ${name}! I sent you an email earlier this week — reaching out here as well because ${ANGLE_REASON[arc.angle](lead.firmName)}.
 ${ANGLE_QUESTION[arc.angle](lead.firmName)}`;
+  }
+  return `Hi ${name}, one more thought on ${lead.firmName}:
+${arc.tension}
+Worth a short chat — or is the timing off?`;
 }
 
-/**
- * Lemlist multichannel (Floor, Nov 2026 — Willow took Lemlist):
- * LinkedIn connect (day 0) → LinkedIn DM (day 3) → Email 1 (day 6) → Email 2 (day 13) → Email 3 (day 20).
- * Max 3 emails. Same story arc on every touch. Any reply on either channel stops the rest.
- * Every message step needs Floor's approval before Lemlist sends it.
- */
-const DEFAULT_PLAYBOOK: {
+type PlaybookStep = {
   kind: SequenceStepKind;
   label: string;
   waitDays: number;
   touch?: EmailTouch;
-}[] = [
-  { kind: "linkedin_connect", label: "LinkedIn connect + note (day 0)", waitDays: 0 },
-  { kind: "wait", label: "Wait 3 days (if no reply) → LinkedIn DM", waitDays: 3 },
-  { kind: "linkedin_message", label: "LinkedIn DM — one question (day 3)", waitDays: 0 },
-  { kind: "wait", label: "Wait 3 days (if no reply) → Email 1", waitDays: 3 },
-  { kind: "email", label: "Email 1 — HubSpot insight → one story (day 6)", waitDays: 0, touch: 1 },
-  { kind: "wait", label: "Wait exactly 7 days (if no reply) → Email 2", waitDays: 7 },
-  { kind: "email", label: "Email 2 — same story (day 13)", waitDays: 0, touch: 2 },
-  { kind: "wait", label: "Wait exactly 7 days (if no reply) → Email 3", waitDays: 7 },
-  { kind: "email", label: "Email 3 — same story, last note (day 20)", waitDays: 0, touch: 3 },
+  condition?: string;
+};
+
+/**
+ * Lemlist multichannel (Floor, Nov 2026): warm up on LinkedIn, one personal email,
+ * then the follow-ups happen on LinkedIn — more personal than more emails.
+ * Visit profile + like latest post + invite (day 0) → the one email (day 1)
+ * → LinkedIn message if the invite was accepted (day 3) → LinkedIn follow-up (day 5).
+ * Any reply on either channel stops the rest. Every written line needs Floor's approval.
+ */
+const DEFAULT_PLAYBOOK: PlaybookStep[] = [
+  { kind: "linkedin_visit", label: "Visit their LinkedIn profile", waitDays: 0 },
+  { kind: "linkedin_like", label: "Like their latest post", waitDays: 0 },
+  { kind: "linkedin_connect", label: "Connection request + short note", waitDays: 0 },
+  { kind: "wait", label: "Wait 1 day → the email", waitDays: 1 },
+  { kind: "email", label: "Email — why we’re reaching out, from the HubSpot note", waitDays: 0, touch: 1 },
+  { kind: "wait", label: "Wait 2 days → LinkedIn message (if the invite was accepted)", waitDays: 2 },
+  { kind: "linkedin_message", label: "LinkedIn message — “I sent you an email…”", waitDays: 0, condition: AFTER_ACCEPT },
+  { kind: "wait", label: "Wait 2 days → LinkedIn follow-up", waitDays: 2 },
+  { kind: "linkedin_followup", label: "LinkedIn follow-up", waitDays: 0, condition: AFTER_ACCEPT },
 ];
 
-/** No LinkedIn URL on the lead → no LinkedIn steps; run the email part straight away. */
-const EMAIL_ONLY_PLAYBOOK = DEFAULT_PLAYBOOK.filter(
-  (p, i) => i >= DEFAULT_PLAYBOOK.findIndex((x) => x.kind === "email"),
-);
+/** No LinkedIn URL on the lead → no LinkedIn steps; just the one email. */
+const EMAIL_ONLY_PLAYBOOK = DEFAULT_PLAYBOOK.filter((p) => p.kind === "email");
 
 function channelFor(kind: SequenceStepKind): OutreachChannel | undefined {
   if (kind === "linkedin_connect") return "linkedin_connect";
@@ -195,7 +225,7 @@ function scrubBody(body: string, topics?: string[]): string {
 export function buildSequenceForLead(
   lead: Lead,
   bdrName: string,
-  playbookOverride?: typeof DEFAULT_PLAYBOOK,
+  playbookOverride?: PlaybookStep[],
   options: BuildSequenceOptions = {},
 ): Omit<OutreachSequence, "id" | "createdAt" | "updatedAt"> {
   const hasLinkedIn = Boolean(lead.linkedInUrl?.trim());
@@ -216,7 +246,7 @@ export function buildSequenceForLead(
         waitDays: p.waitDays,
         status: "pending" as const,
         rationale: withFeedbackRationale(
-          `Pause exactly ${p.waitDays} days. Next step goes out only if no reply on LinkedIn or email. Any reply → stop the sequence (record_reply) → classify / Slack Floor.`,
+          `Pause ${p.waitDays} day${p.waitDays === 1 ? "" : "s"}. The next step goes out only if there is no reply on LinkedIn or email. Any reply → stop the sequence (record_reply) → classify / Slack Floor.`,
           guidance,
         ),
       };
@@ -238,7 +268,19 @@ export function buildSequenceForLead(
         status: "draft" as const,
       };
     }
-    const liKind = p.kind === "linkedin_connect" ? "linkedin_connect" : "linkedin_message";
+    if (isActionStep(p.kind)) {
+      return {
+        id,
+        kind: p.kind,
+        label: p.label,
+        waitDays: p.waitDays,
+        sendVia: sendViaFor(p.kind),
+        rationale: "Automatic in Lemlist — warms the lead up before the invite. Skip it if it doesn’t fit this person.",
+        status: "pending" as const,
+      };
+    }
+    const liKind =
+      p.kind === "linkedin_connect" || p.kind === "linkedin_followup" ? p.kind : "linkedin_message";
     return {
       id,
       kind: p.kind,
@@ -246,6 +288,7 @@ export function buildSequenceForLead(
       waitDays: p.waitDays,
       channel: channelFor(p.kind),
       sendVia: sendViaFor(p.kind),
+      condition: p.condition,
       body: scrubBody(draftLinkedIn(lead, arc, bdrName, liKind), neverPitch),
       rationale: withFeedbackRationale(whyBlock(lead, arc), guidance),
       status: "draft" as const,
@@ -256,7 +299,7 @@ export function buildSequenceForLead(
     leadId: lead.id,
     name: hasLinkedIn || playbookOverride
       ? `LinkedIn + email sequence · ${lead.firmName}`
-      : `Email sequence (no LinkedIn URL) · ${lead.firmName}`,
+      : `Email only (no LinkedIn URL) · ${lead.firmName}`,
     status: "draft",
     steps,
     opportunityAngles: angles.length ? [arc.angle, ...angles.filter((a) => a !== arc.angle)] : [arc.angle],

@@ -47,7 +47,7 @@ When **any** of these run, load active feedback first:
 
 1. `sales-hubspot-pull` — skip listed companies; skip/flag **strong social / frequent posters**; prefer preferred titles; apply ICP/geo notes.
 2. `sales-sequence-draft` — inject tone / never-pitch; use consistency phrasing **“haven’t been posting consistently”** (never single-post date callouts); still **approve before send**.
-3. `sales-gmail-send` — on confused / don’t-understand replies: gracious short reply, HubSpot log, cancel E2/E3, no demo.
+3. `sales-gmail-send` — on confused / don’t-understand replies: gracious short reply, HubSpot log, sequence stopped, no demo.
 4. `sales-lead-run` — preflight: load memory → digest → batch pull/draft.
 
 ## List / disable / delete

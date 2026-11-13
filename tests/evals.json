@@ -86,16 +86,17 @@
     },
     {
       "id": "V-08",
-      "scenario": "Generate LinkedIn + email sequence for Lemlist (connect → DM day 3 → max 3 emails) then approve and mark sent",
+      "scenario": "Generate the Lemlist multichannel sequence (visit + like + invite → 1 email → LinkedIn message → LinkedIn follow-up) then approve and mark sent",
       "request": "POST /api/sequences generate → approve_step → mark_sent",
       "expectations": [
-        "Steps in order: linkedin_connect → wait 3d → linkedin_message → wait 3d → Email 1–3 with 7-day waits; every message step sendVia lemlist",
-        "Exactly 3 email steps; connect note ≤300 chars; DM ends in one question",
-        "Lead without LinkedIn URL gets email-only sequence",
+        "Steps in order: linkedin_visit, linkedin_like, linkedin_connect (day 0) → wait 1d → email (day 1) → wait 2d → linkedin_message (day 3, only if invite accepted) → wait 2d → linkedin_followup (day 5)",
+        "Exactly 1 email step; every step sendVia lemlist; visit/like are automatic (no copy, no approval)",
+        "Invite note ≤200 chars; email mentions the LinkedIn invite; LinkedIn message refers back to the email and asks one question",
+        "Lead without LinkedIn URL gets just the email",
         "Opportunity angles non-empty; drafts personalized from HubSpot note background",
-        "mark_sent without approve returns 400",
+        "mark_sent without approve returns 400 for written steps",
         "After approve+mark_sent step status sent and lead stage contacted",
-        "Live send path: Lemlist sends LinkedIn + email after approve (Gmail fallback for email until connected; UI mark_sent is simulator)"
+        "Live send path: Lemlist runs every step after approve (Gmail fallback for the email until connected; UI mark_sent is simulator)"
       ]
     },
     {
@@ -139,7 +140,7 @@
         "Classification BOOK NOW (not NOT YET)",
         "Short outbound reply offers exactly 2 concrete Ludwig demo slots (calendar or edit-ready placeholders)",
         "Slack Floor includes full thread + classification + slots",
-        "E2/E3 cancelled; HubSpot logs inbound + outbound",
+        "Sequence stopped (Lemlist / record_reply); HubSpot logs inbound + outbound",
         "No calendar event auto-created"
       ]
     },
@@ -278,7 +279,7 @@
         "No Ludwig slot offer as a hard book ask",
         "No Slack Floor booking ping",
         "No calendar auto-create",
-        "E2/E3 kept if NOT YET"
+        "NOT YET gets one value reply; no automated touch continues after the reply"
       ]
     },
     {
@@ -302,8 +303,8 @@
     },
     {
       "id": "I-14",
-      "scenario": "Must not approve a LinkedIn connect note over 300 characters",
-      "request": "POST /api/sequences approve_step on linkedin_connect with 301+ char body",
+      "scenario": "Must not approve a LinkedIn invite note over 200 characters (Lemlist limit)",
+      "request": "POST /api/sequences approve_step on linkedin_connect with 201+ char body",
       "expectations": [
         "Returns 400 with char count and max",
         "Step stays draft"
@@ -325,6 +326,23 @@
       "expectations": [
         "Gmail send refused / skipped for that lead",
         "No duplicate email reaches the prospect"
+      ]
+    },
+    {
+      "id": "I-17",
+      "scenario": "Must not send a second cold email — follow-ups happen on LinkedIn",
+      "request": "Lead did not reply to the email and did not accept the invite",
+      "expectations": [
+        "No second email is drafted, scheduled or sent",
+        "Sequence ends after the email unless the invite is accepted"
+      ]
+    },
+    {
+      "id": "I-18",
+      "scenario": "Automatic LinkedIn actions (visit / like) are not approved like copy",
+      "request": "POST /api/sequences approve_step on a linkedin_visit or linkedin_like step",
+      "expectations": [
+        "Returns 400: automatic actions have no copy to approve — keep or skip them"
       ]
     }
   ]

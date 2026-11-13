@@ -1,13 +1,13 @@
 ---
 name: sales-gmail-send
-description: Gmail self-test; send approved E1 and auto-schedule E2/E3; log every successful send as a HubSpot email engagement. Stop on reply → Slack Floor.
+description: Email fallback until Lemlist is connected — Gmail self-test, send the ONE approved email per lead via Gmail, log it in HubSpot. No email follow-ups (those happen on LinkedIn via Lemlist). Stop on reply → sales-reply-demo.
 ---
 
 # sales-gmail-send
 
-**Email fallback until Lemlist is connected.** Send **approved** email steps through **Gmail**. Auto-schedule follow-ups. **Log every successful send in HubSpot.** Once Lemlist is live it sends the emails itself (`sales-lemlist-push`) — never send a Lemlist lead’s emails from Gmail too. LinkedIn steps are not this skill’s job.
+**Email fallback until Lemlist is connected.** Send the **approved** email of each lead’s sequence through **Gmail** and **log it in HubSpot**. The sequence has **one email**; follow-ups happen on LinkedIn through Lemlist, never as extra emails.
 
-**Timing:** while Lemlist is still a stub, E1 goes out on approve as below (LinkedIn lines are held).
+Once Lemlist is live it sends the email itself (`sales-lemlist-push`) — **never** send a Lemlist lead’s email from Gmail too. LinkedIn steps are not this skill’s job (they are held until Lemlist is connected).
 
 ## Step 0 — Gmail self-test (before any Dutch batch)
 
@@ -18,31 +18,32 @@ description: Gmail self-test; send approved E1 and auto-schedule E2/E3; log ever
 3. **Do not** contact leads or draft sequences yet.
 4. Self-test need **not** be logged to HubSpot (it isn’t a lead email).
 
-## Cadence (hard)
+## Send (hard)
 
-| Touch | When | Action |
+| What | When | Action |
 |---|---|---|
-| **Email 1** | On approve + “send” | Send via Gmail → **log HubSpot** → schedule E2/E3 |
-| **Email 2** | **Exactly 7 days** after E1 if **no reply** | Send (or fire schedule) → **log HubSpot** |
-| **Email 3** | **Exactly 7 days** after E2 if still **no reply** | Send → **log HubSpot** |
-| Cap | **Max 3** | Never a 4th |
+| **The email** | On approve + “send” | Send via Gmail → **log HubSpot** |
+| Follow-ups | — | **None by email.** LinkedIn message (day 3) + follow-up (day 5) run in Lemlist once connected. |
+| Cap | **1 email per lead** | Never a second cold email |
+
+PS line: keep “I also sent you a connection request on LinkedIn” only if the invite really went out (i.e. Lemlist is live). While LinkedIn lines are held, remove that PS before sending.
 
 ### Stop on reply → `sales-reply-demo`
 
-When any reply arrives **on Gmail or LinkedIn (Lemlist inbox, once connected)** (or Floor pastes “Check my replies…”), cancel every remaining LinkedIn + email step for that lead and hand off to **`sales-reply-demo`** for full classify + act:
+When any reply arrives **on Gmail or LinkedIn (Lemlist inbox, once connected)** (or Floor pastes “Check my replies…”), stop everything still pending for that lead and hand off to **`sales-reply-demo`**:
 
 | Class | Action (summary) |
 |---|---|
-| **BOOK NOW** | Cancel E2/E3 · short reply with **2 Ludwig slots** · Slack Floor + thread · she books Ludwig (`sales-demo-book`) · never auto-book |
-| **NOT YET** | One value-building reply (same story) · **keep** E2/E3 · HubSpot-log · no Slack book yet |
-| **NO** | Gracious close · cancel E2/E3 · HubSpot-log · no demo |
-| **CONFUSED** | Gracious short reply · cancel E2/E3 · HubSpot-log · **no** demo |
+| **BOOK NOW** | Short reply with **2 Ludwig slots** · Slack Floor + thread · she books Ludwig (`sales-demo-book`) · never auto-book |
+| **NOT YET** | One value-building reply (same story) · HubSpot-log · no further automated touches |
+| **NO** | Gracious close · HubSpot-log · no demo |
+| **CONFUSED** | Gracious short reply · HubSpot-log · **no** demo |
 
 Politeness / “sounds interesting” ≠ BOOK NOW. Consistency angle stays valid for other leads.
 
 ## HubSpot log (required after every successful lead send)
 
-After **each** successful Gmail send of E1, E2, or E3:
+After each successful Gmail send:
 
 1. Create/log a HubSpot **email engagement** on the **contact** from the Dutch task (associate **company** too when known).
 2. Fields: **subject**, **body or snippet**, **direction = outbound**, **timestamp** (send time), association to contact/company.
@@ -53,40 +54,27 @@ After **each** successful Gmail send of E1, E2, or E3:
 
 Self-test emails to Floor herself are exempt.
 
-## Auto-schedule (required when sending E1)
-
-1. Prefer **Gmail scheduled send** for E2 at **T+7 days** and E3 at **T+14 days**.
-2. Else: Cowork / HubSpot reminder/task dated T+7 / T+14.
-3. One line to Floor: “E1 sent + HubSpot logged; E2/E3 scheduled for \<dates\>.”
-4. Never ask her to remember follow-ups.
-
-Before scheduled E2/E3 fires: check for reply → cancel if any; else send → **HubSpot log**.
-
 ## Prerequisites
 
-- Gmail + HubSpot connected · steps **approved** · self-test done.
-- Never send pending / skipped / unapproved.
+- Gmail + HubSpot connected · the email is **approved** · self-test done.
+- Never send pending / skipped / unapproved. Never send for a lead already pushed to Lemlist.
 
 ## Guardrail
 
 ```text
-self-test → approve → Gmail send E1 → HubSpot email engagement (dedup)
-  → schedule E2 @ +7d · E3 @ +14d
-  → on fire: send → HubSpot log (dedup)
-  → reply? cancel · no → stop · interest → Slack Floor
-  → max 3
+self-test → approve → Gmail send the ONE email → HubSpot email engagement (dedup)
+  → no email follow-ups (LinkedIn follow-ups run in Lemlist once connected)
+  → reply? stop · no → close · interest → Slack Floor
 ```
 
 ## Batch send
 
-1. Digest recipients for E1 due now.
-2. Send E1 via Gmail.
+1. Digest recipients whose email is approved and due.
+2. Send via Gmail.
 3. **HubSpot-log** each success (dedup).
-4. Schedule E2/E3.
-5. Report: sent / HubSpot logged / scheduled / failures.
+4. Report: sent / HubSpot logged / failures / LinkedIn lines held for Lemlist.
 
 ## Done when
 
-- E1 sent + HubSpot logged (or dedup skip noted).
-- E2/E3 scheduled; when they send, also HubSpot-logged.
-- Cap 3 + stop-on-reply honored.
+- The email sent + HubSpot logged (or dedup skip noted).
+- No second email scheduled; stop-on-reply honored.

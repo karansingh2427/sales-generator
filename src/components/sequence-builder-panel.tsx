@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Check, ListOrdered, MessageSquareReply, Send, SkipForward } from "lucide-react";
-import { LINKEDIN_CONNECT_NOTE_MAX } from "@/lib/sequence-engine";
+import { LINKEDIN_CONNECT_NOTE_MAX, needsApproval } from "@/lib/sequence-engine";
 
 type Props = {
   leads: Lead[];
@@ -97,7 +97,7 @@ export function SequenceBuilderPanel({
       onStatus(
         data.mode === "existing"
           ? `Opened existing sequence for ${leads.find((l) => l.id === leadId)?.firmName}.`
-          : `Draft sequence ready — LinkedIn connect → DM (day 3) → Email 1–3. Approve every line before anything sends.`,
+          : `Draft sequence ready — visit + like + invite → 1 email → 2 LinkedIn messages. Approve every line before anything sends.`,
       );
     } finally {
       setBusy(false);
@@ -196,9 +196,9 @@ export function SequenceBuilderPanel({
             LinkedIn + email sequence (Lemlist)
           </CardTitle>
           <CardDescription>
-            HubSpot notes = background — LinkedIn connect (day 0) → LinkedIn DM (day 3) → Email 1
-            (day 6) → Email 2 → Email 3. <strong>Approve every line</strong>; Lemlist sends
-            LinkedIn + email (stub until API key). Any reply stops the sequence. Mark sent here is a
+            HubSpot notes = background — profile visit + like + invite (day 0) → one email (day 1) →
+            LinkedIn message if accepted (day 3) → LinkedIn follow-up (day 5).{" "}
+            <strong>Approve every line</strong>; Lemlist runs it (stub until connected). Any reply stops the sequence. Mark sent here is a
             UI simulator.
           </CardDescription>
         </CardHeader>
@@ -293,7 +293,7 @@ export function SequenceBuilderPanel({
                   </div>
                   <Badge variant={stepBadge(step.status)}>{step.status}</Badge>
                 </div>
-                {step.kind === "wait" ? (
+                {!needsApproval(step) ? (
                   <p className="text-sm text-muted-foreground">{step.rationale}</p>
                 ) : (
                   <>
@@ -336,7 +336,7 @@ export function SequenceBuilderPanel({
                   </>
                 )}
                 <div className="flex flex-wrap gap-2">
-                  {step.kind !== "wait" && step.status !== "sent" && step.status !== "skipped" && (
+                  {needsApproval(step) && step.status !== "sent" && step.status !== "skipped" && (
                     <>
                       <Button
                         size="sm"
@@ -365,14 +365,14 @@ export function SequenceBuilderPanel({
                       </Button>
                     </>
                   )}
-                  {step.kind === "wait" && step.status !== "sent" && (
+                  {!needsApproval(step) && step.status !== "sent" && step.status !== "skipped" && (
                     <Button
                       size="sm"
                       variant="secondary"
                       disabled={busy}
                       onClick={() => void act("mark_sent", step)}
                     >
-                      Mark wait done
+                      {step.kind === "wait" ? "Mark wait done" : "Mark done"}
                     </Button>
                   )}
                   {step.status !== "sent" && step.status !== "skipped" && (

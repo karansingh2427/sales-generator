@@ -18,6 +18,8 @@ import {
   buildSequenceForLead,
   validateSequenceAction,
   LINKEDIN_CONNECT_NOTE_MAX,
+  isActionStep,
+  needsApproval,
 } from "../src/lib/sequence-engine.ts";
 import { buildLemlistPayload, pushToLemlist, resolveLemlistMode } from "../src/lib/lemlist.ts";
 import { scoreExpertiseIcp, parseSocialPresence } from "../src/lib/icp.ts";
@@ -70,67 +72,76 @@ assert.equal(joost?.geoCode, "NL");
 
 const seq = buildSequenceForLead(els!, "Floor Hoefkens");
 const emailSteps = seq.steps.filter((s) => s.kind === "email");
-assert.equal(emailSteps.length, 3, "multichannel sequence caps at 3 emails");
-assert.ok(seq.steps.some((s) => s.kind === "wait" && s.waitDays === 7), "emails wait ~1 week");
-const msgSteps = seq.steps.filter((s) => s.kind !== "wait");
+assert.equal(emailSteps.length, 1, "one personal email — follow-ups happen on LinkedIn");
 assert.deepEqual(
-  msgSteps.map((s) => s.kind),
-  ["linkedin_connect", "linkedin_message", "email", "email", "email"],
-  "LinkedIn connect → DM → Email 1–3",
+  seq.steps.map((s) => s.kind),
+  ["linkedin_visit", "linkedin_like", "linkedin_connect", "wait", "email", "wait", "linkedin_message", "wait", "linkedin_followup"],
+  "visit → like → invite → email → LinkedIn message → LinkedIn follow-up",
 );
-assert.equal(seq.steps[1].kind, "wait");
-assert.equal(seq.steps[1].waitDays, 3, "DM goes out day 3");
-assert.ok(msgSteps.every((s) => s.sendVia === "lemlist"), "Lemlist sends LinkedIn + email");
-assert.ok(msgSteps.every((s) => s.status === "draft"), "every line starts as draft — approve first");
+assert.deepEqual(seq.steps.filter((s) => s.kind === "wait").map((s) => s.waitDays), [1, 2, 2], "email day 1, DM day 3, follow-up day 5");
+assert.ok(seq.steps.every((s) => s.kind === "wait" || s.sendVia === "lemlist"), "Lemlist runs every step");
+const actions = seq.steps.filter((s) => isActionStep(s.kind));
+assert.equal(actions.length, 2);
+assert.ok(actions.every((s) => s.status === "pending" && !s.body), "automatic actions carry no copy");
+const msgSteps = seq.steps.filter(needsApproval);
+assert.deepEqual(msgSteps.map((s) => s.kind), ["linkedin_connect", "email", "linkedin_message", "linkedin_followup"]);
+assert.ok(msgSteps.every((s) => s.status === "draft"), "every written line starts as draft — approve first");
 const connect = msgSteps[0];
-assert.ok(connect.body.length <= LINKEDIN_CONNECT_NOTE_MAX, "connect note fits LinkedIn limit");
-assert.ok(connect.body.includes(els.firmName));
-assert.ok(msgSteps[1].body.includes("?"), "DM asks one question");
+assert.equal(LINKEDIN_CONNECT_NOTE_MAX, 200, "Lemlist invite-note limit");
+assert.ok(connect.body.length <= LINKEDIN_CONNECT_NOTE_MAX, "connect note fits Lemlist limit");
+const longFirm = buildSequenceForLead({ ...els, firmName: "Peeters & Van den Broeck Registeraccountants en Belastingadviseurs" }, "Floor Hoefkens");
+assert.ok(longFirm.steps.find((s) => s.kind === "linkedin_connect").body.length <= LINKEDIN_CONNECT_NOTE_MAX, "long firm names still fit");
+assert.ok(/connection request on LinkedIn/.test(emailSteps[0].body), "email mentions the LinkedIn invite");
+const dm = msgSteps[2];
+assert.ok(/sent you an email/.test(dm.body) && dm.body.includes("?"), "DM references the email and asks one question");
+assert.ok(dm.condition && /accepted/.test(dm.condition), "DM only after the invite is accepted");
+assert.ok(msgSteps[3].condition, "follow-up is conditional too");
 assert.ok(seq.name.includes("LinkedIn + email"));
 
-// No LinkedIn URL → email-only, no 6-day dead wait
+// No LinkedIn URL → just the one email
 const noLi = buildSequenceForLead({ ...els, linkedInUrl: undefined }, "Floor Hoefkens");
-assert.ok(!noLi.steps.some((s) => s.kind.startsWith("linkedin")));
-assert.equal(noLi.steps[0].kind, "email");
+assert.deepEqual(noLi.steps.map((s) => s.kind), ["email"]);
+assert.ok(!/connection request/.test(noLi.steps[0].body), "no LinkedIn PS without a LinkedIn URL");
 assert.match(noLi.name, /no LinkedIn URL/);
 
-// Lemlist stub: refuses until every line is approved, returns payload only, never "sent"
+// Lemlist stub: refuses until every written line is approved, returns payload only, never "sent"
 const stamp = { id: "seq_t", createdAt: "", updatedAt: "" };
 const draftSeq = { ...seq, ...stamp };
 assert.equal(buildLemlistPayload(els, draftSeq).ok, false, "unapproved sequence is never pushed");
-const approveAll = (q) => ({
-  ...q,
-  steps: q.steps.map((s) => (s.kind === "wait" ? s : { ...s, status: "approved" })),
-});
+const approveAll = (q) => ({ ...q, steps: q.steps.map((s) => (needsApproval(s) ? { ...s, status: "approved" } : s)) });
 const linkedInOnly = {
   ...draftSeq,
-  steps: draftSeq.steps.map((s) => (s.kind.startsWith("linkedin") ? { ...s, status: "approved" } : s)),
+  steps: draftSeq.steps.map((s) => (needsApproval(s) && s.kind !== "email" ? { ...s, status: "approved" } : s)),
 };
-assert.equal(buildLemlistPayload(els, linkedInOnly).ok, false, "emails must be approved too");
+assert.equal(buildLemlistPayload(els, linkedInOnly).ok, false, "the email must be approved too");
 const approvedSeq = approveAll(draftSeq);
 const pushed = await pushToLemlist(els, approvedSeq, "", "cmp_test");
-assert.equal(pushed.ok, true);
+assert.equal(pushed.ok, true, "automatic actions don't need approval");
 assert.equal(pushed.mode, "stub");
 assert.equal(pushed.sent, false);
 assert.equal(pushed.payload.campaignId, "cmp_test");
 assert.equal(pushed.payload.email, els.email);
+assert.deepEqual(pushed.payload.actions, { visitProfile: true, likeLastPost: true });
+assert.deepEqual(Object.keys(pushed.payload.variables).sort(), ["connectNote", "emailBody", "emailSubject", "linkedinFollowup", "linkedinMessage"]);
 assert.equal(pushed.payload.variables.connectNote, connect.body);
-assert.equal(pushed.payload.variables.linkedinMessage, msgSteps[1].body);
-assert.equal(pushed.payload.variables.email1Subject, emailSteps[0].subject);
-assert.equal(pushed.payload.variables.email3Body, emailSteps[2].body);
-const skippedE3 = {
+assert.equal(pushed.payload.variables.emailSubject, emailSteps[0].subject);
+assert.equal(pushed.payload.variables.linkedinMessage, dm.body);
+const likeStep = actions.find((s) => s.kind === "linkedin_like");
+const followup = msgSteps[3];
+const skipped = {
   ...approvedSeq,
-  steps: approvedSeq.steps.map((s) => (s.id === emailSteps[2].id ? { ...s, status: "skipped" } : s)),
+  steps: approvedSeq.steps.map((s) => (s.id === likeStep.id || s.id === followup.id ? { ...s, status: "skipped" } : s)),
 };
-const withSkip = buildLemlistPayload(els, skippedE3);
+const withSkip = buildLemlistPayload(els, skipped);
 assert.equal(withSkip.ok, true);
-assert.equal(withSkip.payload.variables.email3Body, "", "skipped step sends empty copy");
-assert.deepEqual(withSkip.payload.skippedSteps, [emailSteps[2].id]);
+assert.equal(withSkip.payload.actions.likeLastPost, false, "skipped like is turned off");
+assert.equal(withSkip.payload.variables.linkedinFollowup, "", "skipped step sends empty copy");
+assert.deepEqual(withSkip.payload.skippedSteps.sort(), [likeStep.id, followup.id].sort());
 assert.equal(buildLemlistPayload({ ...els, email: "" }, approvedSeq).ok, false, "Lemlist needs an email");
 assert.equal(resolveLemlistMode("key"), "live_not_wired");
 const repliedSeq = { ...approvedSeq, stoppedOnReply: { channel: "linkedin", at: "" } };
 assert.equal(buildLemlistPayload(els, repliedSeq).ok, false, "reply stops Lemlist push");
-assert.ok(seq.steps.every((s) => s.kind === "wait" || (s.body && s.body.length > 20)));
+assert.ok(seq.steps.filter(needsApproval).every((s) => s.body && s.body.length > 20), "every written line has copy");
 assert.ok(seq.opportunityAngles.length > 0);
 assert.ok(
   emailSteps.some((s) => s.body && /chat|curious|radar|Ludwig|intro/i.test(s.body)),
@@ -146,7 +157,7 @@ assert.ok(vacE1?.body);
 assert.ok(!/content calendar|quarterly calendar/i.test(vacE1.body), "no random content-calendar pivot on vacancy story");
 assert.ok(/hiring|vacanc|candidate|LinkedIn|visibility|trust/i.test(vacE1.body), "vacancy story stays on hiring/visibility");
 const vacBodies = vacSeq.steps.filter((s) => s.kind === "email").map((s) => s.body ?? "").join("\\n");
-assert.ok(/hiring|vacanc|visibility|LinkedIn/i.test(vacBodies), "emails 2–3 continue same story thread");
+assert.ok(/hiring|vacanc|visibility|LinkedIn/i.test(vacBodies), "the email stays on the vacancy story");
 
 const bad = validateSequenceAction({ action: "mark_sent" });
 assert.equal(bad.ok, false);

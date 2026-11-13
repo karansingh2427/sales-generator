@@ -3,7 +3,7 @@
 Prototype for **Floor Hoefkens** (BDR @ [Willow](https://willow.co/)): **HubSpot company notes = preferred background** → agent **personalizes the full LinkedIn + email sequence** (LinkedIn **research** OK when notes are thin or she asks — not every run) → Floor **approves every line** → **Lemlist** sends LinkedIn + email → any reply stops the sequence → on interest, **Slack Floor** (with the conversation) so she **manually books Ludwig’s calendar**. Sales Nav CSV remains a fallback. Cursor/Claude **skills** ship alongside the Next.js UI.
 
 **Geography:** **Netherlands first**, Belgium second — **NL + BE only**.  
-**Channels:** **Lemlist (LinkedIn + email)** — LinkedIn connect (day 0) → LinkedIn DM (day 3) → Email 1 (day 6) → Email 2 (day 13) → Email 3 (day 20); max **3** emails. Lemlist push is a **stub** until `LEMLIST_API_KEY` is wired; meanwhile emails go via Gmail in Cowork and LinkedIn lines are held.  
+**Channels:** **Lemlist (LinkedIn + email)** — profile visit + like latest post + invite (day 0) → **one** personal email (day 1) → LinkedIn message if the invite was accepted (day 3) → LinkedIn follow-up (day 5); max **1** email, follow-ups on LinkedIn. Lemlist push is a **stub** until Lemlist is connected (its API needs a higher plan; Lemlist’s Claude connector is the preferred route); meanwhile the email goes via Gmail in Cowork and LinkedIn lines are held.  
 **Governance:** approve-before-send (pilot); **never auto-book** Calendar. **CRM language:** English writebacks. Prefer Floor’s Cowork **HubSpot + Gmail + Slack** connectors.
 
 ## For Floor
@@ -57,7 +57,7 @@ See **[docs/skills.md](./docs/skills.md)** for first-run steps.
 ## Sequences (Lemlist: LinkedIn + email)
 
 1. Pull Dutch HubSpot tasks from the **last ~30 days** (never-contacted only; 2–3 batches/day) + company notes (skill) — notes = background only.
-2. Personalize the full sequence: LinkedIn connect + note → DM (day 3) → Email 1 → ~1 week → Email 2 → Email 3 (**max 3 emails**). Prefer HubSpot notes; LinkedIn research OK when thin / asked. No LinkedIn URL → email-only.
+2. Personalize the full sequence for the person in the HubSpot note: profile visit + like latest post + invite note → one email → LinkedIn message (if accepted) → LinkedIn follow-up. Prefer HubSpot notes; LinkedIn research OK when thin / asked. No LinkedIn URL → just the email.
 3. Approve every line → Lemlist sends LinkedIn + email (stub until key; Gmail in Cowork for email meanwhile).
 4. Any reply on either channel stops the sequence → classify → on interest Slack Floor → she books Ludwig.
 

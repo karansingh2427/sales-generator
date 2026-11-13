@@ -5,9 +5,9 @@ import type { OutreachSequence, SequenceStep } from "@/types/sales";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { LINKEDIN_CONNECT_NOTE_MAX } from "@/lib/sequence-engine";
+import { isActionStep, LINKEDIN_CONNECT_NOTE_MAX } from "@/lib/sequence-engine";
 import { cn } from "@/lib/utils";
-import { Check, Hourglass, Mail, Pencil, SkipForward, Undo2 } from "lucide-react";
+import { Check, Eye, GitBranch, Hourglass, Mail, Pencil, SkipForward, ThumbsUp, Undo2 } from "lucide-react";
 import { LinkedInIcon } from "@/components/campaign/campaign-ui";
 
 export type StepAction = "update_step" | "approve_step" | "skip_step";
@@ -24,25 +24,66 @@ type Props = {
 
 type TimelineItem =
   | { type: "message"; step: SequenceStep; day: number; title: string }
+  | { type: "action"; step: SequenceStep; day: number }
   | { type: "wait"; step: SequenceStep; days: number };
+
+const TITLE: Partial<Record<SequenceStep["kind"], string>> = {
+  linkedin_connect: "Connection request",
+  linkedin_message: "LinkedIn message",
+  linkedin_followup: "LinkedIn follow-up",
+};
 
 function buildTimeline(steps: SequenceStep[]): TimelineItem[] {
   let day = 0;
   let email = 0;
+  const emails = steps.filter((s) => s.kind === "email").length;
   return steps.map((step) => {
     if (step.kind === "wait") {
       day += step.waitDays;
       return { type: "wait", step, days: step.waitDays };
     }
+    if (isActionStep(step.kind)) return { type: "action", step, day };
     if (step.kind === "email") email += 1;
     const title =
-      step.kind === "linkedin_connect"
-        ? "Connection request"
-        : step.kind === "email"
-          ? `Email ${email}`
-          : "LinkedIn message";
+      step.kind === "email" ? (emails > 1 ? `Email ${email}` : "Email") : (TITLE[step.kind] ?? "LinkedIn message");
     return { type: "message", step, day, title };
   });
+}
+
+/** Automatic LinkedIn action (profile visit, like) — nothing to write, only keep or skip. */
+function ActionRow({
+  item,
+  busy,
+  onAction,
+}: {
+  item: Extract<TimelineItem, { type: "action" }>;
+  busy: boolean;
+  onAction: Props["onAction"];
+}) {
+  const { step } = item;
+  const skipped = step.status === "skipped";
+  const Icon = step.kind === "linkedin_like" ? ThumbsUp : Eye;
+  return (
+    <div className="relative flex flex-wrap items-center justify-between gap-2 pl-12 sm:pl-14">
+      <div className="absolute left-[7px] top-0.5 flex size-[22px] items-center justify-center rounded-full bg-[#e8f1fb] text-[#0a66c2] ring-4 ring-white sm:left-[9px]">
+        <Icon className="size-3" />
+      </div>
+      <p className={cn("text-sm text-slate-700", skipped && "text-slate-400 line-through")}>
+        <span className="font-medium">{step.label}</span>
+        <span className="ml-2 text-slate-500">Day {item.day} · automatic</span>
+      </p>
+      {step.status !== "sent" && (
+        <Button
+          size="xs"
+          variant="ghost"
+          disabled={busy}
+          onClick={() => void onAction(skipped ? "update_step" : "skip_step", step)}
+        >
+          {skipped ? <Undo2 /> : <SkipForward />} {skipped ? "Keep" : "Skip"}
+        </Button>
+      )}
+    </div>
+  );
 }
 
 function StatusPill({ status }: { status: SequenceStep["status"] }) {
@@ -108,6 +149,11 @@ function MessageCard({
         </p>
         <StatusPill status={step.status} />
       </div>
+      {step.condition && (
+        <p className="mt-1 flex items-center gap-1.5 text-xs text-slate-500">
+          <GitBranch className="size-3.5 text-slate-400" /> {step.condition}
+        </p>
+      )}
 
       <div className="mt-3">
         {editing ? (
@@ -210,8 +256,10 @@ export function MessageTimeline({ sequence, busy, onAction }: Props) {
         item.type === "wait" ? (
           <div key={item.step.id} className="relative flex items-center gap-2 pl-12 text-sm text-slate-500 sm:pl-14">
             <Hourglass className="size-3.5 text-slate-400" />
-            {item.days} days later, only if they stay quiet
+            {item.days} {item.days === 1 ? "day" : "days"} later, only if they stay quiet
           </div>
+        ) : item.type === "action" ? (
+          <ActionRow key={item.step.id} item={item} busy={busy} onAction={onAction} />
         ) : (
           <MessageCard key={`${item.step.id}-${item.step.status}`} item={item} busy={busy} onAction={onAction} />
         ),

@@ -133,6 +133,8 @@ for (const required of [
   "I-14",
   "I-15",
   "I-16",
+  "I-17",
+  "I-18",
 ]) {
   if (!ids.includes(required)) {
     console.error(`Missing eval case ${required}`);

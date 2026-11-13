@@ -1,12 +1,15 @@
 import type { Lead, OutreachSequence, SequenceStep } from "@/types/sales";
+import { isActionStep, needsApproval } from "@/lib/sequence-engine";
 
 /**
  * Lemlist push — STUB until Willow's Lemlist API key is set.
  *
- * Lemlist sends the whole sequence: LinkedIn steps (connect note + DM) and the
- * emails (from Floor's inbox connected inside Lemlist), and stops on reply.
- * Lemlist campaign steps are shared templates, so each lead carries its own
- * Floor-approved copy as custom variables ({{connectNote}}, {{email1Body}}, …).
+ * Lemlist runs the whole sequence — profile visit, like latest post, invite, the one
+ * email (from Floor's inbox connected inside Lemlist) and the LinkedIn messages — and
+ * stops on reply. Campaign steps are shared templates, so each lead carries its own
+ * Floor-approved copy as custom variables ({{connectNote}}, {{emailBody}}, …).
+ * Note: Lemlist's API needs a paid plan with API access (402 otherwise), and LinkedIn
+ * steps need the Multichannel plan.
  *
  * Only fully approved sequences are ever pushed. With no key we return the exact
  * lead payload so Floor can review it; with a key we still refuse until the real
@@ -25,6 +28,8 @@ export type LemlistLeadPayload = {
   linkedinUrl?: string;
   /** Approved copy per step, referenced as {{name}} in the Lemlist campaign. */
   variables: Record<string, string>;
+  /** Automatic LinkedIn actions Floor kept (false = skipped for this lead). */
+  actions: { visitProfile: boolean; likeLastPost: boolean };
   /** Step ids Floor skipped — their variables are empty; the campaign must skip them. */
   skippedSteps: string[];
 };
@@ -37,24 +42,28 @@ export function resolveLemlistMode(apiKey: string | undefined | null): LemlistMo
   return apiKey?.trim() ? "live_not_wired" : "stub";
 }
 
-function isMessageStep(step: SequenceStep): boolean {
-  return step.kind !== "wait";
-}
-
-/** Variable names used in the Lemlist campaign template, in sequence order. */
+/** Variable names used in the Lemlist campaign template. */
 function variablesFor(steps: SequenceStep[]): Record<string, string> {
   const vars: Record<string, string> = {};
   let email = 0;
   for (const s of steps) {
     const body = s.status === "skipped" ? "" : (s.body ?? "");
     if (s.kind === "linkedin_connect") vars.connectNote = body;
+    else if (s.kind === "linkedin_message") vars.linkedinMessage = body;
+    else if (s.kind === "linkedin_followup") vars.linkedinFollowup = body;
     else if (s.kind === "email") {
       email += 1;
-      vars[`email${email}Subject`] = s.status === "skipped" ? "" : (s.subject ?? "");
-      vars[`email${email}Body`] = body;
-    } else vars.linkedinMessage = body;
+      const key = email === 1 ? "email" : `email${email}`;
+      vars[`${key}Subject`] = s.status === "skipped" ? "" : (s.subject ?? "");
+      vars[`${key}Body`] = body;
+    }
   }
   return vars;
+}
+
+function keptAction(steps: SequenceStep[], kind: SequenceStep["kind"]): boolean {
+  const step = steps.find((s) => s.kind === kind);
+  return !!step && step.status !== "skipped";
 }
 
 export function buildLemlistPayload(
@@ -68,7 +77,7 @@ export function buildLemlistPayload(
   if (!lead.email?.trim()) {
     return { ok: false, error: "Lead has no email address — Lemlist needs one to add the lead" };
   }
-  const steps = sequence.steps.filter(isMessageStep);
+  const steps = sequence.steps.filter(needsApproval);
   const live = steps.filter((s) => s.status !== "skipped");
   if (!live.length) {
     return { ok: false, error: "Every step is skipped — nothing to push" };
@@ -99,7 +108,13 @@ export function buildLemlistPayload(
       companyName: lead.firmName,
       linkedinUrl: lead.linkedInUrl?.trim() || undefined,
       variables: variablesFor(steps),
-      skippedSteps: steps.filter((s) => s.status === "skipped").map((s) => s.id),
+      actions: {
+        visitProfile: keptAction(sequence.steps, "linkedin_visit"),
+        likeLastPost: keptAction(sequence.steps, "linkedin_like"),
+      },
+      skippedSteps: sequence.steps
+        .filter((s) => (needsApproval(s) || isActionStep(s.kind)) && s.status === "skipped")
+        .map((s) => s.id),
     },
   };
 }

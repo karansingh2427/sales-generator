@@ -9,6 +9,7 @@ import {
 } from "@/lib/db";
 import {
   buildSequenceForLead,
+  isActionStep,
   LINKEDIN_CONNECT_NOTE_MAX,
   validateSequenceAction,
 } from "@/lib/sequence-engine";
@@ -93,6 +94,12 @@ export async function POST(request: Request) {
       .find((s) => s.id === parsed.sequenceId)
       ?.steps.find((s) => s.id === parsed.stepId);
     const note = parsed.bodyText ?? current?.body ?? "";
+    if (current && isActionStep(current.kind)) {
+      return NextResponse.json(
+        { error: "Automatic LinkedIn actions have no copy to approve — keep or skip them" },
+        { status: 400 },
+      );
+    }
     if (current?.kind === "linkedin_connect" && note.length > LINKEDIN_CONNECT_NOTE_MAX) {
       return NextResponse.json(
         { error: `LinkedIn connect note is ${note.length} chars — max ${LINKEDIN_CONNECT_NOTE_MAX}` },
@@ -123,13 +130,13 @@ export async function POST(request: Request) {
     const before = state.sequences.find((s) => s.id === parsed.sequenceId);
     const step = before?.steps.find((s) => s.id === parsed.stepId);
     if (!step) return NextResponse.json({ error: "Sequence or step not found" }, { status: 404 });
-    if (step.kind === "wait") {
-      // Completing a wait = acknowledge delay elapsed
+    if (step.kind === "wait" || isActionStep(step.kind)) {
+      // Completing a wait / automatic action = acknowledge it happened
       const seq = await updateSequenceStep(parsed.sequenceId!, parsed.stepId!, {
         status: "sent",
         sentAt: new Date().toISOString(),
       });
-      return NextResponse.json({ sequence: seq, note: "Wait acknowledged." });
+      return NextResponse.json({ sequence: seq, note: step.kind === "wait" ? "Wait acknowledged." : "Marked done." });
     }
     if (step.status !== "approved" && step.status !== "draft") {
       // Allow mark sent from draft for flexibility, but prefer approve first

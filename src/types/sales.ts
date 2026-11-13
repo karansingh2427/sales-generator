@@ -98,6 +98,9 @@ export interface OutreachDraft {
 }
 
 export type SequenceStepKind =
+  /** Automatic LinkedIn actions (no copy to approve). */
+  | "linkedin_visit"
+  | "linkedin_like"
   | "linkedin_connect"
   | "linkedin_message"
   | "wait"
@@ -121,6 +124,8 @@ export interface SequenceStep {
   channel?: OutreachChannel;
   /** Who transmits the step after Floor approves: Lemlist sends LinkedIn and email. */
   sendVia?: SendProvider;
+  /** When this step only runs on one branch, e.g. after the invite was accepted. */
+  condition?: string;
   subject?: string;
   body?: string;
   rationale?: string;

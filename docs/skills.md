@@ -3,7 +3,7 @@
 | Skill | Path | Job |
 |---|---|---|
 | `sales-hubspot-pull` | [`skills/sales-hubspot-pull/SKILL.md`](../skills/sales-hubspot-pull/SKILL.md) | Dutch HubSpot tasks **last ~30 days** + never-contacted filter + company notes (multi-batch/day) |
-| `sales-sequence-draft` | [`skills/sales-sequence-draft/SKILL.md`](../skills/sales-sequence-draft/SKILL.md) | Prefer notes → LinkedIn connect + DM (day 3) → Email 1–3 (max 3); LinkedIn research OK if thin/asked |
+| `sales-sequence-draft` | [`skills/sales-sequence-draft/SKILL.md`](../skills/sales-sequence-draft/SKILL.md) | Prefer notes → visit + like + invite → 1 email → 2 LinkedIn messages; LinkedIn research OK if thin/asked |
 | `sales-gmail-send` | [`skills/sales-gmail-send/SKILL.md`](../skills/sales-gmail-send/SKILL.md) | After approve — send email steps via Gmail; stop on reply → reply-demo |
 | `sales-lemlist-push` | [`skills/sales-lemlist-push/SKILL.md`](../skills/sales-lemlist-push/SKILL.md) | After every line is approved — push lead + copy to Lemlist (stub until API key) |
 | `sales-reply-demo` | [`skills/sales-reply-demo/SKILL.md`](../skills/sales-reply-demo/SKILL.md) | Classify replies BOOK NOW / NOT YET / NO / CONFUSED → draft + Slack Floor on BOOK NOW |

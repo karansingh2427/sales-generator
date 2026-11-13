@@ -5,13 +5,13 @@ These rules govern human and agent operators. Violations are **invalid** scenari
 ## Outreach & sequence rules
 
 1. **No outreach to disqualified leads** — including **strong social presence** (Floor disqualifier).
-2. **Channels — Lemlist (LinkedIn + email)** (Floor, 2026-11-05: Willow took Lemlist; supersedes the HeyReach plan and the Gmail-only pilot). Default playbook: LinkedIn connect + note (day 0) → LinkedIn DM (day 3) → Email 1 (day 6) → Email 2 (day 13) → Email 3 (day 20). **Lemlist** sends every step (emails from Floor’s inbox connected in Lemlist). Max 3 emails. Lead with no LinkedIn URL → email-only. **Until the Lemlist API key is wired:** emails go via **Gmail** in Cowork (`sales-gmail-send`, E1 on approve / +7d / +14d) and LinkedIn lines are approved + held. No LinkedIn automation outside Lemlist.
-2a. **Stop on reply** — any reply on LinkedIn **or** email stops every remaining LinkedIn step and the automated sequence (`record_reply`), then `sales-reply-demo` classifies it. Only a **NOT YET** reply may keep E2/E3 (existing reply-demo rule).
-2b. **LinkedIn copy** — connect note ≤300 chars, no pitch; DM 2–3 short lines with one question. Same story arc as the emails.
+2. **Channels — Lemlist (LinkedIn + email)** (Floor, 2026-11-13: multichannel, not linear email; supersedes the HeyReach plan and the Gmail-only pilot). Default playbook: profile visit + like latest post + invite (day 0) → **one** personal email (day 1) → LinkedIn message if the invite was accepted (day 3) → LinkedIn follow-up (day 5). **Max 1 email** — follow-ups happen on LinkedIn, more personal. **Lemlist** runs every step (the email from Floor’s inbox connected in Lemlist). Lead with no LinkedIn URL → just the email. **Until Lemlist is connected:** the email goes via **Gmail** in Cowork (`sales-gmail-send`) and LinkedIn lines are approved + held. No LinkedIn automation outside Lemlist.
+2a. **Stop on reply** — any reply on LinkedIn **or** email stops the whole sequence at any point (Lemlist stop-on-reply; mirror with `record_reply`), then `sales-reply-demo` classifies it. No automated touch after a reply, whatever the class.
+2b. **LinkedIn copy** — invite note ≤200 chars (Lemlist limit, variables included), no pitch; LinkedIn messages 2–3 short lines — the first refers back to the email (“I sent you an email — connecting here because …”) and asks one question. Same story arc as the email. Profile visit + like latest post are automatic (no copy); Floor may skip them per lead.
 3. **Every draft includes rationale** — CRM why-good / opener / opportunity angles (`scoreLeadRationale` / sequence engine).
 4. **One story arc** — open with HubSpot-note insight → one tension → soft Willow bridge on the *same* story → short CTA. Never pivot (e.g. vacancy → random content calendar). Emails 2–3 continue the same thread.
 5. **Senior voice** — write as a sales pro with 20–30 years experience; calm, peer-to-peer; never AI-ish or feature dump. Once per batch, learn tone from Floor’s past HubSpot sent emails + feedback playbook.
-6. **CTA** — Email 1 = curious / open to chat (soft). Ludwig intro ok by Email 3. When they agree, **Slack Floor** (include conversation) — she books Ludwig’s calendar manually. Do not promise pricing or legal outcomes.
+6. **CTA** — the email = curious / open to chat (soft); the LinkedIn follow-up may ask for a short chat. When they agree, **Slack Floor** (include conversation) — she books Ludwig’s calendar manually. Do not promise pricing or legal outcomes.
 7. **No fabricated case studies** — use only Willow public claims (expertise firms, EU/GDPR, coaching) and only when they continue the same story.
 8. **Approve every line → send** — draft → Floor **approves each step** → the lead + all approved copy go to **Lemlist** in one push (`sales-lemlist-push`; only when every non-skipped line is approved) → Lemlist sends. Gmail fallback (`sales-gmail-send`) until Lemlist is live. Unattended send without approve is invalid on either channel.
 9. **Sequence mark_sent** without prior **approve_step** is invalid for message steps.
@@ -59,7 +59,7 @@ These rules govern human and agent operators. Violations are **invalid** scenari
 
 1. Skills live under `skills/*/SKILL.md` and are mapped from [AGENTS.md](../AGENTS.md).
 2. `sales-hubspot-pull` must instruct NL-first pulls, **~30-day lookback**, **never-contacted** filter, multi-batch/day, and company notes.
-3. `sales-sequence-draft` must draft **LinkedIn + email** sequences for Lemlist (LinkedIn connect → DM day 3 → Email 1–3) and require approve before send.
+3. `sales-sequence-draft` must draft **LinkedIn + email** sequences for Lemlist (visit + like + invite → 1 email → 2 LinkedIn messages) and require approve before send.
 4. `sales-gmail-send` is the **email fallback until Lemlist is live**: sends only **approved** email steps via Gmail; never LinkedIn. Once a lead is in Lemlist, never also send its emails from Gmail.
 4a. `sales-lemlist-push` pushes a lead to Lemlist only when **every** non-skipped line is approved; **stub** until `LEMLIST_API_KEY` is wired — it must never claim a LinkedIn or email send happened.
 5. `sales-reply-demo` classifies Dutch-batch replies from **email and LinkedIn (Gmail + Lemlist inbox)** as **BOOK NOW / NOT YET / NO / CONFUSED**; politeness ≠ BOOK NOW; never auto-book; HubSpot-log inbound + outbound.

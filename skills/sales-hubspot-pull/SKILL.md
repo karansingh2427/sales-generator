@@ -62,7 +62,7 @@ Batch pull contract
 - Filter: never-contacted only (skip prior outbound email / logged outreach)
 - Cadence: multiple batches/day OK (default 2–3); re-runs are normal
 - Size: tens–hundreds; present in reviewable chunks (default 50)
-- Next: sales-sequence-draft (Gmail max 3 from notes) → approve queue
+- Next: sales-sequence-draft (LinkedIn + 1 email from notes) → approve queue
 - Never: LinkedIn send outside Lemlist, other countries, rebuild lead-gen, force LinkedIn scrape on every company every batch, treat “already ran once” as done forever
 ```
 

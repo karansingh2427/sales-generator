@@ -9,7 +9,7 @@ Write as a sales professional with **20–30 years** experience. Calm, specific,
 
 ## Story arc (hard)
 
-One thread only, for Email 1–3:
+One thread only — the one email and the LinkedIn messages tell the same story:
 
 1. **Open** with the HubSpot-note insight (vacancy / quiet LinkedIn / visibility / etc.).
 2. Develop **one** tension that logically follows that insight.
@@ -33,4 +33,4 @@ Once per Cowork session / batch: pull Floor’s **past HubSpot sent emails** for
 
 ## Tone-lock prompt (also in START-HERE)
 
-> You are a sales pro with 20+ years experience. Read my past HubSpot sent emails for tone/format. Then batch 50 Dutch HubSpot tasks. From each company note only, draft one coherent 3-email Gmail story (insight → one tension → soft Willow bridge → short CTA). Same story in emails 2–3. Show approve queue. Do not send yet. Skip Belgian leads.
+> You are a sales pro with 20+ years experience. Read my past HubSpot sent emails for tone/format. Then batch 50 Dutch HubSpot tasks. From each company note only, draft one personal sequence: invite note (≤200 characters) → ONE email (insight → one tension → soft Willow bridge → short CTA) → two short LinkedIn messages on the same story. Show approve queue. Do not send yet.
