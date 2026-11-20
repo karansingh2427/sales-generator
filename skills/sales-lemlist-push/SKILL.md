@@ -9,10 +9,19 @@ Willow uses **Lemlist** (Nov 2026). Floor connects her **email inbox** and **Lin
 
 ## How to reach Lemlist (in this order)
 
-1. **Lemlist’s Claude connector** (“Connect to Claude” in Lemlist) in Floor’s Cowork session — preferred, same as HubSpot / Gmail / Slack. Use its tools to add the lead to the pilot campaign with the variables below. Check which tools it exposes before the first batch; if it can’t set custom variables, say so instead of improvising.
+1. **Lemlist’s Claude connector** in Floor’s Cowork session — **confirmed working (20 Nov 2026)**: ~280 tools, no plan block. It can list campaigns + steps + stats, add/change/preview sequence steps, **add leads to a campaign with custom variables in one call**, update a lead’s variables, read the inbox and reply, and list senders (inboxes, LinkedIn). Use it for every Lemlist action.
 2. **Web app** `POST /api/lemlist { sequenceId }` — **stub**: returns `mode: "stub"` + the exact lead payload, sends nothing.
    - Lemlist’s REST API needs a plan with API access. On Floor’s plan (Nov 2026) the key is valid but every route answers **402 “available starting emailPro plan”**.
    - LinkedIn steps need Lemlist’s **Multichannel** plan.
+
+## Safety rules for Floor’s Lemlist account (hard)
+
+Floor’s workspace has **~183 campaigns**, including a **running** one (“Floor - 2024 - Law”) and campaigns of Ali, Will and Brent.
+
+- **Only ever touch the campaign “Willow NL pilot”** (and “Willow NL pilot - test” during setup). Never edit, pause, launch, or add leads to any other campaign — even read-only browsing elsewhere only when Floor asks.
+- **Launching** the pilot campaign (draft → running) only when Floor says so in words, e.g. “launch the pilot”. Adding leads to a **draft** campaign sends nothing; adding to a **running** campaign starts their sequence.
+- **Before adding a lead, search Lemlist for that email / LinkedIn URL across all campaigns.** If the person is in any other campaign (old Law / HR / IT / Accountancy campaigns from 2022–2025 included), **skip** them — they were already contacted — and say so in the batch report.
+- Never delete campaigns, leads or steps. Never change senders or settings.
 
 **Never tell Floor a step went out through Lemlist** unless the connector / API confirmed it. Say: “Approved and ready — it goes out once Lemlist is connected.” Meanwhile the email goes out via **`sales-gmail-send`** and the LinkedIn lines are held.
 
