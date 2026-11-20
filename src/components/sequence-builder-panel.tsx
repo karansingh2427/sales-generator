@@ -196,8 +196,8 @@ export function SequenceBuilderPanel({
             LinkedIn + email sequence (Lemlist)
           </CardTitle>
           <CardDescription>
-            HubSpot notes = background — profile visit + like + invite (day 0) → one email (day 1) →
-            LinkedIn message if accepted (day 3) → LinkedIn follow-up (day 5).{" "}
+            HubSpot notes = background — profile visit → like → invite → one email (all day 0) →
+            LinkedIn message as soon as they accept → LinkedIn follow-up 2 days later.{" "}
             <strong>Approve every line</strong>; Lemlist runs it (stub until connected). Any reply stops the sequence. Mark sent here is a
             UI simulator.
           </CardDescription>

@@ -5,7 +5,7 @@
 | T-HS-01 | CRM notes ready | HubSpot panel → Sync **or** skill `sales-hubspot-pull` | Dutch tasks **last ~30d** + never-contacted only + company notes; NL-first; multi-batch OK |
 | T-SEQ-01 | High-ICP Dutch HubSpot lead | `sales-sequence-draft` → Generate | Visit + like + invite → 1 email → LinkedIn message + follow-up, personalized from note |
 | T-SEQ-02 | Review touch | Edit → Approve → `sales-lemlist-push` (all lines; Gmail fallback for email) → Mark sent | Step `sent`; lead `contacted` |
-| T-SEQ-03 | Invite accepted, no reply | Lemlist sends the LinkedIn message (day 3), then the follow-up (day 5) | Max 1 email; follow-ups on LinkedIn |
+| T-SEQ-03 | Invite accepted, no reply | Lemlist sends the LinkedIn message as soon as they accept, then the follow-up 2 days later | Max 1 email; follow-ups on LinkedIn |
 | T-SEQ-04 | Inbound reply (LinkedIn or email) | `record_reply` stops sequence → `sales-reply-demo` classify BOOK NOW / NOT YET / NO / CONFUSED | Politeness ≠ BOOK NOW; HubSpot log in+out |
 | T-SEQ-05 | BOOK NOW reply | Offer 2 Ludwig slots · Slack Floor · she books | Never auto-book; sequence already stopped |
 | T-01 | Offline list | Sales Nav CSV import (fallback) → **NL+BE** → select → Import | `sales_nav_csv` rows |

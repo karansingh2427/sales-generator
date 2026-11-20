@@ -30,7 +30,7 @@ https://sales-generator-delta.vercel.app — confirm HubSpot **mock** mode.
 
 ### 3. Build a sequence
 - Pick a Dutch lead → **Build sequence**
-- You should see **profile visit · like · invite → email (day 1) → LinkedIn message (day 3) → LinkedIn follow-up (day 5)** — one email only
+- You should see **profile visit · like · invite · email (all day 0) → LinkedIn message on accept → LinkedIn follow-up 2 days later** — one email only
 - Edit → **Approve** → **Mark sent** (UI simulator; live Cowork uses real Gmail)
 
 ### 4. Teach the agent

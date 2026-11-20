@@ -10,7 +10,7 @@ never auto-book Calendar.
 
 **Geography locked:** **Netherlands first**, Belgium second — **NL + BE only**.
 
-**Channels:** **Lemlist (LinkedIn + email)** — Willow took a Lemlist subscription (Nov 2026; replaces the earlier HeyReach plan). Profile visit + like latest post + invite (day 0) → **one** personal email (day 1) → LinkedIn message if accepted (day 3) → LinkedIn follow-up (day 5). Max 1 email; follow-ups on LinkedIn. Any reply stops the sequence. Lemlist push is a **stub** until Willow's API key exists — until then emails go out via Gmail in Cowork and LinkedIn lines are held. No LinkedIn automation outside Lemlist.
+**Channels:** **Lemlist (LinkedIn + email)** — Willow took a Lemlist subscription (Nov 2026; replaces the earlier HeyReach plan). Profile visit → like latest post → invite → **one** personal email (all day 0) → LinkedIn message as soon as they accept → LinkedIn follow-up 2 days later. Max 1 email; follow-ups on LinkedIn. Any reply stops the sequence. Lemlist push is a **stub** until Willow's API key exists — until then emails go out via Gmail in Cowork and LinkedIn lines are held. No LinkedIn automation outside Lemlist.
 
 **This file is the entry point for coding agents.** Start here, then follow the pointers.
 

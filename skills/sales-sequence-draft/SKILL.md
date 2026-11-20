@@ -1,6 +1,6 @@
 ---
 name: sales-sequence-draft
-description: Batch-draft personal multichannel sequences (run by Lemlist) for Dutch HubSpot leads — profile visit + like latest post + invite → ONE personal email (day 1) → LinkedIn message if accepted (day 3) → LinkedIn follow-up (day 5). Senior voice, one story arc, stop on any reply. Approve every line.
+description: Batch-draft personal multichannel sequences (run by Lemlist) for Dutch HubSpot leads — profile visit + like latest post + invite → ONE personal email (same day) → LinkedIn message as soon as they accept → LinkedIn follow-up 2 days later. Senior voice, one story arc, stop on any reply. Approve every line.
 ---
 
 # sales-sequence-draft
@@ -47,9 +47,9 @@ The person to contact is the one in the HubSpot note (often the CEO / founder / 
 | 0 | **Visit profile** | automatic (Lemlist) | — |
 | 0 | **Like latest post** | automatic (Lemlist) | Skip it if the latest post is old, sensitive or off-topic. |
 | 0 | **Connection request + note** | agent → Floor approves | **≤200 characters** (Lemlist limit, variables included). Name + firm + the one angle. No pitch, no link. |
-| 1 | **The email** (the only one) | agent → Floor approves | Why we’re reaching out, from the HubSpot note: insight → one tension → soft Willow bridge → short CTA. PS: “I also sent you a connection request on LinkedIn.” |
-| 3 | **LinkedIn message** | agent → Floor approves | **Only if the invite was accepted** and no reply. “Thanks for connecting — I sent you an email earlier this week, reaching out here as well because …” + **one** easy question. |
-| 5 | **LinkedIn follow-up** | agent → Floor approves | 2 days later if still no reply. One more thought on the same story + “worth a short chat, or is the timing off?” |
+| 0 | **The email** (the only one) — right after the invite | agent → Floor approves | Why we’re reaching out, from the HubSpot note: insight → one tension → soft Willow bridge → short CTA. PS: “I also sent you a connection request on LinkedIn.” |
+| on accept | **LinkedIn message** | agent → Floor approves | **As soon as the invite is accepted** (Lemlist waits up to 14 days) and no reply. “Thanks for connecting — I also sent you an email, reaching out here as well because …” + **one** easy question. |
+| +2 days | **LinkedIn follow-up** | agent → Floor approves | 2 days later if still no reply. One more thought on the same story + “worth a short chat, or is the timing off?” |
 
 - **Max 1 email.** No email follow-ups — follow up on LinkedIn.
 - **Stop on any reply** — LinkedIn or email — at any point. Lemlist stops the lead; mirror with `record_reply`, then `sales-reply-demo`.
@@ -68,7 +68,7 @@ Reply classes: **no** → close · **interest** → Slack Floor + conversation �
 
 **Then batch:**
 
-> You are a sales pro with 20+ years experience. Read my past HubSpot sent emails for tone/format. Then batch up to 50 Dutch HubSpot tasks from the last ~30 days (never contacted before). For each, from the company note only, draft one personal multichannel sequence for the person in the note: Lemlist visits their LinkedIn profile and likes their latest post → connection request with a short note (≤200 characters) → day 1: ONE personal email on why I’m reaching out → day 3, only if they accepted: LinkedIn message (“I sent you an email — connecting here because …”, one question) → day 5: LinkedIn follow-up. Only one email; the follow-ups are on LinkedIn. Consistency angle phrasing: “I see you haven’t been posting consistently” — never “I saw your post yesterday/Friday”. Skip frequent posters (bad lead). Trust the HubSpot notes. Stop on any reply, LinkedIn or email (no/interest → Slack me; confused → short gracious reply, log HubSpot, no demo). Show approve queue. Do not send yet. Skip Belgian leads.
+> You are a sales pro with 20+ years experience. Read my past HubSpot sent emails for tone/format. Then batch up to 50 Dutch HubSpot tasks from the last ~30 days (never contacted before). For each, from the company note only, draft one personal multichannel sequence for the person in the note: Lemlist visits their LinkedIn profile and likes their latest post → connection request with a short note (≤200 characters) → right after: ONE personal email on why I’m reaching out → as soon as they accept: LinkedIn message (“I also sent you an email — connecting here because …”, one question) → 2 days later: LinkedIn follow-up. Only one email; the follow-ups are on LinkedIn. Consistency angle phrasing: “I see you haven’t been posting consistently” — never “I saw your post yesterday/Friday”. Skip frequent posters (bad lead). Trust the HubSpot notes. Stop on any reply, LinkedIn or email (no/interest → Slack me; confused → short gracious reply, log HubSpot, no demo). Show approve queue. Do not send yet. Skip Belgian leads.
 
 ## Research / send rules
 
@@ -81,7 +81,7 @@ Reply classes: **no** → close · **interest** → Slack Floor + conversation �
 ```text
 style from HubSpot sent emails → ONE story
   → visit + like (auto) · invite note · the email · LinkedIn msg · LinkedIn follow-up → approve every line
-  → Lemlist: d0 visit/like/invite · d1 email · d3 msg (if accepted) · d5 follow-up
+  → Lemlist: d0 visit · like · invite · email → msg as soon as they accept → follow-up +2 days
   → reply on either channel? stop ALL · no → close · interest → Slack Floor
 ```
 
@@ -98,7 +98,7 @@ style from HubSpot sent emails → ONE story
 
 | # | Company | Contact | Status | Story | Schedule |
 |---|---------|---------|--------|-------|----------|
-| 1 | Acme NL  | Jan (CEO) | pending | vacancy→hiring trust | d0 visit·like·invite · d1 email · d3 LI msg · d5 LI follow-up |
+| 1 | Acme NL  | Jan (CEO) | pending | vacancy→hiring trust | d0 visit·like·invite·email · LI msg on accept · LI follow-up +2d |
 ```
 
 ## Drafting checklist

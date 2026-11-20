@@ -126,6 +126,7 @@ const ANGLE_QUESTION: Record<StoryArc["angle"], (firm: string) => string> = {
   content_mix: () => `How do you decide what the firm posts about?`,
 };
 
+const ON_ACCEPT = "As soon as they’ve accepted your invite (Lemlist waits up to 14 days) — only if they haven’t replied";
 const AFTER_ACCEPT = "Only if they accepted your invite and haven’t replied";
 
 /**
@@ -150,7 +151,7 @@ function draftLinkedIn(
     return options.find((o) => o.length <= LINKEDIN_CONNECT_NOTE_MAX) ?? options[options.length - 1];
   }
   if (kind === "linkedin_message") {
-    return `Thanks for connecting, ${name}! I sent you an email earlier this week — reaching out here as well because ${ANGLE_REASON[arc.angle](lead.firmName)}.
+    return `Thanks for connecting, ${name}! I also sent you an email — reaching out here as well because ${ANGLE_REASON[arc.angle](lead.firmName)}.
 ${ANGLE_QUESTION[arc.angle](lead.firmName)}`;
   }
   return `Hi ${name}, one more thought on ${lead.firmName}:
@@ -169,18 +170,17 @@ type PlaybookStep = {
 /**
  * Lemlist multichannel (Floor, Nov 2026): warm up on LinkedIn, one personal email,
  * then the follow-ups happen on LinkedIn — more personal than more emails.
- * Visit profile + like latest post + invite (day 0) → the one email (day 1)
- * → LinkedIn message if the invite was accepted (day 3) → LinkedIn follow-up (day 5).
+ * Matches the live "Willow NL pilot" campaign (Lemlist only counts whole days):
+ * visit profile → like latest post → invite → the one email, all on day 0 in Lemlist's send queue
+ * → LinkedIn message as soon as the invite is accepted → LinkedIn follow-up 2 days later.
  * Any reply on either channel stops the rest. Every written line needs Floor's approval.
  */
 const DEFAULT_PLAYBOOK: PlaybookStep[] = [
   { kind: "linkedin_visit", label: "Visit their LinkedIn profile", waitDays: 0 },
   { kind: "linkedin_like", label: "Like their latest post", waitDays: 0 },
   { kind: "linkedin_connect", label: "Connection request + short note", waitDays: 0 },
-  { kind: "wait", label: "Wait 1 day → the email", waitDays: 1 },
   { kind: "email", label: "Email — why we’re reaching out, from the HubSpot note", waitDays: 0, touch: 1 },
-  { kind: "wait", label: "Wait 2 days → LinkedIn message (if the invite was accepted)", waitDays: 2 },
-  { kind: "linkedin_message", label: "LinkedIn message — “I sent you an email…”", waitDays: 0, condition: AFTER_ACCEPT },
+  { kind: "linkedin_message", label: "LinkedIn message — “I also sent you an email…”", waitDays: 0, condition: ON_ACCEPT },
   { kind: "wait", label: "Wait 2 days → LinkedIn follow-up", waitDays: 2 },
   { kind: "linkedin_followup", label: "LinkedIn follow-up", waitDays: 0, condition: AFTER_ACCEPT },
 ];

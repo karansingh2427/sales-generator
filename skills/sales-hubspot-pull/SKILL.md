@@ -34,7 +34,8 @@ Default lookback = **last ~30 days / last calendar month**.
 
 1. Check HubSpot for **prior outbound email** or **logged outreach** on the contact **or** company (email engagements, logged Gmail/send notes, sequence/outreach activities, prior Sales Generator sends).
 2. **Skip** if any prior outbound/logged outreach exists — even a single cold email.
-2a. **Also check Lemlist** (connector): if the contact’s email or LinkedIn URL is a lead in **any** Lemlist campaign (Floor’s workspace has years of old campaigns), treat them as already contacted and skip.
+2a. **Skip do-not-contact contacts:** HubSpot has no “do not contact” field, so Willow marks them with **Contact again later = “Definitely not”** and/or **Lead Status = “Unqualified”** (plus a note with the reason, e.g. “asked not to be emailed again”). Skip these contacts — and don’t pick another person at the same company without Floor’s OK.
+2b. **Also check Lemlist** (connector): if the contact’s email or LinkedIn URL is a lead in **any** Lemlist campaign (Floor’s workspace has years of old campaigns), treat them as already contacted and skip.
 3. Also skip if this contact/company already appears in **today’s earlier approve/sent queues** (same calendar day multi-batch).
 4. In the batch table, mark skipped rows as `skip: already contacted` (or `skip: earlier batch today`) so Floor sees why volume dropped.
 5. Do **not** treat a HubSpot **task** itself as proof of prior email outreach — tasks are lead-gen work items; only email/outreach engagements count.

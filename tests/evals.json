@@ -89,7 +89,7 @@
       "scenario": "Generate the Lemlist multichannel sequence (visit + like + invite → 1 email → LinkedIn message → LinkedIn follow-up) then approve and mark sent",
       "request": "POST /api/sequences generate → approve_step → mark_sent",
       "expectations": [
-        "Steps in order: linkedin_visit, linkedin_like, linkedin_connect (day 0) → wait 1d → email (day 1) → wait 2d → linkedin_message (day 3, only if invite accepted) → wait 2d → linkedin_followup (day 5)",
+        "Steps in order: linkedin_visit, linkedin_like, linkedin_connect, email (all day 0, matching the live Lemlist campaign) → linkedin_message as soon as the invite is accepted (Lemlist waits up to 14 days) → wait 2d → linkedin_followup",
         "Exactly 1 email step; every step sendVia lemlist; visit/like are automatic (no copy, no approval)",
         "Invite note ≤200 chars; email mentions the LinkedIn invite; LinkedIn message refers back to the email and asks one question",
         "Lead without LinkedIn URL gets just the email",

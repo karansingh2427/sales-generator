@@ -23,7 +23,7 @@ Once Lemlist is live it sends the email itself (`sales-lemlist-push`) — **neve
 | What | When | Action |
 |---|---|---|
 | **The email** | On approve + “send” | Send via Gmail → **log HubSpot** |
-| Follow-ups | — | **None by email.** LinkedIn message (day 3) + follow-up (day 5) run in Lemlist once connected. |
+| Follow-ups | — | **None by email.** LinkedIn message (on accept) + follow-up (2 days later) run in Lemlist once connected. |
 | Cap | **1 email per lead** | Never a second cold email |
 
 PS line: keep “I also sent you a connection request on LinkedIn” only if the invite really went out (i.e. Lemlist is live). While LinkedIn lines are held, remove that PS before sending.

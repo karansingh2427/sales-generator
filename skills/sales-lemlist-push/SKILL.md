@@ -22,6 +22,9 @@ Floor’s workspace has **~183 campaigns**, including a **running** one (“Floo
 - **Launching** the pilot campaign (draft → running) only when Floor says so in words, e.g. “launch the pilot”. Adding leads to a **draft** campaign sends nothing; adding to a **running** campaign starts their sequence.
 - **Before adding a lead, search Lemlist for that email / LinkedIn URL across all campaigns.** If the person is in any other campaign (old Law / HR / IT / Accountancy campaigns from 2022–2025 included), **skip** them — they were already contacted — and say so in the batch report.
 - Never delete campaigns, leads or steps. Never change senders or settings.
+- **Read back before you claim.** After every Lemlist change, re-read the campaign (lead count, each lead’s variables, steps) and report what Lemlist actually shows — never what you expect. Before launch, confirm every lead has all five variables filled with Floor-approved text and nothing else is in the campaign.
+- **LinkedIn URL must be a profile link** (`linkedin.com/in/…`). Sales Navigator links (`linkedin.com/sales/…`) don’t work for Lemlist’s LinkedIn steps — find the normal profile link, or add the lead without a LinkedIn URL (email-only branch) and say so.
+- **Launching** happens only after Floor types it in words (“Launch the campaign …”). Never tell her to press a button labelled Launch; if a UI step is needed, name it exactly (e.g. “the Launch *tab* at the top — don’t press the blue button”).
 
 **Never tell Floor a step went out through Lemlist** unless the connector / API confirmed it. Say: “Approved and ready — it goes out once Lemlist is connected.” Meanwhile the email goes out via **`sales-gmail-send`** and the LinkedIn lines are held.
 
@@ -34,9 +37,9 @@ Campaign steps are shared templates, so each written step is just a variable; ea
 | 0 | LinkedIn: **Visit profile** | — (lead field `visitProfile`) |
 | 0 | LinkedIn: **Like last post** | — (lead field `likeLastPost`) |
 | 0 | LinkedIn: **Invitation** | `{{connectNote}}` (≤200 chars incl. variables) |
-| 1 | **Email** | subject `{{emailSubject}}` · body `{{emailBody}}` |
-| 3 | Condition **Accepted invite** → Yes: LinkedIn **Chat message** | `{{linkedinMessage}}` |
-| 5 | LinkedIn **Chat message** (same Yes branch) | `{{linkedinFollowup}}` |
+| 0 | **Email** | subject `{{emailSubject}}` · body `{{emailBody}}` |
+| on accept | Condition **Accepted invite** (waits up to 14 days) → Yes: LinkedIn **Chat message** | `{{linkedinMessage}}` |
+| +2 days | LinkedIn **Chat message** (same Yes branch) | `{{linkedinFollowup}}` |
 
 - Start with a **Has LinkedIn URL** condition; leads without one get only the email.
 - Turn on **stop on reply** for both channels.
@@ -71,6 +74,6 @@ Lemlist’s HubSpot integration can log sends and replies. If Floor turns it on,
 
 ```text
 approve EVERY written line → one push to Lemlist (connector first; web app = stub)
-  → d0 visit · like · invite → d1 email → d3 msg (if accepted) → d5 follow-up
+  → d0 visit · like · invite · email → msg as soon as they accept → follow-up +2 days
   → reply on either channel → Lemlist stops it → record_reply → sales-reply-demo
 ```

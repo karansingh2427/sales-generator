@@ -76,10 +76,10 @@ const emailSteps = seq.steps.filter((s) => s.kind === "email");
 assert.equal(emailSteps.length, 1, "one personal email — follow-ups happen on LinkedIn");
 assert.deepEqual(
   seq.steps.map((s) => s.kind),
-  ["linkedin_visit", "linkedin_like", "linkedin_connect", "wait", "email", "wait", "linkedin_message", "wait", "linkedin_followup"],
-  "visit → like → invite → email → LinkedIn message → LinkedIn follow-up",
+  ["linkedin_visit", "linkedin_like", "linkedin_connect", "email", "linkedin_message", "wait", "linkedin_followup"],
+  "visit → like → invite → email (all day 0) → LinkedIn message on accept → follow-up",
 );
-assert.deepEqual(seq.steps.filter((s) => s.kind === "wait").map((s) => s.waitDays), [1, 2, 2], "email day 1, DM day 3, follow-up day 5");
+assert.deepEqual(seq.steps.filter((s) => s.kind === "wait").map((s) => s.waitDays), [2], "only wait: follow-up 2 days after the LinkedIn message");
 assert.ok(seq.steps.every((s) => s.kind === "wait" || s.sendVia === "lemlist"), "Lemlist runs every step");
 const actions = seq.steps.filter((s) => isActionStep(s.kind));
 assert.equal(actions.length, 2);
@@ -95,6 +95,7 @@ assert.ok(longFirm.steps.find((s) => s.kind === "linkedin_connect").body.length 
 assert.ok(/connection request on LinkedIn/.test(emailSteps[0].body), "email mentions the LinkedIn invite");
 const dm = msgSteps[2];
 assert.ok(/sent you an email/.test(dm.body) && dm.body.includes("?"), "DM references the email and asks one question");
+assert.ok(/accept/.test(dm.condition) && /14 days/.test(dm.condition), "DM fires as soon as the invite is accepted");
 assert.ok(dm.condition && /accepted/.test(dm.condition), "DM only after the invite is accepted");
 assert.ok(msgSteps[3].condition, "follow-up is conditional too");
 assert.ok(seq.name.includes("LinkedIn + email"));

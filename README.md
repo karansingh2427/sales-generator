@@ -3,7 +3,7 @@
 Prototype for **Floor Hoefkens** (BDR @ [Willow](https://willow.co/)): **HubSpot company notes = preferred background** → agent **personalizes the full LinkedIn + email sequence** (LinkedIn **research** OK when notes are thin or she asks — not every run) → Floor **approves every line** → **Lemlist** sends LinkedIn + email → any reply stops the sequence → on interest, **Slack Floor** (with the conversation) so she **manually books Ludwig’s calendar**. Sales Nav CSV remains a fallback. Cursor/Claude **skills** ship alongside the Next.js UI.
 
 **Geography:** **Netherlands first**, Belgium second — **NL + BE only**.  
-**Channels:** **Lemlist (LinkedIn + email)** — profile visit + like latest post + invite (day 0) → **one** personal email (day 1) → LinkedIn message if the invite was accepted (day 3) → LinkedIn follow-up (day 5); max **1** email, follow-ups on LinkedIn. Lemlist push is a **stub** until Lemlist is connected (its API needs a higher plan; Lemlist’s Claude connector is the preferred route); meanwhile the email goes via Gmail in Cowork and LinkedIn lines are held.  
+**Channels:** **Lemlist (LinkedIn + email)** — profile visit → like latest post → invite → **one** personal email (all day 0, one after another) → LinkedIn message as soon as they accept → LinkedIn follow-up 2 days later; max **1** email, follow-ups on LinkedIn. Lemlist push is a **stub** until Lemlist is connected (its API needs a higher plan; Lemlist’s Claude connector is the preferred route); meanwhile the email goes via Gmail in Cowork and LinkedIn lines are held.  
 **Governance:** approve-before-send (pilot); **never auto-book** Calendar. **CRM language:** English writebacks. Prefer Floor’s Cowork **HubSpot + Gmail + Slack** connectors.
 
 ## For Floor
