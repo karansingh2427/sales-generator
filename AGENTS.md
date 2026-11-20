@@ -31,7 +31,8 @@ Plugin skills live under `skills/` (see [`.cursor-plugin/plugin.json`](.cursor-p
 | `sales-sequence-draft` | [skills/sales-sequence-draft/SKILL.md](skills/sales-sequence-draft/SKILL.md) | Batch-draft multichannel sequences (visit + like + invite → 1 email → 2 LinkedIn messages) into approve queue |
 | `sales-gmail-send` | [skills/sales-gmail-send/SKILL.md](skills/sales-gmail-send/SKILL.md) | Email fallback until Lemlist is connected — send approved email steps via Gmail (Cowork connector) |
 | `sales-lemlist-push` | [skills/sales-lemlist-push/SKILL.md](skills/sales-lemlist-push/SKILL.md) | After every line is approved — add the lead + its copy to the Lemlist campaign (**stub** until API key) |
-| `sales-reply-demo` | [skills/sales-reply-demo/SKILL.md](skills/sales-reply-demo/SKILL.md) | Dutch-batch Gmail + LinkedIn replies → BOOK NOW / NOT YET / NO / CONFUSED; Slack Floor on BOOK NOW |
+| `sales-reply-demo` | [skills/sales-reply-demo/SKILL.md](skills/sales-reply-demo/SKILL.md) | Dutch-batch Gmail + LinkedIn replies → BOOK NOW / NOT YET / NO / CONFUSED; **Slack ping Floor on every reply** (hourly check, Mon–Fri) |
+| `sales-daily-update` | [skills/sales-daily-update/SKILL.md](skills/sales-daily-update/SKILL.md) | Mon–Fri 09:00 Europe/Amsterdam — short Slack update: sent, replies + reply rate, demos, awaiting approval, what to adjust |
 | `sales-demo-book` | [skills/sales-demo-book/SKILL.md](skills/sales-demo-book/SKILL.md) | Slack Floor + conversation → she books Ludwig; never auto-create events |
 | `sales-feedback-learn` | [skills/sales-feedback-learn/SKILL.md](skills/sales-feedback-learn/SKILL.md) | “Remember: …” — applied on next Dutch batch pull/drafts |
 | `sales-lead-run` | [skills/sales-lead-run/SKILL.md](skills/sales-lead-run/SKILL.md) | Orchestrate batch pass (2–3×/day) + Lemlist send (Gmail fallback) + reply→demo + demo handoff |
@@ -51,6 +52,7 @@ Pattern mirrored from [agent-data/job-search](https://github.com/agent-data/job-
 - **Sequences:** `src/lib/sequence-engine.ts`, `src/app/api/sequences/route.ts`, `src/components/sequence-builder-panel.tsx`
 - **Campaigns UI (Floor's main view):** `src/app/campaign/page.tsx`, `src/components/campaign/` — our own outreach-agent workspace (inspired by, not copied from, vendor demos like Reachium)
 - **Lemlist (stub):** `src/lib/lemlist.ts`, `src/app/api/lemlist/route.ts`, `skills/sales-lemlist-push/`
+- **Daily update:** `src/lib/daily-update.ts`, `src/app/api/daily-update/route.ts`, `skills/sales-daily-update/`
 - **Feedback learning:** `src/lib/feedback.ts`, `src/app/api/feedback/route.ts`, `src/components/feedback-panel.tsx`, `skills/sales-feedback-learn/`
 - **ICP / geo:** `src/lib/icp.ts`, `src/lib/geo.ts` (NL primary, BE secondary, no other countries)
 - **Fallback CSV:** `src/lib/sales-nav-import.ts`

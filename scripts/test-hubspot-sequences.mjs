@@ -22,6 +22,7 @@ import {
   needsApproval,
 } from "../src/lib/sequence-engine.ts";
 import { buildLemlistPayload, pushToLemlist, resolveLemlistMode } from "../src/lib/lemlist.ts";
+import { buildDailyUpdate, updateWindowStart } from "../src/lib/daily-update.ts";
 import { scoreExpertiseIcp, parseSocialPresence } from "../src/lib/icp.ts";
 import { mapHubSpotStage, DEFAULT_STAGE_MAP } from "../src/lib/hubspot-config.ts";
 
@@ -166,6 +167,42 @@ assert.equal(gen.ok, true);
 const reply = validateSequenceAction({ action: "record_reply", sequenceId: "s1", channel: "linkedin" });
 assert.equal(reply.ok, true);
 assert.equal(validateSequenceAction({ action: "record_reply", sequenceId: "s1", channel: "sms" }).ok, false);
+
+// Daily 09:00 update (Europe/Amsterdam): window, counts, reply rate
+const tue = new Date("2026-11-17T08:00:00Z"); // Tue 09:00 CET
+const mon = new Date("2026-11-16T08:00:00Z"); // Mon 09:00 CET
+assert.equal(updateWindowStart(tue).toISOString(), "2026-11-16T08:00:00.000Z", "since yesterday 09:00");
+assert.equal(updateWindowStart(mon).toISOString(), "2026-11-13T08:00:00.000Z", "Monday covers since Friday");
+const at = (iso) => ({ status: "sent", sentAt: iso });
+const mk = (id, leadId, steps, extra = {}) => ({ id, leadId, name: id, status: "active", opportunityAngles: [], createdAt: "", updatedAt: "", steps, ...extra });
+const duState = {
+  leads: [els, joost],
+  bookings: [{ id: "b1", leadId: els.id, aeName: "Ludwig", scheduledAt: "", durationMinutes: 30, meetingLink: "", status: "scheduled", createdAt: "2026-11-16T15:00:00Z" }],
+  sequences: [
+    mk("s1", els.id, [
+      { id: "a", kind: "linkedin_connect", label: "", waitDays: 0, ...at("2026-11-16T10:00:00Z") },
+      { id: "b", kind: "email", label: "", waitDays: 0, ...at("2026-11-16T10:30:00Z") },
+      { id: "c", kind: "linkedin_message", label: "", waitDays: 0, ...at("2026-11-12T10:00:00Z") },
+    ], { stoppedOnReply: { channel: "linkedin", at: "2026-11-16T14:00:00Z" } }),
+    mk("s2", joost.id, [
+      { id: "d", kind: "email", label: "", waitDays: 0, ...at("2026-11-10T10:00:00Z") },
+      { id: "e", kind: "linkedin_followup", label: "", waitDays: 0, status: "draft" },
+    ]),
+    mk("s3", "lead_x", [{ id: "f", kind: "email", label: "", waitDays: 0, status: "draft" }]),
+  ],
+};
+const du = buildDailyUpdate(duState, tue);
+assert.deepEqual(du.sent, { invites: 1, emails: 1, linkedinMessages: 0 }, "only sends inside the window count");
+assert.equal(du.replies.total, 1);
+assert.equal(du.replies.linkedin, 1);
+assert.equal(du.replies.leads[0].firm, els.firmName);
+assert.deepEqual(du.pilot, { contacted: 2, replied: 1, replyRate: 50 });
+assert.equal(du.awaitingApproval, 2, "drafts waiting, replied lead excluded");
+assert.equal(du.demosBooked, 1);
+assert.ok(du.text.includes("Outreach update — Tue 17 Nov (since yesterday)"));
+assert.ok(du.text.includes("Pilot so far: 2 contacted · 1 replied (50%)"));
+assert.ok(buildDailyUpdate(duState, mon).text.includes("since Friday"));
+assert.equal(buildDailyUpdate({ leads: [], sequences: [], bookings: [] }, tue).pilot.replyRate, 0, "no divide-by-zero");
 
 console.log("HubSpot + sequence unit checks passed");
 `,

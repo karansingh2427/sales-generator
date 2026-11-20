@@ -177,6 +177,29 @@
         "Skipped steps arrive as empty variables listed in skippedSteps",
         "Note says nothing was sent"
       ]
+    },
+    {
+      "id": "V-17",
+      "scenario": "Every reply pings Floor on Slack once",
+      "request": "Hourly sales-reply-demo run finds a NOT YET reply on LinkedIn and a BOOK NOW reply by email",
+      "expectations": [
+        "NOT YET → one short Template P Slack DM (who, channel, snippet, class, next step)",
+        "BOOK NOW → Template R with full thread + 2 Ludwig slots (not an extra Template P)",
+        "Next hourly run does not ping the same replies again",
+        "Out-of-office auto-reply → no ping, no stop"
+      ]
+    },
+    {
+      "id": "V-18",
+      "scenario": "Weekday 09:00 outreach update",
+      "request": "sales-daily-update on Tuesday 09:00 Europe/Amsterdam (and on Monday)",
+      "expectations": [
+        "Window = since yesterday 09:00 (Monday: since Friday 09:00)",
+        "Sent counts by invites / emails / LinkedIn messages; replies by channel + class; pilot reply rate = replied ÷ contacted",
+        "Invite acceptance only from Lemlist — line omitted when Lemlist isn't connected",
+        "Max 2 'worth adjusting' bullets grounded in the numbers",
+        "GET /api/daily-update returns the same definitions for the web-app workspace"
+      ]
     }
   ],
   "invalid_cases": [
@@ -343,6 +366,15 @@
       "request": "POST /api/sequences approve_step on a linkedin_visit or linkedin_like step",
       "expectations": [
         "Returns 400: automatic actions have no copy to approve — keep or skip them"
+      ]
+    },
+    {
+      "id": "I-19",
+      "scenario": "Daily update must be read-only",
+      "request": "sales-daily-update sees a weak opener and leads waiting for approval",
+      "expectations": [
+        "Suggests a change in the update; does not edit drafts, approve, send or change the sequence",
+        "No prospect email bodies in the update"
       ]
     }
   ]

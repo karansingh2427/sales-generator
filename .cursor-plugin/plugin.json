@@ -1,7 +1,7 @@
 {
   "name": "sales-generator",
-  "version": "0.5.0",
-  "description": "Willow BDR skill pack for Floor Hoefkens: HubSpot company-note pull (Netherlands first), LinkedIn + email sequences via Lemlist with approve-every-line (Gmail fallback for email until Lemlist is connected), reply→demo classifier (BOOK NOW / NOT YET / NO / CONFUSED), Slack→Ludwig demo handoff, and feedback learning. No LinkedIn automation outside Lemlist.",
+  "version": "0.6.0",
+  "description": "Willow BDR skill pack for Floor Hoefkens: HubSpot company-note pull (Netherlands first), LinkedIn + email sequences via Lemlist with approve-every-line (Gmail fallback for email until Lemlist is connected), reply→demo classifier (BOOK NOW / NOT YET / NO / CONFUSED) with a Slack ping on every reply, a weekday 09:00 Slack outreach update, Slack→Ludwig demo handoff, and feedback learning. No LinkedIn automation outside Lemlist.",
   "author": { "name": "Karandeep Singh" },
   "homepage": "https://github.com/karansingh2427/sales-generator",
   "repository": "https://github.com/karansingh2427/sales-generator",

@@ -1,6 +1,6 @@
 ---
 name: sales-reply-demo
-description: Pull Dutch-batch email + LinkedIn replies (Gmail, Lemlist inbox), classify BOOK NOW / NOT YET / NO / CONFUSED (politeness ≠ intent), draft the right next email, Slack Floor on BOOK NOW with thread + 2 Ludwig slots she can book manually. Never auto-book calendar. HubSpot-log inbound + outbound.
+description: Pull Dutch-batch email + LinkedIn replies (Gmail, Lemlist inbox), classify BOOK NOW / NOT YET / NO / CONFUSED (politeness ≠ intent), Slack-ping Floor on EVERY reply, draft the right next message; BOOK NOW gets thread + 2 Ludwig slots she books manually. Never auto-book calendar. HubSpot-log inbound + outbound.
 ---
 
 # sales-reply-demo
@@ -15,11 +15,13 @@ Floor pastes (or says):
 
 Also invoked from `sales-lead-run` after outbound sends, and from `sales-gmail-send` / `sales-demo-book` when a reply arrives.
 
+**Scheduled reply check (so pings arrive without Floor asking):** a Cowork recurring task runs “Check my replies from the Dutch batch and handle them.” **every hour, Monday–Friday 08:00–18:00 (Europe/Amsterdam)**. Set it up once with the prompt in `START-HERE-FLOOR.md`. Cowork only runs while Floor’s laptop is on; on the first run after a gap, handle everything that came in meanwhile.
+
 ## Scope
 
 - **Dutch batch leads only** (NL HubSpot tasks / companies already in the pilot). Skip Belgian / non-pilot threads.
 - Pull **recent inbound Gmail replies** on threads where we sent the email, **and replies from Lemlist** (once connected — LinkedIn and email) on leads where we sent the connect note / DM.
-- **Any reply on either channel → cancel all remaining LinkedIn steps immediately** (Lemlist stops the lead itself; also mirror it with web-app `record_reply`). There are no email follow-ups to keep; the class below (only NOT YET keeps E2/E3).
+- **Any reply on either channel → cancel all remaining LinkedIn steps immediately** (Lemlist stops the lead itself; also mirror it with web-app `record_reply`). There are no email follow-ups to keep.
 - Answer on the channel they replied on (LinkedIn reply → LinkedIn answer via Lemlist, same approve rule).
 - One coherent story continues (same senior voice + consistency rules as outbound). Do **not** invent a new pitch.
 
@@ -71,7 +73,28 @@ Also invoked from `sales-lead-run` after outbound sends, and from `sales-gmail-s
 4. **No** demo push. **No** Slack booking ping.
 5. Consistency angle stays valid for **other** leads (one post ≠ posting consistently).
 
-## Template R — Slack Floor (BOOK NOW only)
+## Slack ping on every reply (required)
+
+Floor wants to know about **every** reply, not only demo requests. For each newly handled reply, send **one** Slack DM to Floor:
+
+- **BOOK NOW** → Template R below (full thread + 2 Ludwig slots).
+- **NOT YET / NO / CONFUSED** → Template P — short.
+
+```text
+💬 Reply from <Name> (<Company>) on <LinkedIn | email>
+“<first ~200 chars of their reply>”
+Class: <NOT YET | NO | CONFUSED> · Sequence stopped
+Next: <draft reply ready to approve in Cowork | gracious close drafted | nothing to do>
+HubSpot: <contact URL if available>
+```
+
+Rules:
+- **One ping per reply** — never re-ping a reply already pinged (dedup on lead + reply timestamp; note pinged replies in the digest).
+- Ping as soon as the reply is classified; don’t wait for Floor to approve the drafted answer.
+- If Lemlist’s own Slack reply notifications are switched on, keep ours (it carries the class + next step) and suggest Floor turns Lemlist’s off to avoid doubles.
+- Out-of-office / auto-replies: no ping, no stop — note them in the daily update only.
+
+## Template R — Slack Floor (BOOK NOW)
 
 ```text
 🎯 Reply → demo — BOOK NOW (please book Ludwig)
@@ -127,7 +150,7 @@ Gmail (read replies + send) · HubSpot (log) · Slack (Floor ping) · Google Cal
 ```text
 # Reply → demo — <date>
 Replies pulled: <n> · BOOK NOW: <n> · NOT YET: <n> · NO: <n> · CONFUSED: <n>
-Slack Floor (BOOK NOW): <n> · Sequences stopped: <n>
+Slack pings sent: <n> (BOOK NOW: <n>) · Sequences stopped: <n>
 HubSpot logged (in/out): <n>/<n>
 ```
 

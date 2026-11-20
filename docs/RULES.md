@@ -63,6 +63,8 @@ These rules govern human and agent operators. Violations are **invalid** scenari
 4. `sales-gmail-send` is the **email fallback until Lemlist is live**: sends only **approved** email steps via Gmail; never LinkedIn. Once a lead is in Lemlist, never also send its emails from Gmail.
 4a. `sales-lemlist-push` pushes a lead to Lemlist only when **every** non-skipped line is approved; **stub** until `LEMLIST_API_KEY` is wired — it must never claim a LinkedIn or email send happened.
 5. `sales-reply-demo` classifies Dutch-batch replies from **email and LinkedIn (Gmail + Lemlist inbox)** as **BOOK NOW / NOT YET / NO / CONFUSED**; politeness ≠ BOOK NOW; never auto-book; HubSpot-log inbound + outbound.
+5a. **Every reply → one Slack ping to Floor** (Template P; BOOK NOW uses Template R). Hourly reply check Mon–Fri 08:00–18:00 Europe/Amsterdam via Cowork. Dedup — never re-ping the same reply; no ping for out-of-office.
+5b. `sales-daily-update` Slacks Floor Mon–Fri at 09:00 Europe/Amsterdam: sent since the last update, replies + pilot reply rate, invite acceptance (Lemlist only — never estimated), demos, awaiting approval, max 2 “worth adjusting” bullets. Read-only: never edits, approves or sends.
 6. `sales-demo-book` must Slack Floor (with conversation), never auto-book Calendar, and use the three post-demo outcomes after she books Ludwig. BOOK NOW from reply-demo is the preferred trigger.
 7. Orchestrator `sales-lead-run` may compose the skills — it must not bypass HITL, geo lock, the Lemlist channel rules, stop-on-reply, or the Slack→Ludwig handoff.
 8. `sales-feedback-learn` persists structured feedback; pull/draft/lead-run **must** load active feedback.

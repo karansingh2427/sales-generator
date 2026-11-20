@@ -24,6 +24,10 @@ No GitHub. Unzip on **your** computer → open **that** folder in Claude Cowork.
 
 > Set this up to run about 2–3 times per day on a recurring schedule in Cowork (morning / midday / afternoon if you can). Each run should paste/execute the Dutch batch prompt above — fresh 30-day pull, never-contacted only, new approve queue. Do not stop after the first daily run. If Cowork scheduling UI differs, create recurring reminders that open this folder and run the batch prompt.
 
-7. When replies come in, paste:
+7. **Reply pings + 9am update** (one-time setup — paste once):
 
-> Check my replies from the Dutch batch and handle them.
+> Set up two recurring tasks in Cowork, Europe/Amsterdam time, Monday to Friday only. (1) Every hour from 08:00 to 18:00: “Check my replies from the Dutch batch and handle them.” — and Slack me one short message for every new reply (who, LinkedIn or email, what they said, the class, what’s next). (2) Every day at 09:00: “Give me my outreach update.” — Slack me a short update on what went out since the last one, replies and reply percentage, demos booked, what’s waiting for my approval, and 1–2 things worth adjusting.
+
+My laptop needs to be on with Claude open for these to run — if one was missed, it runs as soon as I’m back.
+
+8. Anytime: **“Check my replies from the Dutch batch and handle them.”** or **“Give me my outreach update.”**

@@ -23,7 +23,8 @@ Floor follows `START-HERE-FLOOR.md`. Follow-ups auto-scheduled; **every lead ema
 | **Consistency** | Phrase “haven’t been posting consistently” — never “saw your post Friday”; one post ≠ consistent; skip **frequent** posters |
 | **Schedule** | Lemlist runs the timing once connected; Cowork recurring for batch runs |
 | **HubSpot** | After every successful Gmail send → email engagement (dedup if already synced) |
-| **Replies** | `sales-reply-demo` — BOOK NOW / NOT YET / NO / CONFUSED (politeness ≠ intent) |
+| **Replies** | `sales-reply-demo` — BOOK NOW / NOT YET / NO / CONFUSED (politeness ≠ intent) · Slack ping on every reply · hourly check Mon–Fri |
+| **Daily update** | `sales-daily-update` — Slack Floor Mon–Fri 09:00 (sent, replies + rate, demos, awaiting approval) |
 | **Stop** | Any reply stops the sequence · NO → close · BOOK NOW → Slack Floor + 2 Ludwig slots · CONFUSED → gracious, no demo · NOT YET → one value reply |
 | **Pilot** | Approve every written line (LinkedIn + email) before send · any reply stops everything |
 
@@ -34,7 +35,7 @@ Floor follows `START-HERE-FLOOR.md`. Follow-ups auto-scheduled; **every lead ema
 2. **`sales-hubspot-pull`** — Dutch tasks **last ~30 days**; **never-contacted only**; skip Belgian; skip frequent / strong-presence posters; exclude already drafted/sent earlier today.
 3. **`sales-sequence-draft`** — one story · visit/like/invite → 1 email → 2 LinkedIn messages → approve queue.
 4. **`sales-lemlist-push`** (connector first) — push fully approved leads · until Lemlist is live: **`sales-gmail-send`** sends the one email → **HubSpot log**.
-5. **`sales-reply-demo`** — pull inbound replies → classify → draft/act → BOOK NOW → Slack Floor (`sales-demo-book`) + 2 slots; never auto-book.
+5. **`sales-reply-demo`** — pull inbound replies → classify → **Slack ping Floor on every reply** → draft/act → BOOK NOW → Template R + 2 slots (`sales-demo-book`); never auto-book.
 6. **Offer next batch** — after the queue is handled, remind Floor she can run **another batch now** or wait for the next scheduled run (target 2–3×/day). Do **not** close as if the day is finished.
 
 ## Prompts (START-HERE)

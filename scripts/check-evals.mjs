@@ -60,6 +60,7 @@ const skillDirs = [
   "skills/sales-gmail-send/SKILL.md",
   "skills/sales-lemlist-push/SKILL.md",
   "skills/sales-reply-demo/SKILL.md",
+  "skills/sales-daily-update/SKILL.md",
   "skills/sales-demo-book/SKILL.md",
   "skills/sales-lead-run/SKILL.md",
   "skills/sales-feedback-learn/SKILL.md",
@@ -135,6 +136,9 @@ for (const required of [
   "I-16",
   "I-17",
   "I-18",
+  "V-17",
+  "V-18",
+  "I-19",
 ]) {
   if (!ids.includes(required)) {
     console.error(`Missing eval case ${required}`);
