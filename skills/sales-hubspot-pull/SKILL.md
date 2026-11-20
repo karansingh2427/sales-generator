@@ -1,11 +1,11 @@
 ---
 name: sales-hubspot-pull
-description: Pull Dutch HubSpot tasks from the last ~30 days (not only today), filter never-contacted only, and support multiple batches per day. Company notes = preferred background for Gmail sequences — NL primary, BE secondary. LinkedIn research OK when notes thin or Floor asks; never force every run. No LinkedIn send. Prefer HubSpot tools in Floor’s Cowork session.
+description: Pull Dutch HubSpot tasks newest first (today, yesterday, … up to 2 months back) until the day’s volume (15→30/day), never-contacted + do-not-contact + Lemlist dedup. Company notes = preferred background for Gmail sequences — NL primary, BE secondary. LinkedIn research OK when notes thin or Floor asks; never force every run. No LinkedIn send. Prefer HubSpot tools in Floor’s Cowork session.
 ---
 
 # sales-hubspot-pull
 
-**One-liner:** HubSpot notes = **preferred background**. Pull Dutch tasks from the **last ~30 days**, keep only **never-contacted** contacts/companies, and treat every run as a **fresh batch** (2–3×/day is normal).
+**One-liner:** HubSpot notes = **preferred background**. Pull Dutch tasks **newest first, up to 2 months back**, keep only **never-contacted** contacts/companies, and treat every run as a **fresh batch** (2–3×/day is normal).
 
 Pass notes to `sales-sequence-draft` for Gmail personalization.
 
@@ -19,14 +19,13 @@ Pass notes to `sales-sequence-draft` for Gmail personalization.
 
 Default filter: `NL + BE`. Sort / present **Netherlands first**. Floor’s phase-1 pilot prompt: **Dutch tasks only** (skip Belgian).
 
-## Lookback (hard rule — not “today only”)
+## Lookback (hard rule — newest first, up to 2 months)
 
-Default lookback = **last ~30 days / last calendar month**.
-
-1. Pull HubSpot **tasks** assigned to Floor (or her usual filter) whose due / created / updated date falls in the **last 30 days** — **not** only due-today.
-2. Include open/incomplete tasks in that window first; if the pool is thin, also consider recently completed tasks in the same window that still point at never-contacted NL companies.
-3. If Floor says “today’s tasks,” still **default to the 30-day pool** unless she explicitly insists on a narrower filter — today’s list alone is too small for the Dutch pilot.
-4. Fall back to NL company search only when tasks aren’t available; keep the same 30-day / never-contacted spirit.
+1. Pull HubSpot **tasks** assigned to Floor (Dutch / NL companies), **newest first**: today’s tasks, then yesterday’s, then the day before — back day by day up to **2 months**.
+2. Stop going back as soon as the run’s volume is reached (automatic mode: **15/day the first week, then 30/day**; on request: what Floor asks for).
+3. Within a day, open/incomplete tasks first; recently completed tasks only if they still point at a never-contacted NL company.
+4. If 2 months back still doesn’t fill the volume, return what there is and say why — never pad with weak or already-contacted leads.
+5. Fall back to NL company search only when tasks aren’t available; same never-contacted rules.
 
 ## Never-contacted filter (hard rule)
 
@@ -36,7 +35,7 @@ Default lookback = **last ~30 days / last calendar month**.
 2. **Skip** if any prior outbound/logged outreach exists — even a single cold email.
 2a. **Skip do-not-contact contacts:** HubSpot has no “do not contact” field, so Willow marks them with **Contact again later = “Definitely not”** and/or **Lead Status = “Unqualified”** (plus a note with the reason, e.g. “asked not to be emailed again”). Skip these contacts — and don’t pick another person at the same company without Floor’s OK.
 2b. **Also check Lemlist** (connector): if the contact’s email or LinkedIn URL is a lead in **any** Lemlist campaign (Floor’s workspace has years of old campaigns), treat them as already contacted and skip.
-3. Also skip if this contact/company already appears in **today’s earlier approve/sent queues** (same calendar day multi-batch).
+3. Also skip if this contact/company was already handled in an earlier run (sent to Lemlist, ⚠️ held, or skipped).
 4. In the batch table, mark skipped rows as `skip: already contacted` (or `skip: earlier batch today`) so Floor sees why volume dropped.
 5. Do **not** treat a HubSpot **task** itself as proof of prior email outreach — tasks are lead-gen work items; only email/outreach engagements count.
 
@@ -44,36 +43,30 @@ Default lookback = **last ~30 days / last calendar month**.
 
 This skill is **not** a one-shot.
 
-- Floor may run **2–3 batches per day** (default). Each paste / schedule fire is a **new pull**.
-- **Never** treat “we already ran once” (today, yesterday, or ever) as done forever.
-- Each run: re-query the 30-day Dutch task pool → apply never-contacted + feedback skips → fill the next chunk (default **50**).
-- Prefer companies **not yet shown** in earlier batches today; if the never-contacted pool is exhausted, say so clearly and stop — don’t recycle already-contacted leads.
+- In automatic mode it runs every weekday at 08:00 (via `sales-lead-run`); Floor can also ask for an extra run anytime.
+- Each run is a **new pull**: re-query newest-first → apply never-contacted + do-not-contact + Lemlist dedup + feedback skips → fill the day’s volume.
+- Skip anyone already handled in an earlier run (sent, ⚠️ held, or skipped). If the 2-month pool is exhausted, say so clearly and stop — don’t recycle leads.
 
-## Batch pull (phase 1 — primary path)
+## Batch pull (primary path)
 
-Floor works in **bulk**: tens to hundreds of Dutch HubSpot tasks/companies per pass.
-
-1. Pull **Dutch tasks from the last ~30 days** that point at NL companies; fall back to NL company search if tasks aren’t available.
-2. Apply **never-contacted** + feedback skips **before** counting toward the batch.
-3. Cap presentation in chunks Floor can review (e.g. first **50**, then “next 50” / “run another batch”) unless she asks for the full set.
-4. Output a numbered table ready for `sales-sequence-draft` **batch mode** → items land in an **approve queue** (not auto-send).
+1. Pull Dutch tasks newest first (see Lookback) that point at NL companies.
+2. Apply **never-contacted** + do-not-contact + Lemlist dedup + feedback skips **before** counting toward the volume.
+3. Hand the list to `sales-sequence-draft`, which writes the texts and runs the **quality gate** (automatic mode — no approve queue; ⚠️ leads wait for Floor).
 
 ```text
 Batch pull contract
-- Source: Dutch HubSpot tasks · last ~30 days (not today-only) → NL companies + notes
-- Filter: never-contacted only (skip prior outbound email / logged outreach)
-- Cadence: multiple batches/day OK (default 2–3); re-runs are normal
-- Size: tens–hundreds; present in reviewable chunks (default 50)
-- Next: sales-sequence-draft (LinkedIn + 1 email from notes) → approve queue
-- Never: LinkedIn send outside Lemlist, other countries, rebuild lead-gen, force LinkedIn scrape on every company every batch, treat “already ran once” as done forever
+- Source: Dutch HubSpot tasks · newest first · up to 2 months back → NL companies + notes
+- Filter: never-contacted + do-not-contact (Definitely not / Unqualified) + not in any Lemlist campaign
+- Volume: 15/day first week, then 30/day (automatic mode)
+- Next: sales-sequence-draft (write + quality gate) → sales-lemlist-push
+- Never: LinkedIn send outside Lemlist, other countries, rebuild lead-gen, force LinkedIn scrape on every company every run, recycle already-contacted leads
 ```
 
-## Prefer live HubSpot via session tools
 
 Floor’s HubSpot is already connected to **her Claude**. In Cursor / Claude:
 
 1. Use the **HubSpot MCP / native HubSpot tools** available in **this user session**.
-2. Search **Tasks** (Dutch / NL) with a **~30-day lookback** when Floor says “batch”, “another batch”, or “today’s tasks”; else **Companies** in the Netherlands first, then Belgium if asked.
+2. Search **Tasks** (Dutch / NL) **newest first, up to 2 months back** when running the daily outreach or when Floor asks for a batch; else **Companies** in the Netherlands first, then Belgium if asked.
 3. For each candidate, confirm **never contacted** (no prior outbound email / logged outreach on contact or company).
 4. Read **company notes** (and company properties if notes are empty) for:
    - **why-good** — why this firm fits Willow
@@ -87,13 +80,13 @@ Web-app fallback (optional): `POST /api/hubspot { action: "sync" }` with mock mo
 
 0. **Load Floor feedback** from `.data/feedback.json` (or `skills/memory/FEEDBACK.md` / `GET /api/feedback`). Apply skip-company, prefer-title, ICP/geo notes, disqualifier patterns. Confirm in one line what memory is active.
 1. Confirm geo = NL primary, BE secondary; refuse lists that include other countries. For pilot batches, default **NL only** unless she includes BE.
-2. Via HubSpot tools, pull **Dutch tasks in the last ~30 days** in bulk (or list NL companies). Paginate / chunk (default show **50**).
-3. For each company/contact, **skip if already contacted** (prior outbound email or logged outreach). Also skip companies already drafted/sent earlier today.
+2. Via HubSpot tools, pull **Dutch tasks newest first, up to 2 months back** until the run’s volume is reached (or list NL companies).
+3. For each company/contact, **skip if already contacted** (prior outbound email or logged outreach), flagged do-not-contact, in any Lemlist campaign, or handled in an earlier run.
 4. For remaining companies, pull the latest **company note** (agent handoff). Prefer company-level over contact-only notes.
 5. Skip / flag **strong social presence** (Floor disqualifier) **and** any company named in active skip feedback.
 6. Present a short table: # · company · country · right contact · opener one-liner · why-good · presence · contacted? · feedback flags · task due (if any).
 7. Sort Netherlands first; preferred titles (from feedback) and highest ICP / freshest notes first.
-8. Ask Floor: **batch-draft all N** / select rows / next chunk / **run another batch later** → hand off to `sales-sequence-draft` **batch / approve-queue** mode.
+8. Hand off to `sales-sequence-draft` (write + quality gate). In automatic mode don’t ask Floor first; on a manual request, show the list if she asked to see it.
 9. If she steers (“skip that one forever”, “prefer Ops managers”) → invoke `sales-feedback-learn` before the next pull.
 
 ## Company note contract
@@ -121,9 +114,8 @@ CRM language is **English**. Outreach copy language is editable later.
 
 ## Done when
 
-- Floor sees a NL-first (or Dutch-tasks) list from the **~30-day** pool with note fields filled (or explicitly empty), sized for batch review.
+- A NL-first list from the **newest-first, ≤2-month** pool with note fields filled (or explicitly empty), sized to the run’s volume.
 - **Already-contacted** contacts/companies are absent from the draft set (shown only as skip reasons if useful).
 - Out-of-scope countries are absent.
 - Strong-presence firms are flagged skip.
-- Agent offers **another batch** / next chunk — does **not** imply the day is finished after one run.
-- Next action offered: **batch draft into approve queue** (`sales-sequence-draft`) — not send.
+- Handed to `sales-sequence-draft` for writing + the quality gate.

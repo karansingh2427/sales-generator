@@ -3,7 +3,7 @@
 Prototype for **Floor Hoefkens** (BDR @ [Willow](https://willow.co/)): **HubSpot company notes = preferred background** → agent **personalizes the full LinkedIn + email sequence** (LinkedIn **research** OK when notes are thin or she asks — not every run) → Floor **approves every line** → **Lemlist** sends LinkedIn + email → any reply stops the sequence → on interest, **Slack Floor** (with the conversation) so she **manually books Ludwig’s calendar**. Sales Nav CSV remains a fallback. Cursor/Claude **skills** ship alongside the Next.js UI.
 
 **Geography:** **Netherlands first**, Belgium second — **NL + BE only**.  
-**Channels:** **Lemlist (LinkedIn + email)** — profile visit → like latest post → invite → **one** personal email (all day 0, one after another) → LinkedIn message as soon as they accept → LinkedIn follow-up 2 days later; max **1** email, follow-ups on LinkedIn. Lemlist push is a **stub** until Lemlist is connected (its API needs a higher plan; Lemlist’s Claude connector is the preferred route); meanwhile the email goes via Gmail in Cowork and LinkedIn lines are held.  
+**Channels:** **Lemlist (LinkedIn + email)** — profile visit → like latest post → invite → **one** personal email (all day 0, one after another) → LinkedIn message as soon as they accept → LinkedIn follow-up 2 days later; max **1** email, follow-ups on LinkedIn. Live since 20 Nov 2026 as the Lemlist campaign “Willow NL pilot”, reached through Floor’s Lemlist Claude connector, in **[automatic mode](docs/AUTOMATIC-MODE.md)**. (The web app’s own Lemlist API push stays a stub — 402 on her plan.)  
 **Governance:** approve-before-send (pilot); **never auto-book** Calendar. **CRM language:** English writebacks. Prefer Floor’s Cowork **HubSpot + Gmail + Slack** connectors.
 
 ## For Floor
@@ -15,10 +15,9 @@ Prototype for **Floor Hoefkens** (BDR @ [Willow](https://willow.co/)): **HubSpot
 
 ### Floor first-run (short)
 
-1. Unzip → open folder in Cowork (HubSpot + Gmail connected).
-2. Paste the **one prompt** in `START-HERE-FLOOR.md` (senior voice + HubSpot tone + one story).
-3. `approve 1-20` → `Send approved emails via Gmail.`
-4. Replies → `Check my replies from the Dutch batch and handle them.` → BOOK NOW Slack you → you book Ludwig.
+1. Unzip → open the folder in Cowork (HubSpot, Lemlist, Slack, Gmail connected).
+2. Paste the **one setup message** in `START-HERE-FLOOR.md` once — it creates the 3 automatic tasks (08:00 outreach, hourly reply check, 08:50 update) and the Lemlist limits.
+3. After that it runs by itself ([automatic mode](docs/AUTOMATIC-MODE.md)); Floor handles ⚠️ leads, reads “today’s texts”, OKs replies and books Ludwig. Emergency stop: “Stop the automatic outreach”.
 
 ## Quick start
 
@@ -56,9 +55,9 @@ See **[docs/skills.md](./docs/skills.md)** for first-run steps.
 
 ## Sequences (Lemlist: LinkedIn + email)
 
-1. Pull Dutch HubSpot tasks from the **last ~30 days** (never-contacted only; 2–3 batches/day) + company notes (skill) — notes = background only.
+1. Every weekday 08:00: pull Dutch HubSpot tasks **newest first, up to 2 months back** (never-contacted, do-not-contact and Lemlist dedup; 15/day first week, then 30/day) + company notes — notes = background only.
 2. Personalize the full sequence for the person in the HubSpot note: profile visit + like latest post + invite note → one email → LinkedIn message (if accepted) → LinkedIn follow-up. Prefer HubSpot notes; LinkedIn research OK when thin / asked. No LinkedIn URL → just the email.
-3. Approve every line → Lemlist sends LinkedIn + email (stub until key; Gmail in Cowork for email meanwhile).
+3. **Quality gate** (replaces per-line approval since 20 Nov 2026) → passing leads go to the Lemlist campaign “Willow NL pilot” (max 20/day with LinkedIn steps); unsure ones get ⚠️ and wait for Floor.
 4. Any reply on either channel stops the sequence → classify → on interest Slack Floor → she books Ludwig.
 
 ## Demo booking (Slack → Floor → Ludwig)

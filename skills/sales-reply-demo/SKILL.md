@@ -139,7 +139,7 @@ For **every** handled reply:
 - Consistency phrasing: “haven’t been posting consistently” — never “I saw your post yesterday/Friday”.
 - One post does not kill the angle; skip frequent posters as leads (already handled upstream).
 - No em-dash spam; calm, short, oral. Match prospect language when they wrote in Dutch.
-- LinkedIn only via Lemlist (stub until connected). No auto-book.
+- LinkedIn only via Lemlist (Floor’s connector). Replies to prospects only after Floor’s OK. No auto-book.
 
 ## Prefer session tools
 

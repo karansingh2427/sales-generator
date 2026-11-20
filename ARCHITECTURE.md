@@ -1,7 +1,7 @@
 # Architecture
 
 Sales Generator is a **BDR workflow OS** for Willow: sync HubSpot **company notes as background**,
-**personalize full LinkedIn + email sequences** from those notes (no re-scrape), approve every line → Lemlist sends them, stop on any reply,
+**personalize full LinkedIn + email sequences** from those notes (no re-scrape), quality-check them (⚠️ = wait for Floor) → Lemlist sends them automatically, stop on any reply,
 Slack Floor on interest so she books Ludwig — with governance docs and a **skill pack**.
 **Netherlands first**, Belgium second, NL+BE only. **LinkedIn + email via Lemlist (stub until key; Gmail fallback for email meanwhile).**
 
@@ -38,7 +38,7 @@ sales-feedback-learn / .data/feedback.json  (tone / “how I write”)
         ↓
 sales-hubspot-pull / /api/hubspot (Dutch tasks · NL first)
         ↓
-sales-sequence-draft  (visit + like + invite · 1 email · 2 LinkedIn messages, from note · approve queue)
+sales-sequence-draft  (visit + like + invite · 1 email · 2 LinkedIn messages, from note · quality gate)
         ↓
 sales-lemlist-push (LinkedIn + email · stub)  ·  sales-gmail-send (email fallback until Lemlist is live)
         ↓  any reply on either channel → stop sequence

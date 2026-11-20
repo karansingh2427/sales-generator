@@ -1,6 +1,6 @@
 ---
 name: sales-lemlist-push
-description: After Floor approves every written line, add the lead and its approved copy to the Lemlist pilot campaign; Lemlist visits the profile, likes the latest post, sends the invite, the one email and the LinkedIn messages, and stops on reply. Prefer Lemlist's Claude connector in Cowork; the web-app API route is a stub.
+description: Add quality-gate-passed leads (automatic mode) and their 5 texts to the running Lemlist campaign "Willow NL pilot" via Floor's Lemlist Claude connector — max 20/day with LinkedIn steps, read back after every change, never another campaign, stop conditions + "Stop the automatic outreach". Web-app API route is a stub (402 on her plan).
 ---
 
 # sales-lemlist-push
@@ -24,9 +24,12 @@ Floor’s workspace has **~183 campaigns**, including a **running** one (“Floo
 - Never delete campaigns, leads or steps. Never change senders or settings.
 - **Read back before you claim.** After every Lemlist change, re-read the campaign (lead count, each lead’s variables, steps) and report what Lemlist actually shows — never what you expect. Before launch, confirm every lead has all five variables filled with Floor-approved text and nothing else is in the campaign.
 - **LinkedIn URL must be a profile link** (`linkedin.com/in/…`). Sales Navigator links (`linkedin.com/sales/…`) don’t work for Lemlist’s LinkedIn steps — find the normal profile link, or add the lead without a LinkedIn URL (email-only branch) and say so.
+- **Volume:** max **20 new leads/day with LinkedIn steps** (Lemlist limits: invites 10/day ramping to 20, visits 25, messages 25; window Mon–Fri 09:00–17:30). Extra leads that day go in without a LinkedIn URL (email-only).
+- **Stop conditions:** if Floor’s email or LinkedIn sender is disconnected, Lemlist shows errors or bounces, or anything looks off — add nothing, Slack Floor.
+- **“Stop the automatic outreach”** → pause the morning task and the campaign “Willow NL pilot” immediately.
 - **Launching** happens only after Floor types it in words (“Launch the campaign …”). Never tell her to press a button labelled Launch; if a UI step is needed, name it exactly (e.g. “the Launch *tab* at the top — don’t press the blue button”).
 
-**Never tell Floor a step went out through Lemlist** unless the connector / API confirmed it. Say: “Approved and ready — it goes out once Lemlist is connected.” Meanwhile the email goes out via **`sales-gmail-send`** and the LinkedIn lines are held.
+**Never tell Floor a step went out through Lemlist** unless the connector confirmed it (read back). The campaign is **running** since 20 Nov 2026, so leads you add **start right away** within the sending window.
 
 ## The campaign (set up once)
 
@@ -49,7 +52,8 @@ Campaign steps are shared templates, so each written step is just a variable; ea
 
 Push one lead at a time, **once**, only when:
 
-- **every** non-skipped written line (invite note, email, both LinkedIn messages) is **approved** — the automatic visit/like need no approval,
+- the lead **passed the quality gate** (`sales-sequence-draft`), or Floor approved it after it was held as ⚠️ — **never add a ⚠️ lead on your own**,
+- all 5 texts are filled (`connectNote`, `emailSubject`, `emailBody`, `linkedinMessage`, `linkedinFollowup`),
 - the lead has an email address,
 - nothing in the sequence was already sent (e.g. the email via the Gmail fallback),
 - the sequence hasn’t stopped on a reply.
@@ -73,7 +77,7 @@ Lemlist’s HubSpot integration can log sends and replies. If Floor turns it on,
 ## Guardrail
 
 ```text
-approve EVERY written line → one push to Lemlist (connector first; web app = stub)
+quality gate passed (⚠️ → Floor) → one push to “Willow NL pilot” via the connector (web app = stub) → read back
   → d0 visit · like · invite · email → msg as soon as they accept → follow-up +2 days
   → reply on either channel → Lemlist stops it → record_reply → sales-reply-demo
 ```

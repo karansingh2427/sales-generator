@@ -2,7 +2,7 @@
 
 | Task ID | Trigger | Steps | Done when |
 |---|---|---|---|
-| T-HS-01 | CRM notes ready | HubSpot panel → Sync **or** skill `sales-hubspot-pull` | Dutch tasks **last ~30d** + never-contacted only + company notes; NL-first; multi-batch OK |
+| T-HS-01 | CRM notes ready | HubSpot panel → Sync **or** skill `sales-hubspot-pull` | Dutch tasks **newest first, ≤2 months** + never-contacted + do-not-contact + company notes; NL-first; multi-batch OK |
 | T-SEQ-01 | High-ICP Dutch HubSpot lead | `sales-sequence-draft` → Generate | Visit + like + invite → 1 email → LinkedIn message + follow-up, personalized from note |
 | T-SEQ-02 | Review touch | Edit → Approve → `sales-lemlist-push` (all lines; Gmail fallback for email) → Mark sent | Step `sent`; lead `contacted` |
 | T-SEQ-03 | Invite accepted, no reply | Lemlist sends the LinkedIn message as soon as they accept, then the follow-up 2 days later | Max 1 email; follow-ups on LinkedIn |
@@ -23,13 +23,13 @@
 
 | Task ID | Skill | Notes |
 |---|---|---|
-| A-01 | `sales-hubspot-pull` | Dutch tasks last ~30d + never-contacted + notes (multi-batch/day) |
-| A-02 | `sales-sequence-draft` | Personalize invite + 1 email + 2 LinkedIn messages from note; approve queue |
+| A-01 | `sales-hubspot-pull` | Dutch tasks newest first ≤2 months + never-contacted + do-not-contact + Lemlist dedup |
+| A-02 | `sales-sequence-draft` | Personalize invite + 1 email + 2 LinkedIn messages from note; quality gate (⚠️ = wait for Floor) |
 | A-03 | `sales-gmail-send` | Send approved email steps via Gmail; hand replies to reply-demo |
 | A-03b | `sales-lemlist-push` | Push fully approved lead + copy to Lemlist (stub until API key) |
 | A-04 | `sales-reply-demo` | Classify replies; BOOK NOW → 2 slots + Slack Floor |
 | A-05 | `sales-demo-book` | Slack Floor + conversation; she books Ludwig |
-| A-06 | `sales-lead-run` | Orchestrates A-01 → A-02 → A-03 → A-04 → A-05 (loads feedback first; 2–3 batches/day) |
+| A-06 | `sales-lead-run` | Orchestrates A-01 → A-02 → A-03 → A-04 → A-05 (automatic weekday 08:00 run; see docs/AUTOMATIC-MODE.md) |
 | A-08 | `sales-lead-run` re-batch | “Run another Dutch batch now” | Fresh 30d never-contacted chunk; not one-shot |
 | A-07 | `sales-feedback-learn` | Tone / ICP memory |
 

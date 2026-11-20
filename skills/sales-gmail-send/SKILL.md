@@ -1,11 +1,11 @@
 ---
 name: sales-gmail-send
-description: Email fallback until Lemlist is connected — Gmail self-test, send the ONE approved email per lead via Gmail, log it in HubSpot. No email follow-ups (those happen on LinkedIn via Lemlist). Stop on reply → sales-reply-demo.
+description: Fallback only — if Lemlist's email sender is down. Gmail self-test, send the ONE email per lead via Gmail, log it in HubSpot. Not used in automatic mode (Lemlist sends the email). Never for a lead already in Lemlist.
 ---
 
 # sales-gmail-send
 
-**Email fallback until Lemlist is connected.** Send the **approved** email of each lead’s sequence through **Gmail** and **log it in HubSpot**. The sequence has **one email**; follow-ups happen on LinkedIn through Lemlist, never as extra emails.
+**Fallback only — not used in automatic mode.** Lemlist sends the email since 20 Nov 2026. Use this skill only if Floor’s email sender in Lemlist is down and she asks for it. Send the **approved** email of each lead’s sequence through **Gmail** and **log it in HubSpot**. The sequence has **one email**; follow-ups happen on LinkedIn through Lemlist, never as extra emails.
 
 Once Lemlist is live it sends the email itself (`sales-lemlist-push`) — **never** send a Lemlist lead’s email from Gmail too. LinkedIn steps are not this skill’s job (they are held until Lemlist is connected).
 

@@ -1,6 +1,6 @@
 ---
 name: sales-feedback-learn
-description: Persist Floor’s feedback on ICP, companies, tone, disqualifiers, geo, or sequence quality so the next Dutch batch HubSpot pull and approve-queue drafts apply it. Use when Floor says remember this feedback, teach the agent, skip companies that already post a lot / post frequently, prefer this title, never pitch X, or lists learned feedback to disable/delete.
+description: Persist Floor’s feedback on ICP, companies, tone, disqualifiers, geo, or sequence quality so the next automatic run (HubSpot pull and drafts) applies it. Use when Floor says remember this feedback, teach the agent, skip companies that already post a lot / post frequently, prefer this title, never pitch X, or lists learned feedback to disable/delete.
 ---
 
 # sales-feedback-learn
@@ -60,7 +60,7 @@ When **any** of these run, load active feedback first:
 ## Governance (hard)
 
 - Feedback **never** auto-sends LinkedIn or email.
-- Feedback does **not** bypass draft → approve queue → mark sent.
+- Feedback does **not** bypass the quality gate or the ⚠️ hold (automatic mode).
 - Feedback does **not** allow silent calendar auto-book.
 - Geo hard rule still wins: **Netherlands first**, Belgium second, **NL+BE only**.
 - CRM writebacks stay English.

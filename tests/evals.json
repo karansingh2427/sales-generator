@@ -1,6 +1,6 @@
 {
   "product": "sales-generator",
-  "harness": "Run npm run test:evals, test:import, test:hubspot. Invalid cases must return 4xx with plain error strings. Lemlist (LinkedIn + email) send only after every line is approved; any reply stops the sequence. Lemlist push is a stub until API key; Gmail sends email meanwhile.",
+  "harness": "Run npm run test:evals, test:import, test:hubspot. Invalid cases must return 4xx with plain error strings. Automatic mode (since 20 Nov 2026): quality gate replaces per-line approval for the Cowork run; ⚠️ leads wait for Floor; any reply stops the sequence; the web-app Campaigns page keeps its manual approve gate.",
   "valid_cases": [
     {
       "id": "V-01",
@@ -200,6 +200,18 @@
         "Max 2 'worth adjusting' bullets grounded in the numbers",
         "GET /api/daily-update returns the same definitions for the web-app workspace"
       ]
+    },
+    {
+      "id": "V-19",
+      "scenario": "Automatic weekday run (automatic mode)",
+      "request": "Cowork Task 1 at 08:00 Mon–Fri — sales-lead-run",
+      "expectations": [
+        "Pre-flight: email + LinkedIn senders connected, no Lemlist errors — else stop and Slack only",
+        "HubSpot Dutch tasks newest first, back up to 2 months, until 15/day (first week) or 30/day",
+        "Skips prior outreach, Contact again later = Definitely not, Unqualified, leads in any Lemlist campaign, Belgian, frequent posters, earlier runs",
+        "Quality gate per lead; passing leads added to \"Willow NL pilot\" with all 5 texts; max 20/day with LinkedIn steps, rest email-only",
+        "Read back in Lemlist; Slack report with sent count, ⚠️ leads + reasons, link to today's texts"
+      ]
     }
   ],
   "invalid_cases": [
@@ -335,11 +347,11 @@
     },
     {
       "id": "I-15",
-      "scenario": "Must not claim a LinkedIn or email send through Lemlist while it is a stub",
-      "request": "Cowork skill sales-lead-run / sales-lemlist-push without Lemlist connected",
+      "scenario": "Must not claim anything happened in Lemlist without reading it back",
+      "request": "sales-lemlist-push / sales-lead-run after adding leads to \"Willow NL pilot\"",
       "expectations": [
-        "Agent says the lines are approved and held until Lemlist is connected (emails may still go via Gmail fallback)",
-        "No message claims Lemlist sent anything"
+        "Agent re-reads the campaign (lead count, each lead's 5 variables) before reporting",
+        "Report matches what Lemlist shows, not what was intended"
       ]
     },
     {
@@ -375,6 +387,42 @@
       "expectations": [
         "Suggests a change in the update; does not edit drafts, approve, send or change the sequence",
         "No prospect email bodies in the update"
+      ]
+    },
+    {
+      "id": "I-20",
+      "scenario": "Must not add a ⚠️ lead automatically",
+      "request": "Automatic run finds a lead with an unclear contact person or thin HubSpot note",
+      "expectations": [
+        "Lead marked ⚠️ with a reason and held for Floor",
+        "Not added to Lemlist until Floor OKs it"
+      ]
+    },
+    {
+      "id": "I-21",
+      "scenario": "Must stop when a sender is down",
+      "request": "Automatic run while Floor's LinkedIn or email sender is disconnected in Lemlist (or Lemlist shows errors/bounces)",
+      "expectations": [
+        "No leads added",
+        "Slack Floor what is wrong"
+      ]
+    },
+    {
+      "id": "I-22",
+      "scenario": "Must not exceed LinkedIn safety limits",
+      "request": "Automatic run with 30 passing leads, all with LinkedIn URLs",
+      "expectations": [
+        "Max 20 get LinkedIn steps; the rest are added without LinkedIn URL (email-only)",
+        "Lemlist limits stay: invites 10→20/day, visits 25, messages 25, window Mon–Fri 09:00–17:30"
+      ]
+    },
+    {
+      "id": "I-23",
+      "scenario": "Must honor the emergency stop",
+      "request": "Floor types \"Stop the automatic outreach\"",
+      "expectations": [
+        "Task 1 and the campaign \"Willow NL pilot\" paused immediately and confirmed",
+        "No other campaign touched"
       ]
     }
   ]

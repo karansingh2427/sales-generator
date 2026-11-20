@@ -12,22 +12,22 @@
 
 ## Consent & automation
 
-- **Approve every line → Lemlist send** — Floor must **approve** each LinkedIn and email step; then the lead + its approved copy go to **Lemlist** (`sales-lemlist-push`, stub until API key), which sends LinkedIn + email. Until then email goes via **Gmail** (`sales-gmail-send`). No other LinkedIn automation.
+- **Automatic mode (Floor’s decision, 20 Nov 2026)** — the morning task adds quality-gate-passed leads to “Willow NL pilot” without per-line approval; uncertain leads get ⚠️ and wait for Floor; stop conditions + the “Stop the automatic outreach” phrase pause everything. Replies still need her OK. Spec: [AUTOMATIC-MODE.md](AUTOMATIC-MODE.md).
 - **Stop on reply** — a reply on LinkedIn or email skips every remaining step on both channels.
 - HubSpot notes are **background only**; personalize the full sequence from the note — **no re-scrape**.
-- Unattended send without approve stays out until Willow policy + explicit OK.
+- Unattended send is allowed **only** within automatic mode’s guardrails (quality gate, ⚠️ hold, LinkedIn limits, stop conditions). Floor reviews “today’s texts” and can stop it anytime.
 - **No silent HubSpot write storms** — stage push is explicit; sync is operator-triggered.
 - **No silent CSV import** — Sales Nav commit requires human-selected rows.
 - Skills prefer **session HubSpot MCP/tools**; do not require embedding a private-app token in the web app.
-- **Feedback learning** applies skip/prefer/tone on later runs but **never** auto-sends and never bypasses approve-before-send.
-- **Batch cadence:** 2–3 Dutch batches/day is normal; pulls use a **~30-day** HubSpot task lookback and **never-contacted** filter (skip prior outbound/logged outreach).
+- **Feedback learning** applies skip/prefer/tone on later runs but never bypasses the quality gate or the ⚠️ hold.
+- **Cadence:** weekday 08:00 automatic run; HubSpot tasks newest first up to **2 months** back; **never-contacted** + do-not-contact filters; Lemlist dedup across all campaigns.
 - Future auto-sequences require documented opt-in and unsubscribe (EU GDPR; NL + BE book).
 - **CRM language:** HubSpot writebacks English-only; outreach drafts may be edited freely.
 
 ## Model use
 
 - Default: deterministic templates in `outreach-engine.ts` + `sequence-engine.ts` (auditable).
-- Skills: prose drafts following RULES; human approve still required.
+- Skills: prose drafts following RULES; the quality gate replaces per-line approval in automatic mode; ⚠️ leads need Floor.
 - Optional: `OPENAI_API_KEY` + `useLiveModel: true` reserved for v2.
 
 ## Threat model (this slice)

@@ -63,7 +63,7 @@ That runs `sales-feedback-learn` and saves structured memory (category, target, 
 | Outreach draft | Same skip + never-pitch |
 | `sales-lead-run` | Loads memory in preflight, shows digest, then pull → draft → book |
 
-**Still required:** you approve every message, send it yourself, then mark sent. Feedback does **not** unlock auto-send.
+**Still true in automatic mode:** feedback changes how Claude writes and which leads it picks, but it never bypasses the quality gate or the ⚠️ hold.
 
 ---
 

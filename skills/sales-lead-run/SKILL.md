@@ -1,92 +1,59 @@
 ---
 name: sales-lead-run
-description: Floor Dutch LinkedIn + email pass (Lemlist; Gmail fallback) — multi-batch day (2–3×), 30-day HubSpot lookback, never-contacted only, Gmail self-test, one story, visit + like + invite → ONE email → 2 LinkedIn messages, HubSpot email log after every send, reply→demo classifier. Approve every line → Lemlist (LinkedIn + email, stub until connected; Gmail for email meanwhile). Re-runs are normal; never treat “already ran once” as done forever.
+description: Floor's automatic daily outreach run (Task 1, weekdays 08:00 Amsterdam) — Dutch HubSpot tasks newest first up to 2 months back, never-contacted + do-not-contact + Lemlist dedup, write visit/like/invite → ONE email → 2 LinkedIn messages, quality gate (⚠️ = hold for Floor), add passing leads to Lemlist "Willow NL pilot" (max 20/day with LinkedIn), read back, Slack report. Stop conditions + "Stop the automatic outreach".
 ---
 
 # sales-lead-run
 
-Floor follows `START-HERE-FLOOR.md`. Follow-ups auto-scheduled; **every lead email logged in HubSpot**. Replies → `sales-reply-demo`.
+**Automatic mode (default since 20 Nov 2026, Floor’s decision).** Full spec: [docs/AUTOMATIC-MODE.md](../../docs/AUTOMATIC-MODE.md). Floor sets it up once with the single message in `START-HERE-FLOOR.md`; after that it runs by itself.
 
-**Cadence:** default **2–3 batches per day**. Each paste or schedule fire is a full new pass — not a one-shot.
+## The run (Task 1 — Mon–Fri 08:00 Europe/Amsterdam)
 
-## End vision
+| Step | Skill | What |
+|---|---|---|
+| 0 | — | **Pre-flight:** Floor’s email + LinkedIn are connected as senders on “Willow NL pilot”, no Lemlist errors/bounces. Otherwise **stop** → Slack Floor, add nothing. |
+| 1 | `sales-feedback-learn` | Load active feedback (tone, skips, never-pitch). |
+| 2 | `sales-hubspot-pull` | Dutch HubSpot tasks **newest first** — today, yesterday, … up to **2 months** back — until the day’s volume: **15/day the first week, then 30/day**. Skip prior outreach, Contact again later = “Definitely not”, Lead Status = “Unqualified”, anyone in **any** Lemlist campaign, Belgian leads, frequent posters, anyone handled before. |
+| 3 | `sales-sequence-draft` | Write invite note · ONE email (Floor’s signature) · LinkedIn message · LinkedIn follow-up for the decision maker — one story. |
+| 4 | `sales-sequence-draft` | **Quality gate.** Pass → step 5. Unsure → **⚠️** with a reason, held for Floor. |
+| 5 | `sales-lemlist-push` | Add passing leads to **“Willow NL pilot”** with all 5 texts and start them. **Max 20/day with LinkedIn steps**; the rest without LinkedIn URL (email-only). Never another campaign. |
+| 6 | `sales-lemlist-push` | **Read back** in Lemlist: every new lead has all 5 texts; pause any lead that doesn’t. |
+| 7 | — | Save `approve-queue/<date>-auto.md` (all texts) and **Slack Floor** the report (digest below). |
 
-| | |
-|---|---|
-| **Step 0** | Gmail self-test to her own inbox (once per new machine / connector — skip if already proven) |
-| **Input** | Dutch HubSpot tasks from **last ~30 days** + notes (trust notes — **no** live LinkedIn check every run) |
-| **Filter** | **Never-contacted only** — skip prior outbound email / logged HubSpot outreach |
-| **Cadence** | **2–3 batches/day**; re-runs normal; never “already ran once → done forever” |
-| **Voice** | Sales pro 20+ years; match past HubSpot sent emails |
-| **Sequence** | One story · d0 visit profile → like latest post → invite (≤200 chars) → **one** email → LinkedIn message as soon as they accept → follow-up 2 days later · max **1** email · while Lemlist is a stub: LinkedIn lines approved + held, the email via Gmail on approve |
-| **Send** | Fully approved lead → `sales-lemlist-push` (LinkedIn + email) · until Lemlist is live: email → `sales-gmail-send` |
-| **Consistency** | Phrase “haven’t been posting consistently” — never “saw your post Friday”; one post ≠ consistent; skip **frequent** posters |
-| **Schedule** | Lemlist runs the timing once connected; Cowork recurring for batch runs |
-| **HubSpot** | After every successful Gmail send → email engagement (dedup if already synced) |
-| **Replies** | `sales-reply-demo` — BOOK NOW / NOT YET / NO / CONFUSED (politeness ≠ intent) · Slack ping on every reply · hourly check Mon–Fri |
-| **Daily update** | `sales-daily-update` — Slack Floor Mon–Fri 09:00 (sent, replies + rate, demos, awaiting approval) |
-| **Stop** | Any reply stops the sequence · NO → close · BOOK NOW → Slack Floor + 2 Ludwig slots · CONFUSED → gracious, no demo · NOT YET → one value reply |
-| **Pilot** | Approve every written line (LinkedIn + email) before send · any reply stops everything |
+Fewer good leads than the target → send fewer and say why. Never pad with weak leads.
 
-## Invoke in order
+## Other Cowork tasks (set up by the same START-HERE message)
 
-0. **Gmail self-test** — own inbox only; no leads; no HubSpot log needed. Skip if Floor already confirmed send works on this machine.
-1. **CRM style** — past HubSpot sent emails + feedback (ignore retracted “soften not-posting if recent post”).
-2. **`sales-hubspot-pull`** — Dutch tasks **last ~30 days**; **never-contacted only**; skip Belgian; skip frequent / strong-presence posters; exclude already drafted/sent earlier today.
-3. **`sales-sequence-draft`** — one story · visit/like/invite → 1 email → 2 LinkedIn messages → approve queue.
-4. **`sales-lemlist-push`** (connector first) — push fully approved leads · until Lemlist is live: **`sales-gmail-send`** sends the one email → **HubSpot log**.
-5. **`sales-reply-demo`** — pull inbound replies → classify → **Slack ping Floor on every reply** → draft/act → BOOK NOW → Template R + 2 slots (`sales-demo-book`); never auto-book.
-6. **Offer next batch** — after the queue is handled, remind Floor she can run **another batch now** or wait for the next scheduled run (target 2–3×/day). Do **not** close as if the day is finished.
+- **Task 2 — reply check**, hourly 08:00–18:00: `sales-reply-demo` (Slack per reply; replies to prospects only after Floor’s OK).
+- **Task 3 — daily update**, 08:50: `sales-daily-update`.
 
-## Prompts (START-HERE)
+## Floor’s commands
 
-**Step 0:**
+- `show me the ⚠️ leads` → list held leads with reasons; on her OK, add them via `sales-lemlist-push`.
+- `show me today's texts` → today’s `approve-queue/<date>-auto.md`.
+- `Run another batch now` / `Write 5 more leads` → an extra run with the same rules.
+- **`Stop the automatic outreach`** → immediately pause Task 1 **and** the campaign “Willow NL pilot”, then confirm. Resume only when she says so.
 
-> Send me one short test email via Gmail to my own inbox with subject “Willow Sales Generator test” and body “Gmail send works.” Don’t contact any leads yet.
+## LinkedIn safety
 
-**Batch (first run or any run):**
-
-> You are a sales pro with 20+ years experience. Read my past HubSpot sent emails for tone/format. Then batch up to 50 Dutch HubSpot tasks from the last ~30 days (not only today). Only include contacts/companies never contacted before — skip anyone with prior outbound email or logged outreach in HubSpot. For each, from the company note only, draft one personal multichannel sequence for the person in the note: Lemlist visits their LinkedIn profile and likes their latest post → connection request with a short note (≤200 characters) → right after: ONE personal email on why I’m reaching out (insight → one tension → soft Willow bridge → short CTA) → as soon as they accept: LinkedIn message (“I also sent you an email — connecting here because …”, one question) → 2 days later: LinkedIn follow-up. Only one email; the follow-ups are on LinkedIn. Consistency angle phrasing: “I see you haven’t been posting consistently” — never “I saw your post yesterday/Friday”. One post does not kill that angle. Skip frequent posters (bad lead). Don’t live-check LinkedIn every run — trust HubSpot notes. Until Lemlist is connected: send the approved email from Gmail and hold the LinkedIn lines. After every send, log it in HubSpot on the contact (skip if already synced). Stop on any reply, LinkedIn or email (no/interest → Slack me; if confused / don’t get the point → short gracious reply, log HubSpot, no demo). Show approve queue. Do not send yet. Skip Belgian leads. This is one batch of 2–3 today — running again later is normal; do not treat a prior run as done forever.
-
-**Run another batch now:**
-
-> Run another Dutch batch now (same rules): last ~30 days HubSpot tasks, never-contacted only, up to 50, skip anyone already in today’s earlier queues or with prior outbound/logged outreach. Draft approve queue. Do not send yet. Skip Belgian leads.
-
-**Schedule 2–3×/day (Cowork):**
-
-> Set this up to run about 2–3 times per day on a recurring schedule in Cowork (morning / midday / afternoon if you can). Each run should paste/execute the Dutch batch prompt above — fresh 30-day pull, never-contacted only, new approve queue. Do not stop after the first daily run. If Cowork scheduling UI differs, create recurring reminders that open this folder and run the batch prompt.
-
-**Replies:**
-
-> Check my replies from the Dutch batch and handle them.
-
-## Multi-batch day — agent must
-
-- Treat every invocation as a **new pull**, even if a batch already ran today.
-- Dedup against: HubSpot prior outreach · earlier approve/sent queues today · active feedback skips.
-- After finishing a batch, **explicitly invite** “run another batch now” or note the next scheduled slot.
-- Never say or imply the daily job is complete after one batch unless the never-contacted 30-day pool is empty.
+Lemlist limits on Floor’s account: sending window Mon–Fri 09:00–17:30; invites 10/day ramping to 20/day; profile visits 25/day; messages 25/day. LinkedIn allows ~100 invites per rolling week — never more than 20 new LinkedIn leads a day.
 
 ## Never
 
-- Pull **today-only** tasks when the default 30-day pool is available.
-- Draft / send to contacts or companies with **prior outbound email or logged outreach**.
-- Treat “already ran once” as done for the day or forever.
-- Say “I saw your post yesterday/Friday” (or any single-post callout).
-- Treat one post as proof of consistent posting.
-- Live-check LinkedIn against notes on every batch.
-- Treat politeness / “sounds interesting” as BOOK NOW.
-- Push demo after NO or CONFUSED.
-- Auto-book Ludwig / Calendar.
-- Skip HubSpot logging after a successful lead send (unless dedup).
-- Ask Floor to remember follow-ups · vacancy → content calendar · more than 1 email · LinkedIn send outside Lemlist · claiming a send while Lemlist is a stub · sending a Lemlist lead’s emails from Gmail too · send before approve.
+- Add a ⚠️ lead without Floor’s OK, or add anyone when a stop condition is true.
+- Touch any Lemlist campaign other than “Willow NL pilot”, change senders, or delete anything.
+- Contact anyone with prior outreach, a do-not-contact flag, or a lead in any Lemlist campaign.
+- Send more than 1 email per lead · say “I saw your post yesterday/Friday” · pivot vacancy → content calendar.
+- Send a reply to a prospect without Floor’s OK · auto-book Ludwig / Calendar.
+- Claim something happened in Lemlist without reading it back.
 
-## Digest
+## Digest (Slack to Floor after each run)
 
 ```text
-# Sales lead run — <date> · batch <n> of day
-Lookback: last ~30d · Never-contacted kept: <n> · Skipped already-contacted: <n>
-Self-test: ok/skipped · Pushed to Lemlist: <n> · Email via Gmail fallback: <n> · HubSpot logged / dedup-skipped: <n>/<n>
-LinkedIn lines held for Lemlist: <n> · Replies handled (BOOK NOW / NOT YET / NO / CONFUSED): <n>/<n>/<n>/<n>
-Next: run another batch now · or next scheduled slot (target 2–3×/day)
+🚀 Outreach — <date>
+Sent to Lemlist: <n> (<n> with LinkedIn · <n> email-only)
+⚠️ Waiting for you: <n>
+  • <Name>, <Company> — <reason>
+Skipped: <n> already contacted · <n> do-not-contact · <n> in other Lemlist campaigns · <n> other
+Lookback used: back to <date> · Today's texts: approve-queue/<date>-auto.md
 ```

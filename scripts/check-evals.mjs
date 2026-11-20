@@ -88,6 +88,10 @@ if (!rules.includes("Lemlist") || !rules.includes("Stop on reply")) {
   console.error("RULES.md must define Lemlist channels and stop-on-reply");
   ok = false;
 }
+if (!agents.includes("AUTOMATIC-MODE") || !fs.existsSync(path.join(root, "docs/AUTOMATIC-MODE.md"))) {
+  console.error("AGENTS.md must point to docs/AUTOMATIC-MODE.md");
+  ok = false;
+}
 if (!agents.includes("sales-reply-demo")) {
   console.error("AGENTS.md must map sales-reply-demo");
   ok = false;
@@ -139,6 +143,11 @@ for (const required of [
   "V-17",
   "V-18",
   "I-19",
+  "V-19",
+  "I-20",
+  "I-21",
+  "I-22",
+  "I-23",
 ]) {
   if (!ids.includes(required)) {
     console.error(`Missing eval case ${required}`);

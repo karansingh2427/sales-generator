@@ -7,10 +7,12 @@
 
 Lead gen is already handled by an internal agent that writes **HubSpot company notes**. Floor cold-calls today; the Dutch pilot replaces that with **multichannel sequences: LinkedIn + email via Lemlist** (Willow took a Lemlist subscription — Floor, 2026-11-05; replaces the HeyReach plan of 2026-10-21; reference flow: the Reachium campaign page she shared). **HubSpot notes = background**; the agent **personalizes the full sequence from that note** (no LinkedIn/website re-scrape). Floor approves every line → Lemlist sends LinkedIn + email → any reply stops the sequence → on interest **Slack her** (with the conversation) so she **manually books Ludwig** — never auto-book.
 
+
+**Since 20 Nov 2026 the outreach runs in automatic mode** — see [AUTOMATIC-MODE.md](AUTOMATIC-MODE.md).
 ## Goals
 
-1. **HubSpot ingest** of Dutch tasks from the **last ~30 days** (not today-only) + **company-level** agent notes (why-good, opener, right contact) as **background** — hero path over Sales Nav CSV. **Never-contacted only** (skip prior outbound email / logged outreach). Default **2–3 batches/day** — re-runs are normal. Prefer **HubSpot + Gmail + Slack in Floor’s Cowork session**; web-app token is optional fallback.
-2. **Lemlist multichannel sequences:** profile visit → like latest post → invite → **one** personal email (all day 0, one after another) → LinkedIn message as soon as they accept → LinkedIn follow-up 2 days later; **max 1 email**, follow-ups on LinkedIn; personalize every written line from the HubSpot note for the person it names (often the CEO); **approve every line** → one push to Lemlist, which runs both channels; **any reply stops the sequence**. Lead without LinkedIn URL → just the email. Until Lemlist is connected, the email goes via Gmail in Cowork.
+1. **HubSpot ingest** of Dutch tasks, **newest first, up to 2 months back** + **company-level** agent notes (why-good, opener, right contact) as **background** — hero path over Sales Nav CSV. **Never-contacted only** (skip prior outreach, do-not-contact flags, anyone already in a Lemlist campaign). Prefer **HubSpot + Lemlist + Slack in Floor’s Cowork session**.
+2. **Lemlist multichannel sequences:** profile visit → like latest post → invite → **one** personal email (all day 0, one after another) → LinkedIn message as soon as they accept → LinkedIn follow-up 2 days later; **max 1 email**, follow-ups on LinkedIn; personalize every written line from the HubSpot note for the person it names (often the CEO); **quality gate** (automatic mode since 20 Nov 2026; ⚠️ leads wait for Floor) → one push to Lemlist, which runs both channels; **any reply stops the sequence**. Lead without LinkedIn URL → just the email.
 3. Encode opportunity angles from the note: consistency, content quality/mix, visibility, open vacancies — plus CRM opener/rationale.
 4. ICP: decision makers (Partner / Founder / Ops manager); verticals accountancy, legal, IT, HR/recruitment/exec search, coaching, expertise B2B; **skip strong social presence**; geo **Netherlands first**, Belgium second, **NL + BE only**.
 5. Keep Sales Nav CSV as **fallback** import.
@@ -32,9 +34,9 @@ Supersedes earlier Belgium-first defaults (Karandeep preference 2026-10-06).
 ## Non-goals (this turn)
 
 - LinkedIn automation outside Lemlist (direct LinkedIn API, browser bots).
-- Live Lemlist API call — **stubbed** until Willow's API key exists; the push returns the payload for review only.
+- Live Lemlist REST API call from the web app — **stub** (402 on Floor’s plan); the live path is Floor’s Lemlist Claude connector.
 - Re-scraping LinkedIn or company websites (notes are the only source).
-- Unattended send without approve (pilot keeps approve-before-send).
+- Unattended send **outside** automatic mode’s guardrails (no quality gate, no ⚠️ hold, no stop conditions).
 - Live Sales Nav API.
 - Auto-dialer or call recording / NL→EN call transcription (her existing path).
 - Multi-tenant auth.
@@ -50,14 +52,14 @@ Supersedes earlier Belgium-first defaults (Karandeep preference 2026-10-06).
 | RF-HS-03 | As Floor, stage labels map via configurable `HUBSPOT_STAGE_MAP` | Includes Demo Booked → Completed / Rescheduled / Cancelled |
 | RF-HS-04 | As Floor, HubSpot writebacks stay English | Stage push uses English labels |
 | RF-SEQ-01 | As Floor, I get a personal LinkedIn + email sequence from a HubSpot note | Visit + like + invite → 1 email → LinkedIn message (if accepted) → LinkedIn follow-up; no re-scrape |
-| RF-SEQ-02 | As Floor, I approve every line, then Lemlist sends | Cannot push until every line is approved; Lemlist sends LinkedIn + email (stub until key; Gmail in Cowork meanwhile) |
+| RF-SEQ-02 | As Floor, outreach runs automatically every weekday | 08:00 task finds 15→30 leads, quality-gates them, adds passing ones to “Willow NL pilot”, Slacks a report; ⚠️ leads wait for me; “Stop the automatic outreach” pauses everything |
 | RF-SEQ-04 | As Floor, a reply on either channel stops the sequence | `record_reply` skips all remaining LinkedIn + email steps |
 | RF-SEQ-03 | As Floor, strong social presence leads are skipped/DQ | Sync flags; sequence generate rejects DQ |
 | RF-SK-01 | As Floor, I run `sales-hubspot-pull` / `sales-sequence-draft` / `sales-demo-book` from Cursor | Skills present under `skills/`; AGENTS.md maps them |
 | RF-FB-01 | As Floor, I submit feedback via UI form or “remember this feedback” | Entry persisted with category, target, text, timestamp, source |
 | RF-FB-02 | As Floor, next HubSpot pull / sequence draft applies active feedback | Skip company / prefer title / never pitch / tone reflected |
 | RF-FB-03 | As Floor, I see learned feedback and can disable/delete | Feedback tab list; disable keeps history |
-| RF-FB-04 | As Floor, feedback never auto-sends | Approve-before-send still required |
+| RF-FB-04 | As Floor, feedback never weakens the safeguards | Feedback never bypasses the quality gate or the ⚠️ hold |
 | RF-01 | As Floor, I still import Sales Nav CSV (fallback) | Preview defaults to **NL + BE**; human select-before-commit |
 | RF-04 | As Floor, I get a Slack demo handoff then book Ludwig | Slack includes conversation; Floor books Ludwig manually; stage → demo_booked after confirm |
 | RF-04b | As Floor, agents never auto-book Calendar | No Calendar create-event; template instructs manual Ludwig book |
@@ -70,7 +72,7 @@ Supersedes earlier Belgium-first defaults (Karandeep preference 2026-10-06).
 - Sequences **personalize from company notes only** (no re-scrape).
 - Lists stay **NL-first / NL+BE only**.
 - Demo handoff = Slack Floor (with conversation) → she books Ludwig; never auto-book.
-- Every step approved before Lemlist / Gmail send.
+- Every lead passes the quality gate (or Floor’s OK for ⚠️) before Lemlist sends.
 - Zero PII committed to git.
 - Skills usable in Floor’s HubSpot + Gmail + Slack Cowork session.
 
@@ -82,5 +84,5 @@ Supersedes earlier Belgium-first defaults (Karandeep preference 2026-10-06).
 - **Lemlist plan:** the API key works but the API answers 402 (“available starting emailPro plan”); LinkedIn steps need the **Multichannel** plan — or use Lemlist’s Claude connector in Cowork if it covers adding leads with variables.
 - Pipeline name + stages **before** Demo Booked.
 - Property names if structured company props differ from defaults.
-- Explicit OK to drop approve-before-send later (Willow policy).
+- ~~Explicit OK to drop approve-before-send~~ — given by Floor on 20 Nov 2026 (automatic mode, see AUTOMATIC-MODE.md).
 - Email outreach language(s) (CRM is EN; calls are NL).

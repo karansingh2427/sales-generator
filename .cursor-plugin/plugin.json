@@ -1,26 +1,45 @@
 {
   "name": "sales-generator",
-  "version": "0.6.0",
-  "description": "Willow BDR skill pack for Floor Hoefkens: HubSpot company-note pull (Netherlands first), LinkedIn + email sequences via Lemlist with approve-every-line (Gmail fallback for email until Lemlist is connected), reply→demo classifier (BOOK NOW / NOT YET / NO / CONFUSED) with a Slack ping on every reply, a weekday 09:00 Slack outreach update, Slack→Ludwig demo handoff, and feedback learning. No LinkedIn automation outside Lemlist.",
-  "author": { "name": "Karandeep Singh" },
+  "version": "0.7.0",
+  "description": "Willow BDR skill pack for Floor Hoefkens: HubSpot company-note pull (Netherlands first), fully automatic LinkedIn + email outreach via Lemlist (quality gate, ⚠️ leads wait for Floor), reply→demo classifier (BOOK NOW / NOT YET / NO / CONFUSED) with a Slack ping on every reply, a weekday 09:00 Slack outreach update, Slack→Ludwig demo handoff, and feedback learning. No LinkedIn automation outside Lemlist.",
+  "author": {
+    "name": "Karandeep Singh"
+  },
   "homepage": "https://github.com/karansingh2427/sales-generator",
   "repository": "https://github.com/karansingh2427/sales-generator",
   "license": "MIT",
-  "keywords": ["sales", "hubspot", "lemlist", "linkedin", "gmail", "bdr", "willow", "netherlands", "belgium", "skills", "feedback"],
+  "keywords": [
+    "sales",
+    "hubspot",
+    "lemlist",
+    "linkedin",
+    "gmail",
+    "bdr",
+    "willow",
+    "netherlands",
+    "belgium",
+    "skills",
+    "feedback"
+  ],
   "skills": "./skills/",
   "interface": {
     "displayName": "Sales Generator",
     "shortDescription": "NL-first HubSpot pull, Lemlist LinkedIn + email sequences, reply→demo, Slack→Ludwig",
-    "longDescription": "Pull Netherlands-first HubSpot company notes, draft LinkedIn + email sequences with human approve on every line, push them to Lemlist (stub until API key; Gmail sends email meanwhile), classify inbound replies (BOOK NOW / NOT YET / NO / CONFUSED), Slack Floor on BOOK NOW so she books Ludwig manually, and remember Floor’s ICP/company/tone feedback. Geography locked to the Netherlands (primary) and Belgium (secondary) only. No LinkedIn automation outside Lemlist. Never auto-book calendar.",
+    "longDescription": "Pull Netherlands-first HubSpot company notes, write LinkedIn + email sequences, quality-check them and add passing leads to Lemlist automatically every weekday (⚠️ leads wait for Floor; “Stop the automatic outreach” pauses everything), classify inbound replies (BOOK NOW / NOT YET / NO / CONFUSED), Slack Floor on BOOK NOW so she books Ludwig manually, and remember Floor’s ICP/company/tone feedback. Geography locked to the Netherlands (primary) and Belgium (secondary) only. No LinkedIn automation outside Lemlist. Never auto-book calendar.",
     "developerName": "Karandeep Singh",
     "category": "Productivity",
-    "capabilities": ["Interactive", "Read", "Write"],
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
     "defaultPrompt": [
-      "Batch 50 Dutch HubSpot tasks, draft Gmail email sequences, show approve queue. Do not send yet. Skip Belgian leads.",
-      "approve 1-20",
-      "Send approved emails via Gmail.",
-      "Check my replies from the Dutch batch and handle them.",
-      "Remember this feedback: skip company X / prefer Partner titles."
+      "show me the ⚠️ leads",
+      "show me today's texts",
+      "Give me my outreach update.",
+      "Check my replies and handle them.",
+      "Remember this feedback: skip company X / prefer Partner titles.",
+      "Stop the automatic outreach"
     ],
     "websiteURL": "https://github.com/karansingh2427/sales-generator",
     "brandColor": "#0F766E",

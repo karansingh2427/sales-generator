@@ -16,7 +16,7 @@ Your lead-gen agent already drops **company notes** in HubSpot. Those notes are 
 4. Interest → Claude **Slacks you** with the conversation → **you book Ludwig**  
 5. Teach tone with **feedback** (“remember how I write”)
 
-Pilot: approve every line before anything sends. LinkedIn + email go via Lemlist once connected (Gmail for email until then). Nothing auto-books Calendar.
+Live (since 20 Nov 2026): automatic mode — Claude quality-checks every lead and Lemlist sends LinkedIn + email; ⚠️ leads wait for you. Replies need your OK. Nothing auto-books Calendar.
 
 ---
 

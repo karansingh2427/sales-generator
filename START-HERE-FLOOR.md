@@ -1,33 +1,44 @@
-# Floor — start here (your computer only)
+# Floor — start here
 
-No GitHub. Unzip on **your** computer → open **that** folder in Claude Cowork.
+Open **this folder** in **Claude Cowork** (HubSpot, Lemlist, Slack and Gmail connected). Then copy the whole block below and paste it into Claude **once**. That sets everything up — after that it runs by itself.
 
-**Cadence:** run **2–3 batches per day**. One run is never “done forever.”
+```
+Set up my fully automatic outreach. I've decided: it runs by itself — no approval needed from me, except for leads marked ⚠️. Update existing Cowork tasks instead of creating duplicates. All times Amsterdam, Monday to Friday only.
 
-1. Unzip `sales-generator-for-floor.zip` on your Mac → open **that folder** in **Claude Cowork** (HubSpot + Gmail connected).
-2. **Step 0 — Gmail self-test** (once per machine; check your inbox):
+TASK 1 — Morning outreach, every weekday at 08:00
+This week 15 leads per day, from next Monday 30 per day.
+1) Find new leads from my Dutch HubSpot tasks: today's first, then yesterday's, going back day by day up to 2 months.
+2) Only people never contacted before: skip "Contact again later = Definitely not" and "Unqualified" in HubSpot, anyone who is a lead in ANY Lemlist campaign, Belgian leads, people who post a lot, and anyone already handled before.
+3) For the decision maker named in the HubSpot note, write: a LinkedIn invite note (max 200 characters), ONE personal email with my signature, a LinkedIn message for after they accept, and a LinkedIn follow-up. Same story in all four. Normal LinkedIn profile links only (linkedin.com/in/...).
+4) Check every lead before it goes out: right person, all 5 texts filled, invite note under 200 characters, correct name and company everywhere, no made-up facts, never "I saw your post yesterday", no pitch that doesn't fit their story. Anything you're unsure about gets ⚠️ — those wait for me and are NOT added.
+5) Add all leads without ⚠️ to the Lemlist campaign "Willow NL pilot" with their 5 texts (connectNote, emailSubject, emailBody, linkedinMessage, linkedinFollowup) and start them. Max 20 per day get the LinkedIn steps; the others are added without a LinkedIn link so they only get the email. Never touch any other campaign.
+6) Re-check in Lemlist that every new lead has all 5 texts. If one is wrong, pause just that lead.
+7) Slack me: how many went out, which ⚠️ leads wait for me (name, company, why), and where I can read today's texts.
+STOP and only Slack me — add nothing — if my email or LinkedIn is disconnected in Lemlist, Lemlist shows errors or bounces, or something looks off.
 
-> Send me one short test email via Gmail to my own inbox with subject “Willow Sales Generator test” and body “Gmail send works.” Don’t contact any leads yet.
+TASK 2 — Reply check, every hour from 08:00 to 18:00
+Check replies on my "Willow NL pilot" leads (Lemlist inbox and Gmail) and the older pilot threads you already watch. For every new reply send me one short Slack message: who, LinkedIn or email, what they said, what kind of reply it is (book now / not yet / no / confused), what's next, and a draft answer. Never send a reply without my OK. If someone wants a demo, include 2 time slots — I book Ludwig myself. No message for out-of-office replies.
 
-3. Paste the **batch** prompt (any run — morning or later):
+TASK 3 — Daily update, every weekday at 08:50
+Slack me a short update: what went out since the last update, accepted invites, replies and reply percentage, demos booked, ⚠️ leads waiting for me, and 1–2 things I could improve.
 
-> You are a sales pro with 20+ years experience. Read my past HubSpot sent emails for tone/format. Then batch up to 50 Dutch HubSpot tasks from the last ~30 days (not only today). Only include contacts/companies never contacted before — skip anyone with prior outbound email or logged outreach in HubSpot. For each, from the company note only, draft one personal multichannel sequence for the person in the note: Lemlist visits their LinkedIn profile and likes their latest post → connection request with a short note (≤200 characters) → right after: ONE personal email on why I’m reaching out (insight → one tension → soft Willow bridge → short CTA) → as soon as they accept: LinkedIn message (“I also sent you an email — connecting here because …”, one question) → 2 days later: LinkedIn follow-up. Only one email; the follow-ups are on LinkedIn. Consistency angle phrasing: “I see you haven’t been posting consistently” — never “I saw your post yesterday/Friday”. One post does not kill that angle. Skip frequent posters (bad lead). Don’t live-check LinkedIn every run — trust HubSpot notes. Until Lemlist is connected: send the approved email from Gmail and hold the LinkedIn lines. After every send, log it in HubSpot on the contact (skip if already synced). Stop on any reply, LinkedIn or email (no/interest → Slack me; if confused / don’t get the point → short gracious reply, log HubSpot, no demo). Show approve queue. Do not send yet. Skip Belgian leads. This is one batch of 2–3 today — running again later is normal; do not treat a prior run as done forever.
+LEMLIST SETTINGS (only these, nothing else)
+Sending window Monday–Friday 09:00–17:30. LinkedIn invites 10 per day with ramp-up to 20 per day. Profile visits 25 per day. Messages 25 per day.
 
-4. Review → `approve 1-20` → `Send approved emails via Gmail.` (each send is logged in HubSpot)  
-   LinkedIn lines: approve them too — they go out via **Lemlist** once it’s connected (until then nothing is sent on LinkedIn).
+EMERGENCY STOP
+If I ever type "Stop the automatic outreach", immediately pause Task 1 and the campaign "Willow NL pilot", and confirm.
 
-5. **Run another batch now** (same day — paste anytime):
+When done: show me all 3 tasks and the Lemlist settings, then do one test run of Task 1 now.
+```
 
-> Run another Dutch batch now (same rules): last ~30 days HubSpot tasks, never-contacted only, up to 50, skip anyone already in today’s earlier queues or with prior outbound/logged outreach. Draft approve queue. Do not send yet. Skip Belgian leads.
+## After that — things you can type anytime
 
-6. **Schedule 2–3×/day in Cowork** (one-time setup):
+- `show me the ⚠️ leads` — handle the leads waiting for you
+- `show me today's texts` — read what went out (please do this the first weeks)
+- `Give me my outreach update.`
+- `Remember: …` — Claude learns it for next time
+- **`Stop the automatic outreach`** — emergency stop 🛑
 
-> Set this up to run about 2–3 times per day on a recurring schedule in Cowork (morning / midday / afternoon if you can). Each run should paste/execute the Dutch batch prompt above — fresh 30-day pull, never-contacted only, new approve queue. Do not stop after the first daily run. If Cowork scheduling UI differs, create recurring reminders that open this folder and run the batch prompt.
+Your laptop needs to be on with Claude open for the tasks to run. When someone wants a demo you get a Slack with 2 time slots — **you book Ludwig yourself**.
 
-7. **Reply pings + 9am update** (one-time setup — paste once):
-
-> Set up two recurring tasks in Cowork, Europe/Amsterdam time, Monday to Friday only. (1) Every hour from 08:00 to 18:00: “Check my replies from the Dutch batch and handle them.” — and Slack me one short message for every new reply (who, LinkedIn or email, what they said, the class, what’s next). (2) Every day at 09:00: “Give me my outreach update.” — Slack me a short update on what went out since the last one, replies and reply percentage, demos booked, what’s waiting for my approval, and 1–2 things worth adjusting.
-
-My laptop needs to be on with Claude open for these to run — if one was missed, it runs as soon as I’m back.
-
-8. Anytime: **“Check my replies from the Dutch batch and handle them.”** or **“Give me my outreach update.”**
+Details for Claude: [docs/AUTOMATIC-MODE.md](docs/AUTOMATIC-MODE.md).
