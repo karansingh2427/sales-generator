@@ -169,7 +169,7 @@ const reply = validateSequenceAction({ action: "record_reply", sequenceId: "s1",
 assert.equal(reply.ok, true);
 assert.equal(validateSequenceAction({ action: "record_reply", sequenceId: "s1", channel: "sms" }).ok, false);
 
-// Daily 09:00 update (Europe/Amsterdam): window, counts, reply rate
+// Daily 08:30 update (Europe/Amsterdam): window, counts, reply rate
 const tue = new Date("2026-11-17T08:00:00Z"); // Tue 09:00 CET
 const mon = new Date("2026-11-16T08:00:00Z"); // Mon 09:00 CET
 assert.equal(updateWindowStart(tue).toISOString(), "2026-11-16T08:00:00.000Z", "since yesterday 09:00");
@@ -198,10 +198,12 @@ assert.equal(du.replies.total, 1);
 assert.equal(du.replies.linkedin, 1);
 assert.equal(du.replies.leads[0].firm, els.firmName);
 assert.deepEqual(du.pilot, { contacted: 2, replied: 1, replyRate: 50 });
+assert.deepEqual(du.campaign, { invites: 1, emails: 2, linkedinMessages: 1, replies: 1 }, "campaign so far counts every send");
+assert.ok(du.text.includes("Campaign so far: 1 LinkedIn messages"), "update shows the campaign so far");
 assert.equal(du.awaitingApproval, 2, "drafts waiting, replied lead excluded");
 assert.equal(du.demosBooked, 1);
 assert.ok(du.text.includes("Outreach update — Tue 17 Nov (since yesterday)"));
-assert.ok(du.text.includes("Pilot so far: 2 contacted · 1 replied (50%)"));
+assert.ok(du.text.includes("2 leads contacted · 1 replied (50%)"));
 assert.ok(buildDailyUpdate(duState, mon).text.includes("since Friday"));
 assert.equal(buildDailyUpdate({ leads: [], sequences: [], bookings: [] }, tue).pilot.replyRate, 0, "no divide-by-zero");
 

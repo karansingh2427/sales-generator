@@ -10,7 +10,7 @@ The live campaign is **“Willow NL pilot”** in Lemlist (launched 20 Nov 2026)
 |---|---|---|
 | **1 · Morning outreach** | 08:00 | Find, write, check, add to Lemlist, Slack a report |
 | **2 · Reply check** | hourly 08:00–18:00 | Slack Floor once per new reply + draft answer (`sales-reply-demo`) |
-| **3 · Daily update** | 08:50 | Short Slack update (`sales-daily-update`) |
+| **3 · Daily update** | 08:30 | Short Slack update (`sales-daily-update`) |
 
 Cowork runs only while Floor’s laptop is on with Claude open; a missed run happens when she’s back.
 

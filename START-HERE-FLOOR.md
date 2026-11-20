@@ -19,8 +19,13 @@ STOP and only Slack me — add nothing — if my email or LinkedIn is disconnect
 TASK 2 — Reply check, every hour from 08:00 to 18:00
 Check replies on my "Willow NL pilot" leads (Lemlist inbox and Gmail) and the older pilot threads you already watch. For every new reply send me one short Slack message: who, LinkedIn or email, what they said, what kind of reply it is (book now / not yet / no / confused), what's next, and a draft answer. Never send a reply without my OK. If someone wants a demo, include 2 time slots — I book Ludwig myself. No message for out-of-office replies.
 
-TASK 3 — Daily update, every weekday at 08:50
-Slack me a short update: what went out since the last update, accepted invites, replies and reply percentage, demos booked, ⚠️ leads waiting for me, and 1–2 things I could improve.
+TASK 3 — Daily campaign update, every weekday at 08:30
+Slack me a short update of "Willow NL pilot", with numbers from Lemlist:
+- Since yesterday (on Monday: since Friday): LinkedIn invites, LinkedIn messages, emails sent, replies.
+- Campaign so far: LinkedIn invites + accepted, LinkedIn messages, emails, replies (LinkedIn / email) and reply percentage, demos booked.
+- What's working and what's not (which story or message gets replies, which doesn't) — only from real numbers, say "too early to tell" if there are too few.
+- 1 suggestion to improve that I can answer yes or no to.
+- ⚠️ leads waiting for me.
 
 LEMLIST SETTINGS (only these, nothing else)
 Sending window Monday–Friday 09:00–17:30. LinkedIn invites 10 per day with ramp-up to 20 per day. Profile visits 25 per day. Messages 25 per day.

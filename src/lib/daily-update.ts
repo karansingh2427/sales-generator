@@ -1,8 +1,10 @@
 import type { OutreachSequence, ReplyChannel, WorkspaceState } from "@/types/sales";
 
 /**
- * Floor's weekday 09:00 (Europe/Amsterdam) update: what went out since the last
- * update, replies, reply rate, what waits for her approval — short enough for Slack.
+ * Floor's weekday 08:30 (Europe/Amsterdam) update: what went out since the last
+ * update, the campaign so far (LinkedIn, email, replies), reply rate, what waits
+ * for her — short enough for Slack. The Cowork skill adds what works / what doesn't
+ * and one suggestion from the Lemlist numbers.
  * Invite acceptance lives in Lemlist; the Cowork skill adds it once Lemlist is connected.
  */
 
@@ -12,6 +14,8 @@ export type DailyUpdate = {
   from: string;
   to: string;
   sent: { invites: number; emails: number; linkedinMessages: number };
+  /** Campaign so far — every step ever sent, not just since the last update. */
+  campaign: { invites: number; emails: number; linkedinMessages: number; replies: number };
   replies: { total: number; linkedin: number; email: number; leads: { firm: string; contact: string; channel: ReplyChannel }[] };
   pilot: { contacted: number; replied: number; replyRate: number };
   awaitingApproval: number;
@@ -51,12 +55,16 @@ export function buildDailyUpdate(
   const leadById = new Map(state.leads.map((l) => [l.id, l]));
 
   const sent = { invites: 0, emails: 0, linkedinMessages: 0 };
+  const total = { invites: 0, emails: 0, linkedinMessages: 0 };
   for (const seq of state.sequences) {
     for (const s of seq.steps) {
-      if (s.status !== "sent" || !inWindow(s.sentAt, from, now)) continue;
-      if (s.kind === "linkedin_connect") sent.invites += 1;
-      else if (s.kind === "email") sent.emails += 1;
-      else if (s.kind === "linkedin_message" || s.kind === "linkedin_followup") sent.linkedinMessages += 1;
+      if (s.status !== "sent") continue;
+      const buckets = inWindow(s.sentAt, from, now) ? [sent, total] : [total];
+      for (const b of buckets) {
+        if (s.kind === "linkedin_connect") b.invites += 1;
+        else if (s.kind === "email") b.emails += 1;
+        else if (s.kind === "linkedin_message" || s.kind === "linkedin_followup") b.linkedinMessages += 1;
+      }
     }
   }
 
@@ -81,6 +89,7 @@ export function buildDailyUpdate(
     from: from.toISOString(),
     to: now.toISOString(),
     sent,
+    campaign: { ...total, replies: repliedTotal },
     replies: {
       total: replied.length,
       linkedin: replyLeads.filter((r) => r.channel === "linkedin").length,
@@ -107,7 +116,8 @@ export function formatDailyUpdate(u: Omit<DailyUpdate, "text">, now: Date): stri
     `Sent: ${u.sent.invites} invites · ${u.sent.emails} emails · ${u.sent.linkedinMessages} LinkedIn messages`,
     `Replies: ${u.replies.total}${u.replies.total ? ` (${u.replies.linkedin} LinkedIn · ${u.replies.email} email)` : ""}`,
     ...u.replies.leads.map((r) => `  • ${r.contact ? `${r.contact}, ` : ""}${r.firm} — ${r.channel}`),
-    `Pilot so far: ${u.pilot.contacted} contacted · ${u.pilot.replied} replied (${u.pilot.replyRate}%)`,
+    `Campaign so far: ${u.campaign.linkedinMessages} LinkedIn messages · ${u.campaign.invites} invites · ${u.campaign.emails} emails · ${u.campaign.replies} replies`,
+    `  ${u.pilot.contacted} leads contacted · ${u.pilot.replied} replied (${u.pilot.replyRate}%)`,
     `Demos booked: ${u.demosBooked} · Waiting for your approval: ${u.awaitingApproval} leads`,
   ];
   return lines.join("\n");

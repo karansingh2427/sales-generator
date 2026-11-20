@@ -34,7 +34,7 @@ Plugin skills live under `skills/` (see [`.cursor-plugin/plugin.json`](.cursor-p
 | `sales-gmail-send` | [skills/sales-gmail-send/SKILL.md](skills/sales-gmail-send/SKILL.md) | Gmail fallback only if Lemlist’s email sender is down — not used in automatic mode |
 | `sales-lemlist-push` | [skills/sales-lemlist-push/SKILL.md](skills/sales-lemlist-push/SKILL.md) | Add quality-checked leads + their 5 texts to “Willow NL pilot” via the Lemlist connector (web-app API = stub) |
 | `sales-reply-demo` | [skills/sales-reply-demo/SKILL.md](skills/sales-reply-demo/SKILL.md) | Dutch-batch Gmail + LinkedIn replies → BOOK NOW / NOT YET / NO / CONFUSED; **Slack ping Floor on every reply** (hourly check, Mon–Fri) |
-| `sales-daily-update` | [skills/sales-daily-update/SKILL.md](skills/sales-daily-update/SKILL.md) | Mon–Fri 08:50 Europe/Amsterdam — short Slack update: sent, replies + reply rate, demos, awaiting approval, what to adjust |
+| `sales-daily-update` | [skills/sales-daily-update/SKILL.md](skills/sales-daily-update/SKILL.md) | Mon–Fri 08:30 Europe/Amsterdam — short Slack update: sent, replies + reply rate, demos, awaiting approval, what to adjust |
 | `sales-demo-book` | [skills/sales-demo-book/SKILL.md](skills/sales-demo-book/SKILL.md) | Slack Floor + conversation → she books Ludwig; never auto-create events |
 | `sales-feedback-learn` | [skills/sales-feedback-learn/SKILL.md](skills/sales-feedback-learn/SKILL.md) | “Remember: …” — applied on next Dutch batch pull/drafts |
 | `sales-lead-run` | [skills/sales-lead-run/SKILL.md](skills/sales-lead-run/SKILL.md) | Orchestrate batch pass (2–3×/day) + Lemlist send (Gmail fallback) + reply→demo + demo handoff |

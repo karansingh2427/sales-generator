@@ -16,7 +16,7 @@ Prototype for **Floor Hoefkens** (BDR @ [Willow](https://willow.co/)): **HubSpot
 ### Floor first-run (short)
 
 1. Unzip → open the folder in Cowork (HubSpot, Lemlist, Slack, Gmail connected).
-2. Paste the **one setup message** in `START-HERE-FLOOR.md` once — it creates the 3 automatic tasks (08:00 outreach, hourly reply check, 08:50 update) and the Lemlist limits.
+2. Paste the **one setup message** in `START-HERE-FLOOR.md` once — it creates the 3 automatic tasks (08:00 outreach, hourly reply check, 08:30 update) and the Lemlist limits.
 3. After that it runs by itself ([automatic mode](docs/AUTOMATIC-MODE.md)); Floor handles ⚠️ leads, reads “today’s texts”, OKs replies and books Ludwig. Emergency stop: “Stop the automatic outreach”.
 
 ## Quick start

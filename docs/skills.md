@@ -14,7 +14,7 @@
 ## Floor first-run
 
 1. Cowork session with **HubSpot + Lemlist + Slack + Gmail** connected.
-2. Paste the **one setup message** in `START-HERE-FLOOR.md` once — it creates the 08:00 outreach task, the hourly reply check and the 08:50 update, and sets the Lemlist limits.
+2. Paste the **one setup message** in `START-HERE-FLOOR.md` once — it creates the 08:00 outreach task, the hourly reply check and the 08:30 update, and sets the Lemlist limits.
 3. From then on it runs by itself ([automatic mode](AUTOMATIC-MODE.md)). Floor: `show me the ⚠️ leads`, `show me today's texts`, OK replies, book Ludwig.
 4. **“Remember how I write: …”** anytime. Emergency stop: **“Stop the automatic outreach”**.
 

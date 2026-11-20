@@ -25,7 +25,7 @@ Fewer good leads than the target → send fewer and say why. Never pad with weak
 ## Other Cowork tasks (set up by the same START-HERE message)
 
 - **Task 2 — reply check**, hourly 08:00–18:00: `sales-reply-demo` (Slack per reply; replies to prospects only after Floor’s OK).
-- **Task 3 — daily update**, 08:50: `sales-daily-update`.
+- **Task 3 — daily update**, 08:30: `sales-daily-update`.
 
 ## Floor’s commands
 
